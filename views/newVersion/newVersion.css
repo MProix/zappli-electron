@@ -1,0 +1,31 @@
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+body>div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#message{
+    color: white;
+}
+a{
+    color: white;
+}
+a:hover{
+    color: rgb(185, 185, 243);
+}
+#dontShow{
+    color: white;
+    text-decoration: underline;
+}
+#dontShow:hover{
+    color: rgb(185, 185, 243);
+    cursor: pointer;
+}
