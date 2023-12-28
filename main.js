@@ -6,16 +6,23 @@ const os = require("os")
 const path = require("path")
 const https = require('https')
 const pjson = require('./package.json');
+const { autoUpdater, AppUpdater } = require("electron-updater")
+
 let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
 const nodeDiskInfo = require('node-disk-info')
 let autresDisques = []
 let userStoragePath = app.getPath("userData")
 console.log(userStoragePath)
 
+const newVersion = ""
+
 /////////////////////////////////////////////////
 
-/////////////////
-/////////////////
+// basic flags
+
+autoUpdater.autoDownload = false
+autoUpdater.autoInstallOnAppQuit = true
+
 /////////////////
 try {
     const disks = nodeDiskInfo.getDiskInfoSync();
@@ -82,8 +89,18 @@ app.whenReady().then(() => {
         mainWindow.send('store-data', dossiersRacineUtilisateur)
         console.log("autresdisques", autresDisques)
         mainWindow.send('autres-disques', autresDisques)
+        mainWindow.send('version', app.getVersion())
     })
+    autoUpdater.checkForUpdates()
 })
+/////////////// setting auto-updater 
+
+/* new update available */
+autoUpdater.on("update-available", (info) => {
+    console.log("il y a une nouvelle version")
+    newVersion = "Nouvelle version disponible"
+})
+
 
 // ================= NOTIFICATION DE BUREAU (inutile pour le moment) ======================= //
 
