@@ -1,8 +1,33 @@
 const { ipcRenderer } = require('electron');
 
-/* const openWindow = (evt) => {
-    ipcRenderer.send("newWindow", evt.target.id);
-}; */
+// ===================== On précharge les dossiers principaux
+
+ipcRenderer.on('store-data', (evt, data) => {
+    appendSubfolders('#mainUl', data);
+
+})
+ipcRenderer.on('version', (evt, arg) => {
+    console.log(arg)
+});
+ipcRenderer.on('autres-disques', (evt, arg) => {
+    console.log(arg);
+    if (arg.length != 0) {
+        $("#mainUl").append("<hr>");
+        if (arg.length == 1) {
+            $("#mainUl").append(
+                '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up ' + arg[0][2] + '" id="' + arg[0][1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + arg[0][0] + '</span></label></li>'
+            );
+        } else {
+            for (let elt of arg) {
+                console.log(elt);
+                $("#mainUl").append(
+                    '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up ' + elt[2] + '" id="' + elt[1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + elt[0] + '</span></label></li>'
+                );
+            };
+        }
+
+    }
+})
 
 // Ouverture des sous-menus en cliquant sur les icônes de la colonne de gauche
 $(".option").on("click", function () {
@@ -19,12 +44,6 @@ $(".option").on("click", function () {
 $("#cards").on("click", function () {
     $('.optionText').removeClass('index');
 });
-
-// ===================== On précharge les dossiers principaux
-
-ipcRenderer.on('store-data', (evt, data) => {
-    appendSubfolders('#mainUl', data);
-})
 
 // ===================== Le bouton play ===================== //
 
@@ -88,7 +107,7 @@ function appendSubfolders(location, liste) {
     for (let elt of liste) {
         //console.log(elt);
         $(location).append(
-            '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up' + elt[2] + '" id="' + elt[1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + elt[0] + '</span></label></li>'
+            '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up ' + elt[2] + '" id="' + elt[1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + elt[0] + '</span></label></li>'
         );
     };
 };

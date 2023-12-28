@@ -1,21 +1,22 @@
 {
   "name": "zappli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Une application pour générer des tirages aléatoires à partir de votre propre banque d'images.",
   "repository": "https://github.com/MProix/zappli-electron",
-  "publish": {
-    "provider": "github",
-    "releaseType": "release"
-  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "package": "electron-packager .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dist": "electron-builder",
+    "dist": "electron-builder -p always",
     "postinstall": "install-app-deps"
   },
   "build": {
+    "publish": {
+      "provider": "github",
+      "owner": "MProix",
+      "repo": "zappli-electron"
+    },
     "appId": "com.lesZexpertsFLE.zappli",
     "dmg": {
       "contents": [
@@ -56,6 +57,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.0",
     "diskinfo": "^0.0.3",
+    "electron-log": "^5.0.2",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.7",
     "jquery": "^3.7.1",

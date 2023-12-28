@@ -6,7 +6,7 @@ const os = require("os")
 const path = require("path")
 const https = require('https')
 const pjson = require('./package.json');
-const { autoUpdater, AppUpdater } = require("electron-updater")
+const { autoUpdater } = require("electron-updater")
 
 let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
 const nodeDiskInfo = require('node-disk-info')
@@ -17,6 +17,11 @@ console.log(userStoragePath)
 const newVersion = ""
 
 /////////////////////////////////////////////////
+const log = require("electron-log")
+log.transports.file.resolvePathFn = () => path.join(__dirname,'main.log');
+log.info("hello, log")
+log.warn("some problem appears")
+log.log("Application version : "+ app.getVersion())
 
 // basic flags
 
@@ -91,16 +96,27 @@ app.whenReady().then(() => {
         mainWindow.send('autres-disques', autresDisques)
         mainWindow.send('version', app.getVersion())
     })
-    autoUpdater.checkForUpdates()
+    autoUpdater.checkForUpdatesAndNotify()
 })
 /////////////// setting auto-updater 
 
 /* new update available */
 autoUpdater.on("update-available", (info) => {
-    console.log("il y a une nouvelle version")
+    log.info("il y a une nouvelle version", info)
     newVersion = "Nouvelle version disponible"
 })
-
+autoUpdater.on("checking-for-update",()=>{
+    log.info("checking for updates")
+})
+autoUpdater.on("download-progress",(progress)=>{
+    log.info(progress)
+})
+autoUpdater.on("update-downloaded",()=>{
+    log.info("update-downloaded")
+})
+autoUpdater.on("error", () => {
+    log.info("error when updating")
+})
 
 // ================= NOTIFICATION DE BUREAU (inutile pour le moment) ======================= //
 
