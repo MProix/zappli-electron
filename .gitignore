@@ -1,0 +1,5 @@
+node_modules
+dist
+views/newVersion
+views/notification
+yarn.lock
