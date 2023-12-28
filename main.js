@@ -1,46 +1,57 @@
-const { app, BrowserWindow, ipcMain, Menu } = require("electron"),
+const { app, BrowserWindow, ipcMain, Menu, Notification, nativeImage } = require("electron"),
     Store = require("electron-store"),
-    store = new Store();
+    store = new Store()
 const fs = require('fs')
 const os = require("os")
 const path = require("path")
 const https = require('https')
 const pjson = require('./package.json');
-const { isNull } = require("util");
 let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
+const nodeDiskInfo = require('node-disk-info')
+let autresDisques = []
+let userStoragePath = app.getPath("userData")
+console.log(userStoragePath)
+
+/////////////////////////////////////////////////
+
+/////////////////
+/////////////////
+/////////////////
+try {
+    const disks = nodeDiskInfo.getDiskInfoSync();
+    for (let disk of disks) {
+        if (disk.mounted != "C:") {
+            autresDisques.push([disk.mounted, disk.mounted, disk.filesystem])
+        }
+    }
+} catch (e) {
+    console.error(e);
+}
+//////////////////////
+//////////////////////
+//////////////////////
+
 //console.log(app.getPath("userData"))
 // ================ variables globales stockées ================ //
 
+checkUrl()
 let mainWindow = null
 let newVersionWin = null
 var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff"]
 //let disquesSysteme = [['Disque C','C:'],['Disque D','D:'],['Disque F','F:']]
 const userHomeDirectory = os.homedir()
-let writeDir = "uploads1"
-if (fs.existsSync(path.join(__dirname, "public", writeDir))) {
-    erraseFilesAndCopyNews(path.join(__dirname, "public", writeDir))
-} else {
-    fs.mkdirSync(path.join(__dirname, "public", writeDir))
-    fs.chmodSync(path.join(__dirname, "public", writeDir), 0o777)
-}
-let erraseDir = "uploads2"
-if (fs.existsSync(path.join(__dirname, "public", erraseDir))) {
-    erraseFilesAndCopyNews(path.join(__dirname, "public", erraseDir))
-} else {
-    fs.mkdirSync(path.join(__dirname, "public", erraseDir))
-    fs.chmodSync(path.join(__dirname, "public", erraseDir), 0o777)
-}
-if (fs.existsSync(path.join(__dirname, "public", "historique"))) {
+
+if (fs.existsSync(path.join(userStoragePath, "historique"))) {
     //console.log("nettoyage")
-    erraseFilesAndCopyNews(path.join(__dirname, "public", "historique"))
+    erraseFilesAndCopyNews(path.join(userStoragePath, "historique"))
 } else {
-    fs.mkdirSync(path.join(__dirname, "public", "historique"))
-    fs.chmodSync(path.join(__dirname, "public", "historique"), 0o777)
+    fs.mkdirSync(path.join(userStoragePath, "historique"))
+    fs.chmodSync(path.join(userStoragePath, "historique"), 0o777)
 }
 
 var historiqueNum = 1
 
-let disquesSysteme = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory)
+let dossiersRacineUtilisateur = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory)
 
 // ================ NOUVELLE FENETRE D'APPLI ================ //
 
@@ -68,11 +79,23 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
 app.whenReady().then(() => {
     mainWindow = createWindow("views/home/home.html")
     mainWindow.webContents.once('did-finish-load', () => {
-        mainWindow.send('store-data', disquesSysteme)
+        mainWindow.send('store-data', dossiersRacineUtilisateur)
+        console.log("autresdisques", autresDisques)
+        mainWindow.send('autres-disques', autresDisques)
     })
-    checkUrl()
-    checkNewInfo()
 })
+
+// ================= NOTIFICATION DE BUREAU (inutile pour le moment) ======================= //
+
+function showDesktopNotification(title, body, imgPath, textButton) {
+    const notification = new Notification({
+        title: title,
+        body: body,
+        icon: nativeImage.createFromPath(imgPath),
+        closeButtonText: textButton
+    })
+    notification.show()
+}
 
 // =============== ROUTE BOUTON PLAY ===================
 
@@ -80,7 +103,7 @@ ipcMain.on('getDraw', (evt, arg) => {
     var listeOfImages = choosePertinentFiles(arg["listeDossiers"])
     var data = shuffleFolder(listeOfImages, arg["nombreImages"])
     //on crée un fichier d'historique
-    fs.writeFileSync(path.join(__dirname, "public", "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0]))
+    fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0]))
     evt.sender.send('giveDraw', data)
 })
 
@@ -89,7 +112,7 @@ ipcMain.on('getDraw', (evt, arg) => {
 ipcMain.on('getPreviousDraw', (evt, arg) => {
     historiqueNum = historiqueNum - 2
     //console.log(historiqueNum)
-    data = JSON.parse(fs.readFileSync(path.join(__dirname, "public", "historique", "historique" + historiqueNum + ".json")))
+    data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json")))
     historiqueNum += 1
     evt.sender.send('givePreviousDraw', [data, historiqueNum - 1])
 })
@@ -124,7 +147,7 @@ ipcMain.handle('changeImage', async (evt, arg) => {
     var erreur = ""
     historiqueNum = historiqueNum - 1
     //console.log("historique :",historiqueNum)
-    var histList = JSON.parse(fs.readFileSync(path.join(__dirname, "public", "historique", "historique" + historiqueNum + ".json"), "utf-8"))
+    var histList = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), "utf-8"))
     var listComp = []
     for (let elt of histList) {
         listComp.push(elt[0])
@@ -151,7 +174,7 @@ ipcMain.handle('changeImage', async (evt, arg) => {
     //console.log("NouvelleImage : ",newImage)
     //console.log("Erreur : ",erreur)
     //console.log("On en est là dans l'historique : ", historiqueNum)
-    fs.writeFileSync(path.join(__dirname, "public", "historique", "historique" + historiqueNum + ".json"), JSON.stringify(histList))
+    fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), JSON.stringify(histList))
     historiqueNum += 1
     return { "nouvelleImage": newImage, "erreur": erreur, "index": index, "historique": historiqueNum - 1 }
 })
@@ -215,13 +238,14 @@ function shuffleFolder(listeImages, num) {
     if (listeImagesChoisies == 0) {
         error = "Sélectionnez d'abord un dossier contenant des images (couleur verte) en cochant la case devant son nom."
     }
-    if (0 < listeImagesChoisies.length && listeImagesChoisies.length < num) {
+    else if (0 < listeImagesChoisies.length && listeImagesChoisies.length < num) {
         // console.log("pas assez d'images")
         error = "Ce dossier ne contient que " + listeImagesChoisies.length + " image(s) !"
+    } else {
+        var max = listeImages.length
+        //on incrémente les noms de fichiers de l'historique
+        historiqueNum = historiqueNum + 1
     }
-    max = listeImages.length
-    //on incrémente les noms de fichiers de l'historique
-    historiqueNum = historiqueNum + 1
     return [listeImagesChoisies, error, max, historiqueNum - 1]
 }
 
@@ -247,39 +271,47 @@ function checkUrl() {
         res.on("end", () => {
             try {
                 checkedUrl = JSON.parse(body);
+                //console.log("checkedurl", checkedUrl)
                 store.set("distantConfig", checkedUrl.config)
+                checkNewInfo()
             } catch (error) {
                 console.error(error.message);
             };
         });
 
     }).on("error", (error) => {
+        //console.log("localconfig", localConfig)
+        store.set("distantConfig", localConfig)
         console.error(error.message);
     });
 }
 
 function setConfig() {
-    console.log("pas de config")
+    //console.log("pas de config")
     store.set("localConfig", {
         "version": pjson.version,
-        "URL":"https://www.proix.eu/zapplis/superzappli.json"
+        "URL": "https://www.proix.eu/zapplis/superzappli.json"
     })
 }
 
-function checkNewInfo(){
-    console.log(store.get("localConfig"))
-    console.log(store.get("distantConfig"))
-    if(store.get("localConfig").version != store.get("distantConfig").version){
-        var message = "Nouvelle version disponible"
+function checkNewInfo() {
+    //console.log(store.get("dontShowVersion"))
+    //console.log(store.get("localConfig"))
+    //console.log(store.get("distantConfig"))
+    if (store.get("localConfig").version != store.get("distantConfig").version) {
+        var message = "Nouvelle version disponible : "
         var url = "https://www.eglise-ostwald-elsau-montagneverte.fr/wp-content/uploads/2023/01/Semaine-du-28-janvier-au-05-fevrier-2023.pdf"
         var version = store.get("distantConfig").version
-        console.log("versions différentes")
-        newVersionWin = createWindow("views/newVersion/newVersion.html",400,300)
-        newVersionWin.webContents.once('did-finish-load', () => {
-            newVersionWin.send('store-data', {"message":message,"url":url, "version":version})
-        })
-    }else{
-        console.log("mêmes versions")
+        //console.log("versions différentes")
+        if (store.get("distantConfig").version != store.get("dontShowVersion")) {
+            newVersionWin = createWindow("views/newVersion/newVersion.html", 400, 300)
+            newVersionWin.webContents.once('did-finish-load', () => {
+                newVersionWin.send('store-data', { "message": message, "url": url, "version": version })
+            })
+        }
+
+    } else {
+        //console.log("mêmes versions")
     }
 }
 ////////////// config menu /////////////////
@@ -292,7 +324,7 @@ const templateMenu = [
                 label: 'Choisir dossier',
                 accelerator: "CommandOrControl+F",
                 click() {
-                    for(let elt of document.getElementsByClassName("optionText")){
+                    for (let elt of document.getElementsByClassName("optionText")) {
                         elt.classList.remove("index")
                     }
                     document.getElementById("optionText2").classList.add("index")
@@ -344,7 +376,7 @@ const templateMenu = [
                     var data = { "listeDossiers": checkedFolders, "nombreImages": $("#cardsNumber").val() }
                     ipcRenderer.send('getDraw', data);
                     ipcRenderer.on('giveDraw', (evt, data) => {
-                        console.log("data", data);
+                        //console.log("data", data);
                         if (data[1] !== "") {
                             alert(data[1])
                         } else {
@@ -370,7 +402,10 @@ const templateMenu = [
 ///////////////////////////////// ROUTES ET FONCTIONS DE LA PAGE NEWVERSION /////////////////////////////////////////////
 
 ipcMain.on('dontShow', (evt, arg) => {
-    console.log("arg", arg)
-    let dontShowSaved = store.has("dontShow") ? store.get("dontShow") : store.set("dontShow",[])
-    //store.set("dontShow", arg)
+    //console.log("arg", arg)
+    store.set("dontShowVersion", arg)
+    newVersionWin.close()
+})
+ipcMain.on('plusTard', (evt, arg) => {
+    newVersionWin.close()
 })

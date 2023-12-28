@@ -265,7 +265,7 @@ ul{
 }
 .empty:hover{
     color: lightgrey;
-    cursor: not-allowed;
+    /*cursor: not-allowed;*/
 }
 .images{
     color: green;

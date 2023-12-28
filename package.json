@@ -1,24 +1,64 @@
 {
   "name": "zappli",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Une application pour générer des tirages aléatoires à partir de votre propre banque d'images.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "package": "electron-packager .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dist": "electron-builder",
+    "postinstall": "install-app-deps"
   },
-  "author": "",
-  "license": "ISC",
+  "build": {
+    "appId": "com.lesZexpertsFLE.zappli",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": [
+        "NSIS"
+      ],
+      "icon": "public/icon.ico"
+    },
+    "nsis": {
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico",
+      "license": "LICENSE",
+      "runAfterFinish": "true",
+      "deleteAppDataOnUninstall": "true"
+    }
+  },
+  "author": "Mélanie Proix - Les zexperts FLE",
+  "license": "GNU GPL",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.0",
     "diskinfo": "^0.0.3",
     "electron-store": "^8.1.0",
     "jquery": "^3.7.1",
+    "node-disk-info": "^1.3.0",
     "popper.js": "^1.16.1"
   },
   "devDependencies": {
     "electron": "^28.0.0",
-    "electron-packager": "^17.1.2"
+    "electron-builder": "^24.9.1",
+    "electron-updater": "^6.1.7"
   }
 }
