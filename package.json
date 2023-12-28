@@ -1,6 +1,6 @@
 {
   "name": "zappli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Une application pour générer des tirages aléatoires à partir de votre propre banque d'images.",
   "repository": "https://github.com/MProix/zappli-electron",
   "publish": {
