@@ -14,19 +14,11 @@ let autresDisques = []
 let userStoragePath = app.getPath("userData")
 console.log(userStoragePath)
 
-const newVersion = ""
-
-/////////////////////////////////////////////////
+////////////////////////////////////////////////
 const log = require("electron-log")
-log.transports.file.resolvePathFn = () => path.join(__dirname,'main.log');
-log.info("hello, log")
-log.warn("some problem appears")
+log.transports.file.resolvePathFn = () => path.join("C:/Users/melan/Desktop/zappli-electron",'main.log');
+log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : "+ app.getVersion())
-
-// basic flags
-
-autoUpdater.autoDownload = false
-autoUpdater.autoInstallOnAppQuit = true
 
 /////////////////
 try {
@@ -43,10 +35,9 @@ try {
 //////////////////////
 //////////////////////
 
-//console.log(app.getPath("userData"))
 // ================ variables globales stockées ================ //
 
-checkUrl()
+//checkUrl()
 let mainWindow = null
 let newVersionWin = null
 var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff"]
@@ -77,7 +68,9 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
             nodeIntegration: true,
             contextIsolation: false,
             "web-security": false
-        }
+        },
+        titleBarStyle: 'hidden'
+        //frame: true
     })
 
     win.loadFile(windowPath)
@@ -92,7 +85,6 @@ app.whenReady().then(() => {
     mainWindow = createWindow("views/home/home.html")
     mainWindow.webContents.once('did-finish-load', () => {
         mainWindow.send('store-data', dossiersRacineUtilisateur)
-        console.log("autresdisques", autresDisques)
         mainWindow.send('autres-disques', autresDisques)
         mainWindow.send('version', app.getVersion())
     })
@@ -101,12 +93,13 @@ app.whenReady().then(() => {
 /////////////// setting auto-updater 
 
 /* new update available */
+
 autoUpdater.on("update-available", (info) => {
     log.info("il y a une nouvelle version", info)
-    newVersion = "Nouvelle version disponible"
 })
-autoUpdater.on("checking-for-update",()=>{
+autoUpdater.on("checking-for-update",(info)=>{
     log.info("checking for updates")
+    log.info("INFOS : ", info)
 })
 autoUpdater.on("download-progress",(progress)=>{
     log.info(progress)
@@ -114,21 +107,10 @@ autoUpdater.on("download-progress",(progress)=>{
 autoUpdater.on("update-downloaded",()=>{
     log.info("update-downloaded")
 })
-autoUpdater.on("error", () => {
+autoUpdater.on("error", (info) => {
     log.info("error when updating")
+    log.warn(info)
 })
-
-// ================= NOTIFICATION DE BUREAU (inutile pour le moment) ======================= //
-
-function showDesktopNotification(title, body, imgPath, textButton) {
-    const notification = new Notification({
-        title: title,
-        body: body,
-        icon: nativeImage.createFromPath(imgPath),
-        closeButtonText: textButton
-    })
-    notification.show()
-}
 
 // =============== ROUTE BOUTON PLAY ===================
 
@@ -212,6 +194,23 @@ ipcMain.handle('changeImage', async (evt, arg) => {
     return { "nouvelleImage": newImage, "erreur": erreur, "index": index, "historique": historiqueNum - 1 }
 })
 
+// =============== ROUTES BOUTONS CLOSE MINIMIZE AND MAXIMIZE ===============
+
+ipcMain.on("closeApp", (evt, arg) => {
+    mainWindow.close()
+})
+ipcMain.on("minimizeApp", (evt, arg) => {
+    mainWindow.minimize()
+})
+ipcMain.on("maximizeRestoreApp", (evt, arg) => {
+    if(mainWindow.isMaximized()){
+        mainWindow.restore()
+        mainWindow.webContents.send("isRestored")
+    }else{
+        mainWindow.maximize()
+        mainWindow.webContents.send("isMaximized")
+    } 
+})
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
     var finalFoldersList = []

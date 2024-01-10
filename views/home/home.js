@@ -1,4 +1,5 @@
 const { ipcRenderer } = require('electron');
+var isLeftMenuActive = false;
 
 // ===================== On précharge les dossiers principaux
 
@@ -196,3 +197,42 @@ function imgSize(num) {
     })
 }
 
+$("#close").on("click", () => {
+    ipcRenderer.send('closeApp');
+});
+$("#minimize").on("click", () => {
+    ipcRenderer.send('minimizeApp');
+});
+$("#maxRes").on("click", () => {
+    ipcRenderer.send('maximizeRestoreApp');
+});
+
+function changeMaxResBtn(isMaximizedApp){
+    if(isMaximizedApp){
+        $("#maxRes").attr('title',"Restaurer");
+        $("#maxRes").removeClass("maximize");
+        $("#maxRes").addClass("restore");
+    }else{
+        $("#maxRes").attr("title","Agrandir");
+        $("#maxRes").removeClass("restore");
+        $("#maxRes").addClass("maximize");
+    }
+}
+ipcRenderer.on("isMaximized", () => { changeMaxResBtn(true) });
+ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) });
+
+$("#showHideMenus").on("click", () => {
+    if(isLeftMenuActive){
+        $("#monMenu").css("opacity","0");
+        isLeftMenuActive = false;
+    }else{
+        $("#monMenu").css("opacity","1");
+        isLeftMenuActive = true;
+    }
+})
+$("#container").on("click", (e) => {
+    if(e.target.id != "showHideMenus" && isLeftMenuActive){
+        $("#monMenu").css("opacity","0");
+        isLeftMenuActive = false;
+    }
+})

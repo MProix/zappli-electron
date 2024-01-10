@@ -15,8 +15,19 @@
 
 <body>
     <div id="container">
-        <div id="mainMenu"><i class="fa-solid fa-circle-info"></i></div>
-        <div id="header"></div>
+        <div id="mainMenu"><!--<i class="fa-solid fa-circle-info"></i>--></div>
+        <div id="header">
+            <div class="titleBar">
+                <button id="showHideMenus" class="toggleButton"></button>
+                <div class="title">
+                </div>
+            </div>
+            <div class="titleBarBtns">
+                <button class="topBtn minimize" id="minimize" title="Réduire"></button>
+                <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
+                <button class="topBtn close" id="close" title="Fermer"></button>
+            </div>
+        </div>
         <div id="option1" class="option" title="choisir un nombre de cartes"><i class="fa-solid fa-images"></i></div>
         <div id="option2" class="option" title="choisir un ou des dossiers"><i class="fa-regular fa-folder-open"></i></div>
         <div id="option3" class="option" title="choisir l'action à effectuer au clic"><i class="fa-solid fa-arrow-pointer"></i></div>
@@ -48,6 +59,13 @@
         <div id="submitBlock">
             <button id="previous" title="revenir au tirage précédent" class="submit backButton"><i class="fa-solid fa-arrow-rotate-left"></i></button>
             <button title="tirer des cartes" class="submit" id="draw"><span><i class="fa-solid fa-circle-play"></i></span></button>
+        </div>
+    </div>
+    <div id="monMenu">
+        <div id="monMenuContent">
+            <div class="titreMenu"><span>Raccourcis clavier</span></div>
+            <div class="titreMenu"><span>Actions</span></div>
+            <div class="titreMenu"><span>Aide</span></div>
         </div>
     </div>
     <script>
