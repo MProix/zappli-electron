@@ -12,7 +12,6 @@ let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfi
 const nodeDiskInfo = require('node-disk-info')
 let autresDisques = []
 let userStoragePath = app.getPath("userData")
-console.log(userStoragePath)
 
 ////////////////////////////////////////////////
 const log = require("electron-log")
@@ -20,7 +19,7 @@ log.transports.file.resolvePathFn = () => path.join("C:/Users/melan/Desktop/zapp
 log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : "+ app.getVersion())
 
-/////////////////
+///////////////// chercher d'autres disques que c pour windows
 try {
     const disks = nodeDiskInfo.getDiskInfoSync();
     for (let disk of disks) {
@@ -87,6 +86,7 @@ app.whenReady().then(() => {
         mainWindow.send('store-data', dossiersRacineUtilisateur)
         mainWindow.send('autres-disques', autresDisques)
         mainWindow.send('version', app.getVersion())
+        mainWindow.send('OS',process.platform)
     })
     autoUpdater.checkForUpdatesAndNotify()
 })
@@ -115,8 +115,10 @@ autoUpdater.on("error", (info) => {
 // =============== ROUTE BOUTON PLAY ===================
 
 ipcMain.on('getDraw', (evt, arg) => {
+    console.log("LE PROBLEME EST LA")
     var listeOfImages = choosePertinentFiles(arg["listeDossiers"])
     var data = shuffleFolder(listeOfImages, arg["nombreImages"])
+    console.log(data)
     //on crée un fichier d'historique
     fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0]))
     evt.sender.send('giveDraw', data)

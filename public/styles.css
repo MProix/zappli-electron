@@ -97,6 +97,7 @@ body{
                 margin-top: 5px;
                 padding-bottom: 5px;
                 -webkit-app-region: drag;
+                height: 100%;
             }
         #header > .titleBarBtns{
             display: flex;
@@ -353,6 +354,7 @@ ul{
     cursor: not-allowed;
 }
 #monMenu{
+    display:none;
     position: absolute;
     width: 200px;
     background-color: white;
@@ -361,7 +363,6 @@ ul{
     box-shadow: 5px 5px 15px 0px #000000;
     border-radius: 10px;
     padding: 5px;
-    display: flex;
     flex-direction: column;
     z-index: 3;
     opacity: 0;
@@ -384,3 +385,10 @@ ul{
     .titreMenu:hover{
         background-color: #e7e7e7;
     }
+
+.headerBackground{
+    background-image: url("logoZappli.png");
+    background-repeat: no-repeat;
+    background-position: 0px right;
+    background-size: 75px auto;
+}

@@ -5,12 +5,17 @@ var isLeftMenuActive = false;
 
 ipcRenderer.on('store-data', (evt, data) => {
     appendSubfolders('#mainUl', data);
-
 })
-ipcRenderer.on('version', (evt, arg) => {
+ipcRenderer.on('OS', (evt, arg) => {
     console.log(arg)
+    if(arg == "darwin"){
+        $("#mainMenu").css("display","none");
+        $("#showHideMenus").css("display","none");
+        $(".titleBarBtns").css("display","none");
+        $("#header").addClass("headerBackground");
+    }
 });
-ipcRenderer.on('autres-disques', (evt, arg) => {
+/* ipcRenderer.on('autres-disques', (evt, arg) => {
     console.log(arg);
     if (arg.length != 0) {
         $("#mainUl").append("<hr>");
@@ -28,7 +33,7 @@ ipcRenderer.on('autres-disques', (evt, arg) => {
         }
 
     }
-})
+}) */
 
 // Ouverture des sous-menus en cliquant sur les icônes de la colonne de gauche
 $(".option").on("click", function () {
@@ -224,9 +229,11 @@ ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) });
 $("#showHideMenus").on("click", () => {
     if(isLeftMenuActive){
         $("#monMenu").css("opacity","0");
+        $("#monMenu").css("display","none");
         isLeftMenuActive = false;
     }else{
         $("#monMenu").css("opacity","1");
+        $("#monMenu").css("display","flex");
         isLeftMenuActive = true;
     }
 })
