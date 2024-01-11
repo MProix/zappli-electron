@@ -57,6 +57,7 @@ body{
         width: 100%;
         height: 100%;
         border-bottom: 3px solid #343B48;
+        user-select: none;
         -webkit-user-select: none;
         color: white;
     }
