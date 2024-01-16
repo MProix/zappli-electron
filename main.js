@@ -12,12 +12,13 @@ let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfi
 const nodeDiskInfo = require('node-disk-info')
 let autresDisques = []
 let userStoragePath = app.getPath("userData")
+console.log(userStoragePath)
 
 ////////////////////////////////////////////////
 const log = require("electron-log")
-log.transports.file.resolvePathFn = () => path.join("C:/Users/melan/Desktop/zappli-electron",'main.log');
+log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log');
 log.info("////////////////////// hello, log ////////////////////////////////")
-log.log("Application version : "+ app.getVersion())
+log.log("Application version : " + app.getVersion())
 
 ///////////////// chercher d'autres disques que c pour windows
 try {
@@ -52,6 +53,7 @@ if (fs.existsSync(path.join(userStoragePath, "historique"))) {
 }
 
 var historiqueNum = 1
+log.info("BASE HISTORIQUE NUM = ", historiqueNum)
 
 let dossiersRacineUtilisateur = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory)
 
@@ -86,7 +88,7 @@ app.whenReady().then(() => {
         mainWindow.send('store-data', dossiersRacineUtilisateur)
         mainWindow.send('autres-disques', autresDisques)
         mainWindow.send('version', app.getVersion())
-        mainWindow.send('OS',process.platform)
+        mainWindow.send('OS', process.platform)
     })
     autoUpdater.checkForUpdatesAndNotify()
 })
@@ -97,14 +99,14 @@ app.whenReady().then(() => {
 autoUpdater.on("update-available", (info) => {
     log.info("il y a une nouvelle version", info)
 })
-autoUpdater.on("checking-for-update",(info)=>{
+autoUpdater.on("checking-for-update", (info) => {
     log.info("checking for updates")
     log.info("INFOS : ", info)
 })
-autoUpdater.on("download-progress",(progress)=>{
+autoUpdater.on("download-progress", (progress) => {
     log.info(progress)
 })
-autoUpdater.on("update-downloaded",()=>{
+autoUpdater.on("update-downloaded", () => {
     log.info("update-downloaded")
 })
 autoUpdater.on("error", (info) => {
@@ -127,11 +129,18 @@ ipcMain.on('getDraw', (evt, arg) => {
 // =============== ROUTE BOUTON PREVIOUS ===============
 
 ipcMain.on('getPreviousDraw', (evt, arg) => {
-    historiqueNum = historiqueNum - 2
-    //console.log(historiqueNum)
-    data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json")))
-    historiqueNum += 1
-    evt.sender.send('givePreviousDraw', [data, historiqueNum - 1])
+
+    if (historiqueNum < 3) {
+        evt.sender.send('pasdhistorique', [data = "Pas de tirage antérieur"])
+    } else {
+        log.info("getpreviousdraw BASE HISTORIQUE NUM = ", historiqueNum)
+        historiqueNum = historiqueNum - 2
+        log.info("getpreviousdraw WORK HISTORIQUE NUM = ", historiqueNum)
+        data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json")))
+        historiqueNum += 1
+        log.info("getpreviousdraw end HISTORIQUE NUM = ", historiqueNum)
+        evt.sender.send('givePreviousDraw', [data, historiqueNum - 1])
+    }
 })
 
 // =============== ROUTE SUBFOLDERS ====================
@@ -162,7 +171,9 @@ ipcMain.on('getFolder', (evt, arg) => {
 ipcMain.handle('changeImage', async (evt, arg) => {
     //console.log("image à changer : ",arg["imgToChange"])
     var erreur = ""
+    log.info("changeimage BASE HISTORIQUE NUM = ", historiqueNum)
     historiqueNum = historiqueNum - 1
+    log.info("changeimage WORK HISTORIQUE NUM = ", historiqueNum)
     //console.log("historique :",historiqueNum)
     var histList = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), "utf-8"))
     var listComp = []
@@ -192,6 +203,7 @@ ipcMain.handle('changeImage', async (evt, arg) => {
     //console.log("Erreur : ",erreur)
     //console.log("On en est là dans l'historique : ", historiqueNum)
     fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), JSON.stringify(histList))
+    log.info("changeimage END HISTORIQUE NUM = ", historiqueNum)
     historiqueNum += 1
     return { "nouvelleImage": newImage, "erreur": erreur, "index": index, "historique": historiqueNum - 1 }
 })
@@ -205,13 +217,13 @@ ipcMain.on("minimizeApp", (evt, arg) => {
     mainWindow.minimize()
 })
 ipcMain.on("maximizeRestoreApp", (evt, arg) => {
-    if(mainWindow.isMaximized()){
+    if (mainWindow.isMaximized()) {
         mainWindow.restore()
         mainWindow.webContents.send("isRestored")
-    }else{
+    } else {
         mainWindow.maximize()
         mainWindow.webContents.send("isMaximized")
-    } 
+    }
 })
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
@@ -266,6 +278,7 @@ function shuffleFolder(listeImages, num) {
     //console.log("NOMBRE DIMAGES A CHARGER : ",num)
     //console.log("LISTE : ")
     //console.log(listeImages)
+    log.info("shuffleFolder BASE HISTORIQUE NUM = ", historiqueNum)
     var error = ""
     var shuffleImgToLoad = listeImages.sort((a, b) => 0.5 - Math.random());
     var listeImagesChoisies = shuffleImgToLoad.slice(0, num)
@@ -279,6 +292,7 @@ function shuffleFolder(listeImages, num) {
         var max = listeImages.length
         //on incrémente les noms de fichiers de l'historique
         historiqueNum = historiqueNum + 1
+        log.info("shuffleFolder END HISTORIQUE NUM = ", historiqueNum)
     }
     return [listeImagesChoisies, error, max, historiqueNum - 1]
 }

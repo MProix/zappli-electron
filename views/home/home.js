@@ -92,6 +92,9 @@ ipcRenderer.on('givePreviousDraw', (evt, data) => {
     displayImages(data[0]);
 })
 
+ipcRenderer.on('pasdhistorique', (evt, data) => {
+    console.log(data);
+});
 // ===================== Le bouton subfolders ===================== //
 
 function getSubfolders(event) {
