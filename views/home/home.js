@@ -230,7 +230,7 @@ ipcRenderer.on("isMaximized", () => { changeMaxResBtn(true) });
 ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) });
 
 $("#showHideMenus").on("click", () => {
-    if (isLeftMenuActive) {
+    /* if (isLeftMenuActive) {
         $("#monMenu").css("opacity", "0");
         $("#monMenu").css("display", "none");
         isLeftMenuActive = false;
@@ -238,7 +238,8 @@ $("#showHideMenus").on("click", () => {
         $("#monMenu").css("opacity", "1");
         $("#monMenu").css("display", "flex");
         isLeftMenuActive = true;
-    }
+    } */
+    ipcRenderer.send('fireMenu')
 })
 $("#container").on("click", (e) => {
     if (e.target.id != "showHideMenus" && isLeftMenuActive) {

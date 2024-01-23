@@ -349,13 +349,6 @@ function setConfig() {
     }
 } */
 ////////////// config menu /////////////////
-console.log("APP")
-console.log(app)
-var aboutData = {
-    "version": app.getVersion(),
-    "name": app.getName(),
-    "logo": path.join(__dirname, "icon.png")
-}
 
 const isMac = platform === 'darwin'
 const templateMenu = [
@@ -369,9 +362,9 @@ const templateMenu = [
                     click() {
                         openAboutWindow(
                             {
-                            icon_path: path.join(__dirname, 'public', 'icon.png'),
-                            copyright: '(c) 2024 Mélanie Proix - Les Zexperts FLE',
-                            css_path: path.join(__dirname,"public","aboutStyles.css")
+                                icon_path: path.join(__dirname, 'public', 'iconAbout.png'),
+                                copyright: '(c) 2024 Les Zexperts FLE',
+                                css_path: path.join(__dirname, "public", "aboutStyles.css")
                             }
                         )
                     }
@@ -401,7 +394,27 @@ const templateMenu = [
                 }
             ]
         }]
-        : []),
+        : [
+            {
+                label: app.name,
+                submenu: [
+                    {
+                        label: menu["about"][firstLanguage],
+                        click() {
+                            openAboutWindow(
+                                {
+                                    icon_path: path.join(__dirname, 'public', 'iconAbout.png'),
+                                    //copyright: '(c) 2024 Les Zexperts FLE',
+                                    css_path: path.join(__dirname, "public", "aboutStyles.css"),
+                                    homepage: "https://www.leszexpertsfle.com"
+                                }
+                            )
+                        }
+                    }
+                ]
+            }
+
+        ]),
     // { role: 'fileMenu' }
     {
         label: menu["file"][firstLanguage],
@@ -493,7 +506,10 @@ if (platform == "darwin") {
     const menu = Menu.buildFromTemplate(templateMenu)
     Menu.setApplicationMenu(menu)
 }
-
+ipcMain.on('fireMenu', (evt, arg) => {
+    const menu = Menu.buildFromTemplate(templateMenu);
+    menu.popup();
+})
 
 ///////////////////////////////// ROUTES ET FONCTIONS DE LA PAGE NEWVERSION /////////////////////////////////////////////
 
@@ -506,7 +522,7 @@ ipcMain.on('plusTard', (evt, arg) => {
     newVersionWin.close()
 }) */
 
-console.log(app.getPath('home'))
+/* console.log(app.getPath('home'))
 console.log(app.getFileIcon(app.getPath('home')))
 console.log(app.getPath('module'))
 console.log(app.getPath('desktop'))
@@ -516,3 +532,4 @@ console.log(app.getPath('music'))
 console.log(app.getPath('pictures'))
 console.log(app.getPath('videos'))
 console.log(app.getFileIcon(app.getAppPath('home')))
+ */

@@ -1,0 +1,25 @@
+body{
+    background-color: #185286;
+    color: white;
+}
+.logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo>img{
+    width: 100px;
+    height: 100px;
+}
+.copyright,
+.versions {
+  color: white;
+}
+a{
+    text-decoration: none;
+    color: #4593d8;
+}
+.versions{
+    margin-top: 20px;
+    padding-top: 20px;
+}
