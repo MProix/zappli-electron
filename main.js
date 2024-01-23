@@ -363,8 +363,8 @@ const templateMenu = [
                         openAboutWindow(
                             {
                                 icon_path: path.join(__dirname, 'public', 'iconAbout.png'),
-                                copyright: '(c) 2024 Les Zexperts FLE',
-                                css_path: path.join(__dirname, "public", "aboutStyles.css")
+                                css_path: path.join(__dirname, "public", "aboutStyles.css"),
+                                homepage: "https://www.leszexpertsfle.com"
                             }
                         )
                     }
