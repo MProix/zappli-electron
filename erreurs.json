@@ -1,0 +1,19 @@
+{
+    "listeLangues" : ["fr","en"],
+    "erNoPrevious" : {
+        "fr": "Pas de tirage antérieur",
+        "en": "No existing prenious draw"
+    },
+    "erAllImages" : {
+        "fr": "Toutes les images de ce(s) dossier(s) sont déjà affichées",
+        "en": "All the images of this/these folder(s) are already displayed"
+    },
+    "erSelectFolder" : {
+        "fr": "Sélectionnez d'abord un dossier contenant des images (couleur verte) en cochant la case devant son nom.",
+        "en": "Select a folder containing images (red color) by checking the checkbox before it."
+    },
+    "erTooBig" : {
+        "fr": ["Ce dossier ne contient que "," image(s) !"],
+        "en": ["This folder only contains "," image(s) !"]
+    }
+}

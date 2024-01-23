@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Zappli</title>
+    <link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../../public/styles.css">
+
+</head>
+
+<body>
+    <div id="container">
+        <div id="mainMenu"><!--<i class="fa-solid fa-circle-info"></i>--></div>
+        <div id="header">
+            <div class="titleBar">
+                <button id="showHideMenus" class="toggleButton" title="menu"></button>
+                <div class="title">
+                </div>
+            </div>
+            <div class="titleBarBtns">
+                <button class="topBtn minimize" id="minimize" title="Réduire"></button>
+                <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
+                <button class="topBtn close" id="close" title="Fermer"></button>
+            </div>
+        </div>
+        <div id="option1" class="option" title="choisir un nombre de cartes"><i class="fa-solid fa-images"></i></div>
+        <div id="option2" class="option" title="choisir un ou des dossiers"><i class="fa-regular fa-folder-open"></i></div>
+        <div id="option3" class="option" title="choisir l'action à effectuer au clic"><i class="fa-solid fa-arrow-pointer"></i></div>
+        <div id="optionText1" class="optionText">
+            <div id="numbers">
+                <input id="cardsNumber" type="number" name="input_field" value="6" min="1" max="24">
+            </div>
+        </div>
+        <div id="optionText2" class="optionText">
+            <div id="folder"></div>
+            <input type="hidden" name="currentFolder" id="currentFolder">
+            <ul id="mainUl">
+            </ul>
+        </div>
+        <div id="optionText3" class="optionText">
+            <div>
+                <input type="radio" name="action" value="efface" id="efface" checked>
+                <label for="efface">Efface l'image</label><br>
+                <input type="radio" name="action" value="exergue" id="exergue">
+                <label for="exergue">Entoure l'image</label><br>
+                <input type="radio" name="action" value="change" id="change">
+                <label for="change">Change l'image</label><br>
+            </div>
+        </div>
+        <input id="compteur" type="number" value="0">
+        <div id="cards">
+            <div id="displayImages"></div>
+        </div>
+        <div id="submitBlock">
+            <button id="previous" title="revenir au tirage précédent" class="submit backButton"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+            <button title="tirer des cartes" class="submit" id="draw"><span><i class="fa-solid fa-circle-play"></i></span></button>
+        </div>
+    </div>
+    <div id="monMenu">
+        <div id="monMenuContent">
+            <div class="titreMenu"><span>Raccourcis clavier</span></div>
+            <div class="titreMenu"><span>Actions</span></div>
+            <div class="titreMenu"><span>Aide</span></div>
+        </div>
+    </div>
+    <script>
+        window.jquery = window.$ = require('jquery');
+    </script>
+    <script src="home.js"></script>
+</body>
+
+</html>

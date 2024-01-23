@@ -8,10 +8,10 @@ ipcRenderer.on('store-data', (evt, data) => {
 })
 ipcRenderer.on('OS', (evt, arg) => {
     console.log(arg)
-    if(arg == "darwin"){
-        $("#mainMenu").css("display","none");
-        $("#showHideMenus").css("display","none");
-        $(".titleBarBtns").css("display","none");
+    if (arg == "darwin") {
+        $("#mainMenu").css("display", "none");
+        $("#showHideMenus").css("display", "none");
+        $(".titleBarBtns").css("display", "none");
         $("#header").addClass("headerBackground");
     }
 });
@@ -215,13 +215,13 @@ $("#maxRes").on("click", () => {
     ipcRenderer.send('maximizeRestoreApp');
 });
 
-function changeMaxResBtn(isMaximizedApp){
-    if(isMaximizedApp){
-        $("#maxRes").attr('title',"Restaurer");
+function changeMaxResBtn(isMaximizedApp) {
+    if (isMaximizedApp) {
+        $("#maxRes").attr('title', "Restaurer");
         $("#maxRes").removeClass("maximize");
         $("#maxRes").addClass("restore");
-    }else{
-        $("#maxRes").attr("title","Agrandir");
+    } else {
+        $("#maxRes").attr("title", "Agrandir");
         $("#maxRes").removeClass("restore");
         $("#maxRes").addClass("maximize");
     }
@@ -230,19 +230,41 @@ ipcRenderer.on("isMaximized", () => { changeMaxResBtn(true) });
 ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) });
 
 $("#showHideMenus").on("click", () => {
-    if(isLeftMenuActive){
-        $("#monMenu").css("opacity","0");
-        $("#monMenu").css("display","none");
+    if (isLeftMenuActive) {
+        $("#monMenu").css("opacity", "0");
+        $("#monMenu").css("display", "none");
         isLeftMenuActive = false;
-    }else{
-        $("#monMenu").css("opacity","1");
-        $("#monMenu").css("display","flex");
+    } else {
+        $("#monMenu").css("opacity", "1");
+        $("#monMenu").css("display", "flex");
         isLeftMenuActive = true;
     }
 })
 $("#container").on("click", (e) => {
-    if(e.target.id != "showHideMenus" && isLeftMenuActive){
-        $("#monMenu").css("opacity","0");
+    if (e.target.id != "showHideMenus" && isLeftMenuActive) {
+        $("#monMenu").css("opacity", "0");
         isLeftMenuActive = false;
     }
+})
+
+ipcRenderer.on("clickMenu", (evt, arg) => {
+    if (["1","2","3"].includes(arg["action"])) {
+        for (let elt of $(".optionText")) {
+            if (arg["action"] !== elt.id.charAt(elt.id.length - 1)) {
+                $(elt).removeClass('index');
+            }
+        }
+        var classe = "#optionText" + arg["action"];
+        $(classe).toggleClass("index");
+    } else { 
+        alert("mauvais id")
+    }
+})
+ipcRenderer.on("listenPlay", (evt,arg)=>{
+    var checkedFolders = [];
+    for (let elt of $(".folderButton:checkbox:checked")) {
+        checkedFolders.push($(elt).next().children()[0].id);
+    }
+    var data = { "listeDossiers": checkedFolders, "nombreImages": $("#cardsNumber").val() }
+    ipcRenderer.send('getDraw', data);
 })

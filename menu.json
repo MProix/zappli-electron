@@ -1,0 +1,83 @@
+{
+    "listeLangues" : ["fr","en"],
+    "about" : {
+        "fr": "À propos",
+        "en": "about"
+    },
+    "services" : {
+        "fr": "Services",
+        "en": "Services"
+    },
+    "hide" : {
+        "fr": "Masquer zappli",
+        "en": "Hide zappli"
+    },
+    "hideOthers" : {
+        "fr": "Masquer les autres",
+        "en": "Hide others"
+    },
+    "unhide" : {
+        "fr": "Afficher tout",
+        "en": "Show all"
+    },
+    "quit" : {
+        "fr": "Quitter zappli",
+        "en": "Quit zappli"
+    },
+    "file" : {
+        "fr": "Fichier",
+        "en": "File"
+    },
+    "close" : {
+        "fr": "Fermer la fenêtre",
+        "en": "Close window"
+    },
+    "action" : {
+        "fr": "Action",
+        "en": "Action"
+    },
+    "chooseFolder" : {
+        "fr": "Choisir un dossier",
+        "en": "Choose a folder"
+    },
+    "chooseNumber" : {
+        "fr": "Choisir un nombre d'images",
+        "en": "Choose a number of images"
+    },
+    "chooseAction" : {
+        "fr": "Choisir l'action au clic",
+        "en": "Choose an action on click"
+    },
+    "previousDraw" : {
+        "fr": "Tirage précédent",
+        "en": "Previous draw"
+    },
+    "drawImages" : {
+        "fr": "Tirer des images",
+        "en": "Draw images"
+    },
+    "view" : {
+        "fr": "Affichage",
+        "en": "View"
+    },
+    "resetZoom" : {
+        "fr": "Réinitialiser le zoom",
+        "en": "Actual size"
+    },
+    "zoomIn" : {
+        "fr": "Zoom avant",
+        "en": "Zoom in"
+    },
+    "zoomOut" : {
+        "fr": "Zoom arrière",
+        "en": "Zoom out"
+    },
+    "togglefullscreen" : {
+        "fr": "Plein écran",
+        "en": "Toogle full screen"
+    },
+    "" : {
+        "fr": "",
+        "en": ""
+    }
+}

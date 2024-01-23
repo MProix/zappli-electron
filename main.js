@@ -1,22 +1,38 @@
-const { app, BrowserWindow, ipcMain, Menu, Notification, nativeImage } = require("electron"),
+const { app, BrowserWindow, ipcMain, Menu, Notification, nativeImage } = require("electron"), // import des modules d'electron
     Store = require("electron-store"),
-    store = new Store()
+    store = new Store() // on crée la base de données qui collectera les infos pour les notifications
 const fs = require('fs')
 const os = require("os")
 const path = require("path")
 const https = require('https')
-const pjson = require('./package.json');
+const pjson = require('./package.json'); // pour incrire dans la base de données store
 const { autoUpdater } = require("electron-updater")
+const nodeDiskInfo = require('node-disk-info') // pour récupérer les différents disques durs
+const log = require("electron-log") // on initialise le système de log d'electron pour pouvoir débuguer à distance chez l'utilisateur
 
-let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
-const nodeDiskInfo = require('node-disk-info')
-let autresDisques = []
+const openAboutWindow = require('about-window').default;
+const menu = JSON.parse(fs.readFileSync(path.join(__dirname, "menu.json"), "utf-8"))
+const erreurs = JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"), "utf-8"))
+const writtenLanguages = erreurs["listeLangues"] //liste des langues supportées par l'appli (qui ont un fichier home.html dans leur langue)
 let userStoragePath = app.getPath("userData")
-console.log(userStoragePath)
+var platform = process.platform
 
-////////////////////////////////////////////////
-const log = require("electron-log")
-log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log');
+// ================ variables globales stockées ================ //
+///////////////////////////////////////////////////////////////////
+let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
+let autresDisques = []
+
+// on récupère la langue d'affichage principale du système
+var locales = app.getPreferredSystemLanguages()
+console.log("LOCALES : " + locales)
+var firstLanguage = "fr"
+if (locales[0].indexOf("-") != -1) {
+    firstLanguage = locales[0].slice(0, locales[0].indexOf("-"))
+} else {
+    firstLanguage = locales[0]
+}
+
+log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : " + app.getVersion())
 
@@ -31,36 +47,26 @@ try {
 } catch (e) {
     console.error(e);
 }
-//////////////////////
-//////////////////////
-//////////////////////
 
-// ================ variables globales stockées ================ //
-
-//checkUrl()
-let mainWindow = null
-let newVersionWin = null
-var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff"]
+let mainWindow = null //on stocke la variable de fenêtre
+//let newVersionWin = null
+var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff"] // on stocke les extensions valides pour l'afichage des images
 //let disquesSysteme = [['Disque C','C:'],['Disque D','D:'],['Disque F','F:']]
-const userHomeDirectory = os.homedir()
+const userHomeDirectory = os.homedir() // on stocke le chemin du répertoire utilisateur pour construire l'arborescence de ses dossiers
+let dossiersRacineUtilisateur = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory) //on crée l'arborescence de la racine de l'utilisateur
 
 if (fs.existsSync(path.join(userStoragePath, "historique"))) {
-    //console.log("nettoyage")
-    erraseFilesAndCopyNews(path.join(userStoragePath, "historique"))
+    erraseFilesAndCopyNews(path.join(userStoragePath, "historique")) //on vide l'historique s'il existe déjà
 } else {
-    fs.mkdirSync(path.join(userStoragePath, "historique"))
-    fs.chmodSync(path.join(userStoragePath, "historique"), 0o777)
+    fs.mkdirSync(path.join(userStoragePath, "historique")) //sinon on le crée
+    fs.chmodSync(path.join(userStoragePath, "historique"), 0o777) // et on donne les bonnes permissions d'accès
 }
 
-var historiqueNum = 1
-log.info("BASE HISTORIQUE NUM = ", historiqueNum)
-
-let dossiersRacineUtilisateur = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory)
+var historiqueNum = 1 //on initialise l'incrémentation des fichiers d'historique
 
 // ================ NOUVELLE FENETRE D'APPLI ================ //
 
 function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
-    console.log(winWidth, winHeight)
     let win = new BrowserWindow({
         width: winWidth,
         height: winHeight,
@@ -68,7 +74,8 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            "web-security": false
+            "web-security": false,
+            devTools: true // disabling devtools for distrib version
         },
         titleBarStyle: 'hidden'
         //frame: true
@@ -82,8 +89,15 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
     return win
 }
 
+// ================ Initialisation de la fenêtre principale ================ //
 app.whenReady().then(() => {
-    mainWindow = createWindow("views/home/home.html")
+    if (writtenLanguages.includes(firstLanguage)) {
+        //console.log("LANGUAGE : "+firstLanguage)
+        mainWindow = createWindow("views/home/home_" + firstLanguage + ".html")
+    } else {
+        firstLanguage = "fr"
+        mainWindow = createWindow("views/home/home_" + firstLanguage + ".html")
+    }
     mainWindow.webContents.once('did-finish-load', () => {
         mainWindow.send('store-data', dossiersRacineUtilisateur)
         mainWindow.send('autres-disques', autresDisques)
@@ -92,7 +106,8 @@ app.whenReady().then(() => {
     })
     autoUpdater.checkForUpdatesAndNotify()
 })
-/////////////// setting auto-updater 
+
+// ================ setting auto-updater ================ //
 
 /* new update available */
 
@@ -117,29 +132,23 @@ autoUpdater.on("error", (info) => {
 // =============== ROUTE BOUTON PLAY ===================
 
 ipcMain.on('getDraw', (evt, arg) => {
-    console.log("LE PROBLEME EST LA")
-    var listeOfImages = choosePertinentFiles(arg["listeDossiers"])
-    var data = shuffleFolder(listeOfImages, arg["nombreImages"])
-    console.log(data)
-    //on crée un fichier d'historique
-    fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0]))
-    evt.sender.send('giveDraw', data)
+    var listeOfImages = choosePertinentFiles(arg["listeDossiers"]) // on récupère une liste de toutes les images de ce ou ces dossier(s)
+    var data = shuffleFolder(listeOfImages, arg["nombreImages"]) // on mélange et on ne garde que les premiers en fonction du nombre demandé
+    fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0])) //on crée un fichier d'historique
+    evt.sender.send('giveDraw', data) // on renvoie la liste d'images au front end
 })
 
 // =============== ROUTE BOUTON PREVIOUS ===============
 
 ipcMain.on('getPreviousDraw', (evt, arg) => {
-
-    if (historiqueNum < 3) {
-        evt.sender.send('pasdhistorique', [data = "Pas de tirage antérieur"])
-    } else {
-        log.info("getpreviousdraw BASE HISTORIQUE NUM = ", historiqueNum)
-        historiqueNum = historiqueNum - 2
-        log.info("getpreviousdraw WORK HISTORIQUE NUM = ", historiqueNum)
-        data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json")))
-        historiqueNum += 1
-        log.info("getpreviousdraw end HISTORIQUE NUM = ", historiqueNum)
-        evt.sender.send('givePreviousDraw', [data, historiqueNum - 1])
+    if (historiqueNum < 3) { // on vérifie qu'il existe effectivement un tirage antérieur : si non...
+        data = erreurs["erNoPrevious"][firstLanguage]
+        evt.sender.send('pasdhistorique', [data]) //... on renvoie un message d'erreur pour la console du navigateur
+    } else { //...si c'est bon...
+        historiqueNum = historiqueNum - 2 //... on revient sur ce tirage
+        data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"))) // on récupère les données
+        historiqueNum += 1 // on se remet au bon niveau d'historique
+        evt.sender.send('givePreviousDraw', [data, historiqueNum - 1]) // on envoie les données au front end
     }
 })
 
@@ -147,15 +156,15 @@ ipcMain.on('getPreviousDraw', (evt, arg) => {
 
 ipcMain.handle('getSubfolders', async (evt, arg) => {
     var data = {
-        "subFolders": choosePertinentFolders(fs.readdirSync(arg), arg),
-        "parentPath": arg
+        "subFolders": choosePertinentFolders(fs.readdirSync(arg), arg), // on crée la liste des sous-dossiers
+        "parentPath": arg // on récupère l'endroit où les insérer
     }
-    return data
+    return data // on renvoie direct au front end qui attend la réponse
 })
 
-// =============== ROUTE FOLDERS =======================
+// =============== ROUTE FOLDERS POUR LES DISQUES EXTERNES =======================
 
-ipcMain.on('getFolder', (evt, arg) => {
+/* ipcMain.on('getFolder', (evt, arg) => {
     var d = require('diskinfo')
     d.getDrives(function (err, aDrives) {
         var disks = []
@@ -164,51 +173,41 @@ ipcMain.on('getFolder', (evt, arg) => {
         }
         evt.sender.send('giveFolders', disks)
     });
-})
+}) */
 
 // =============== ROUTE CHANGE IMAGE ==================
 
 ipcMain.handle('changeImage', async (evt, arg) => {
-    //console.log("image à changer : ",arg["imgToChange"])
-    var erreur = ""
-    log.info("changeimage BASE HISTORIQUE NUM = ", historiqueNum)
-    historiqueNum = historiqueNum - 1
-    log.info("changeimage WORK HISTORIQUE NUM = ", historiqueNum)
-    //console.log("historique :",historiqueNum)
-    var histList = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), "utf-8"))
-    var listComp = []
+    var erreur = "" // on initialise le potentiel message d'erreur
+    historiqueNum = historiqueNum - 1 // on se remet dans le bon tirage
+    var histList = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), "utf-8")) // on récupère la liste des images
+    var listComp = [] // on initialise une liste avec juste les titres d'images
     for (let elt of histList) {
-        listComp.push(elt[0])
+        listComp.push(elt[0]) // on la remplit
     }
-    //console.log("tirage précédent : ", histList)
-    var newImage = shuffleFolder(choosePertinentFiles(arg["routes"], 1))[0][0]
+    var newImage = shuffleFolder(choosePertinentFiles(arg["routes"], 1))[0][0] // on récupère une nouvelle image
     var index = 0
-    //console.log("histList : ", histList)
-    //console.log("arg",arg)
-    //console.log("Imgtochange",arg["imgToChange"])
-    //console.log("index",index)
-    while (histList[index][0] != arg["imgToChange"]) {
+    while (histList[index][0] != arg["imgToChange"]) { // on parcourt la liste de l'historique pour trouver l'indice de l'image à changer
         index += 1
     }
-    if (choosePertinentFiles(arg["routes"]).length == histList.length) {
-        erreur = "Toutes les images de ce(s) dossier(s) sont déjà affichées"
-    } else {
+    if (choosePertinentFiles(arg["routes"]).length == histList.length) { // on vérifie que toutes les images ne sont pas déjà utilisées
+        console.log("probleme")
+        erreur = erreurs["erAllImages"][firstLanguage]
+        return { "erreur": erreur }
+    } else { // si c'est bon on tire des images jusqu'à ce qu'on en ait une qui n'est pas déjà dans la liste
         while (listComp.includes(newImage[0])) {
             historiqueNum -= 1
             newImage = shuffleFolder(choosePertinentFiles(arg["routes"], 1))[0][0]
         }
+        histList[index] = newImage // on remplace au bon indice
+        fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), JSON.stringify(histList)) // on actualise le fichier d'historique
+        historiqueNum += 1 // on se remet au bon numéro d'historique
+        return { "nouvelleImage": newImage, "erreur": erreur, "index": index, "historique": historiqueNum - 1 } // on renvoie la bonne image et le bon indice au front end
     }
-    histList[index] = newImage
-    //console.log("NouvelleImage : ",newImage)
-    //console.log("Erreur : ",erreur)
-    //console.log("On en est là dans l'historique : ", historiqueNum)
-    fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), JSON.stringify(histList))
-    log.info("changeimage END HISTORIQUE NUM = ", historiqueNum)
-    historiqueNum += 1
-    return { "nouvelleImage": newImage, "erreur": erreur, "index": index, "historique": historiqueNum - 1 }
+
 })
 
-// =============== ROUTES BOUTONS CLOSE MINIMIZE AND MAXIMIZE ===============
+// =============== ROUTES BOUTONS CLOSE MINIMIZE AND MAXIMIZE POUR WINDOWS ===============
 
 ipcMain.on("closeApp", (evt, arg) => {
     mainWindow.close()
@@ -225,13 +224,13 @@ ipcMain.on("maximizeRestoreApp", (evt, arg) => {
         mainWindow.webContents.send("isMaximized")
     }
 })
+
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
     var finalFoldersList = []
     for (let elt of folderList) {
         if (elt[0] !== '.' && fs.lstatSync(path.join(basePath, elt)).isDirectory()) {
             var classes = checkImagesAndEmpty(basePath, elt)
-            //console.log(elt,classes)
             finalFoldersList.push([elt, path.join(basePath, elt), classes])
         }
     }
@@ -241,14 +240,11 @@ function choosePertinentFolders(folderList, basePath) {
 function checkImagesAndEmpty(base, elt) {
     var classesToAdd = { "empty": true, "images": false, "folders": false }
     for (let element of fs.readdirSync(path.join(base, elt))) {
-        //console.log("chemin complet : ",(path.join(base, elt, element)))
         if (fs.lstatSync(path.join(base, elt, element)).isDirectory()) {
-            //console.log("directory")
             classesToAdd["folders"] = true
             classesToAdd["empty"] = false
         }
         if (listOfValidExtensions.includes(path.extname(path.join(elt, element)))) {
-            //console.log("image")
             classesToAdd["images"] = true
             classesToAdd["empty"] = false
         }
@@ -261,7 +257,6 @@ function checkImagesAndEmpty(base, elt) {
 }
 
 function choosePertinentFiles(listeOfPaths) {
-    //console.log("paths : ",listeOfPaths)
     var listeImages = []
     for (let onePath of listeOfPaths) {
         for (let elt of fs.readdirSync(onePath)) {
@@ -270,29 +265,21 @@ function choosePertinentFiles(listeOfPaths) {
             }
         }
     }
-    //console.log("LISTEIMAGES",listeImages)
     return listeImages
 }
 
 function shuffleFolder(listeImages, num) {
-    //console.log("NOMBRE DIMAGES A CHARGER : ",num)
-    //console.log("LISTE : ")
-    //console.log(listeImages)
-    log.info("shuffleFolder BASE HISTORIQUE NUM = ", historiqueNum)
     var error = ""
     var shuffleImgToLoad = listeImages.sort((a, b) => 0.5 - Math.random());
     var listeImagesChoisies = shuffleImgToLoad.slice(0, num)
     if (listeImagesChoisies == 0) {
-        error = "Sélectionnez d'abord un dossier contenant des images (couleur verte) en cochant la case devant son nom."
+        error = erreurs["erSelectFolder"][firstLanguage]
     }
     else if (0 < listeImagesChoisies.length && listeImagesChoisies.length < num) {
-        // console.log("pas assez d'images")
-        error = "Ce dossier ne contient que " + listeImagesChoisies.length + " image(s) !"
+        error = erreurs["erTooBig"][firstLanguage][0] + listeImagesChoisies.length + erreurs["erTooBig"][firstLanguage][1]
     } else {
         var max = listeImages.length
-        //on incrémente les noms de fichiers de l'historique
         historiqueNum = historiqueNum + 1
-        log.info("shuffleFolder END HISTORIQUE NUM = ", historiqueNum)
     }
     return [listeImagesChoisies, error, max, historiqueNum - 1]
 }
@@ -308,7 +295,7 @@ function erraseFilesAndCopyNews(directory) {
     });
 }
 
-function checkUrl() {
+/* function checkUrl() {
     let url = "https://www.proix.eu/zapplis/superzappli.json";
     https.get(url, (res) => {
         let body = "";
@@ -332,17 +319,16 @@ function checkUrl() {
         store.set("distantConfig", localConfig)
         console.error(error.message);
     });
-}
+} */
 
 function setConfig() {
-    //console.log("pas de config")
     store.set("localConfig", {
         "version": pjson.version,
         "URL": "https://www.proix.eu/zapplis/superzappli.json"
     })
 }
 
-function checkNewInfo() {
+/* function checkNewInfo() {
     //console.log(store.get("dontShowVersion"))
     //console.log(store.get("localConfig"))
     //console.log(store.get("distantConfig"))
@@ -361,99 +347,172 @@ function checkNewInfo() {
     } else {
         //console.log("mêmes versions")
     }
-}
+} */
 ////////////// config menu /////////////////
+console.log("APP")
+console.log(app)
+var aboutData = {
+    "version": app.getVersion(),
+    "name": app.getName(),
+    "logo": path.join(__dirname, "icon.png")
+}
 
+const isMac = platform === 'darwin'
 const templateMenu = [
+    // { role: 'appMenu' }
+    ...(isMac
+        ? [{
+            label: app.name,
+            submenu: [
+                {
+                    label: menu["about"][firstLanguage],
+                    click() {
+                        openAboutWindow(
+                            {
+                            icon_path: path.join(__dirname, 'public', 'icon.png'),
+                            copyright: '(c) 2024 Mélanie Proix - Les Zexperts FLE',
+                            css_path: path.join(__dirname,"public","aboutStyles.css")
+                            }
+                        )
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: menu["services"][firstLanguage],
+                    role: 'services'
+                },
+                { type: 'separator' },
+                {
+                    label: menu["hide"][firstLanguage],
+                    role: 'hide'
+                },
+                {
+                    label: menu["hideOthers"][firstLanguage],
+                    role: 'hideOthers'
+                },
+                {
+                    label: menu["unhide"][firstLanguage],
+                    role: 'unhide'
+                },
+                { type: 'separator' },
+                {
+                    label: menu["quit"][firstLanguage],
+                    role: 'quit'
+                }
+            ]
+        }]
+        : []),
+    // { role: 'fileMenu' }
     {
-        label: 'Action',
+        label: menu["file"][firstLanguage],
         submenu: [
+            isMac ? {
+                label: menu["close"][firstLanguage],
+                role: 'close'
+            } : {
+                label: menu["quit"][firstLanguage],
+                role: 'quit'
+            }
+        ]
+    },
+    {
+        label: menu["action"][firstLanguage],
+        submenu: [
+            { role: 'toggleDevTools' },
             {
-                label: 'Choisir dossier',
+                label: menu["chooseFolder"][firstLanguage],
                 accelerator: "CommandOrControl+F",
                 click() {
-                    for (let elt of document.getElementsByClassName("optionText")) {
-                        elt.classList.remove("index")
-                    }
-                    document.getElementById("optionText2").classList.add("index")
-                    //$(".optionText").removeClass("index")
-                    //$("#optionText2").toggleClass("index")
+                    mainWindow.webContents.send("clickMenu", { "action": "2" })
                 }
             },
             {
-                label: "Choisir nombre d'images",
+                label: menu["chooseNumber"][firstLanguage],
                 accelerator: "CommandOrControl+N",
                 click() {
-                    $(".optionText").removeClass("index")
-                    $("#optionText1").toggleClass("index")
+                    mainWindow.webContents.send("clickMenu", { "action": "1" })
                 }
             },
             {
-                label: "Choisir action au clic",
+                label: menu["chooseAction"][firstLanguage],
                 accelerator: "CommandOrControl+A",
                 click() {
-                    $(".optionText").removeClass("index")
-                    $("#optionText3").toggleClass("index")
+                    mainWindow.webContents.send("clickMenu", { "action": "3" })
                 }
             },
+            { type: 'separator' },
             {
-                label: "Revenir au tirage précédent",
+                label: menu["previousDraw"][firstLanguage],
                 accelerator: "Backspace",
                 click() {
-                    //console.log("cliqué sur le bouton back");
-                    ipcRenderer.send('getPreviousDraw', '');
-                    ipcRenderer.on('givePreviousDraw', (evt, data) => {
-                        $("#compteur").attr('value', data[1]);
-                        if (data[1] > 1) {
-                            $("#previous").removeClass("backButton");
-                        } else {
-                            $("#previous").addClass("backButton");
-                        };
-                        displayImages(data[0]);
-                    })
+                    if (historiqueNum < 3) { // on vérifie qu'il existe effectivement un tirage antérieur : si non...
+                        data = erreurs["erNoPrevious"][firstLanguage]
+                        mainWindow.webContents.send('pasdhistorique', [data]) //... on renvoie un message d'erreur pour la console du navigateur
+                    } else { //...si c'est bon...
+                        historiqueNum = historiqueNum - 2 //... on revient sur ce tirage
+                        data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"))) // on récupère les données
+                        historiqueNum += 1 // on se remet au bon niveau d'historique
+                        mainWindow.webContents.send('givePreviousDraw', [data, historiqueNum - 1]) // on envoie les données au front end
+                    }
                 }
             },
             {
-                label: "Tirer des cartes",
+                label: menu["drawImages"][firstLanguage],
                 accelerator: "Return",
                 click() {
-                    var checkedFolders = [];
-                    for (let elt of $(".folderButton:checkbox:checked")) {
-                        checkedFolders.push($(elt).next().children()[0].id);
-                    }
-                    var data = { "listeDossiers": checkedFolders, "nombreImages": $("#cardsNumber").val() }
-                    ipcRenderer.send('getDraw', data);
-                    ipcRenderer.on('giveDraw', (evt, data) => {
-                        //console.log("data", data);
-                        if (data[1] !== "") {
-                            alert(data[1])
-                        } else {
-                            displayImages(data[0])
-                        }
-                        $("#compteur").attr('value', data[3]);
-                        if (data[3] > 1) {
-                            $("#previous").removeClass("backButton");
-                        } else {
-                            $("#previous").addClass("backButton");
-                        };
-                    });
+                    mainWindow.webContents.send("listenPlay")
                 }
             }
         ]
-    }
+    },
+    // { role: 'viewMenu' }
+    {
+        label: menu["view"][firstLanguage],
+        submenu: [
+            {
+                label: menu["resetZoom"][firstLanguage],
+                role: 'resetZoom'
+            },
+            {
+                label: menu["zoomIn"][firstLanguage],
+                role: 'zoomIn'
+            },
+            {
+                label: menu["zoomOut"][firstLanguage],
+                role: 'zoomOut'
+            },
+            { type: 'separator' },
+            {
+                label: menu["togglefullscreen"][firstLanguage],
+                role: 'togglefullscreen'
+            }
+        ]
+    },
 ]
-
-//const menu = Menu.buildFromTemplate(templateMenu)
-//Menu.setApplicationMenu(menu)
+if (platform == "darwin") {
+    const menu = Menu.buildFromTemplate(templateMenu)
+    Menu.setApplicationMenu(menu)
+}
 
 
 ///////////////////////////////// ROUTES ET FONCTIONS DE LA PAGE NEWVERSION /////////////////////////////////////////////
 
-ipcMain.on('dontShow', (evt, arg) => {
+/* ipcMain.on('dontShow', (evt, arg) => {
     //console.log("arg", arg)
     store.set("dontShowVersion", arg)
     newVersionWin.close()
 })
 ipcMain.on('plusTard', (evt, arg) => {
     newVersionWin.close()
-})
+}) */
+
+console.log(app.getPath('home'))
+console.log(app.getFileIcon(app.getPath('home')))
+console.log(app.getPath('module'))
+console.log(app.getPath('desktop'))
+console.log(app.getPath('documents'))
+console.log(app.getPath('downloads'))
+console.log(app.getPath('music'))
+console.log(app.getPath('pictures'))
+console.log(app.getPath('videos'))
+console.log(app.getFileIcon(app.getAppPath('home')))
