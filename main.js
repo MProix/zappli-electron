@@ -16,7 +16,6 @@ const erreurs = JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),
 const writtenLanguages = erreurs["listeLangues"] //liste des langues supportées par l'appli (qui ont un fichier home.html dans leur langue)
 let userStoragePath = app.getPath("userData")
 var platform = process.platform
-console.log(userStoragePath)
 
 // ================ variables globales stockées ================ //
 ///////////////////////////////////////////////////////////////////
@@ -32,12 +31,14 @@ if (locales[0].indexOf("-") != -1) {
     firstLanguage = locales[0]
 }
 var localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
-if (store.get("localConfig")["langue"] == undefined) {
+console.log("TEST : ", localConfig["langue"])
+if (localConfig["langue"] == undefined) {
     setConfig()
+    var showLanguage = firstLanguage
 } else {
-    var showLanguage = store.get("localConfig")["langue"]
+    var showLanguage = localConfig["langue"]
 }
-console.log(showLanguage)
+console.log("showlanguage : ",showLanguage)
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : " + app.getVersion())
