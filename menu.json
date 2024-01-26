@@ -76,8 +76,8 @@
         "fr": "Plein écran",
         "en": "Toogle full screen"
     },
-    "" : {
-        "fr": "",
-        "en": ""
+    "changeLanguage" : {
+        "fr": "Changer la langue d'affichage",
+        "en": "Change display language"
     }
 }

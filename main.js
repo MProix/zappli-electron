@@ -25,16 +25,21 @@ let autresDisques = []
 
 // on récupère la langue d'affichage principale du système
 var locales = app.getPreferredSystemLanguages()
-console.log("LOCALES : " + locales)
 var firstLanguage = "fr"
 if (locales[0].indexOf("-") != -1) {
     firstLanguage = locales[0].slice(0, locales[0].indexOf("-"))
 } else {
     firstLanguage = locales[0]
 }
-var showLanguage = store.get("localConfig")["langue"]
-let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
+var localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
+console.log(localConfig)
+if (store.get("localConfig")["langue"] == "undefined") {
+    setConfig()
+} else {
+    var showLanguage = store.get("localConfig")["langue"]
+}
 
+console.log(showLanguage)
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : " + app.getVersion())
@@ -297,7 +302,15 @@ function erraseFilesAndCopyNews(directory) {
         }
     });
 }
-
+function changeLanguage(lang) {
+    console.log(lang)
+    //contents.reloadIgnoringCache()
+    firstLanguage = lang
+    setConfig()
+    console.log(store.get("localConfig"))
+    app.relaunch()
+    app.exit()
+}
 /* function checkUrl() {
     let url = "https://www.proix.eu/zapplis/superzappli.json";
     https.get(url, (res) => {
@@ -318,7 +331,7 @@ function erraseFilesAndCopyNews(directory) {
         });
 
     }).on("error", (error) => {
-        //console.log("localconfig", localConfig)
+        //console.log("localConfig", localConfig)
         store.set("distantConfig", localConfig)
         console.error(error.message);
     });
@@ -479,6 +492,24 @@ const templateMenu = [
                 click() {
                     mainWindow.webContents.send("listenPlay")
                 }
+            },
+            { type: 'separator' },
+            {
+                label: menu["changeLanguage"][showLanguage],
+                submenu: [
+                    {
+                        label: "English",
+                        click() {
+                            changeLanguage("en")
+                        }
+                    },
+                    {
+                        label: "Français",
+                        click() {
+                            changeLanguage("fr")
+                        }
+                    },
+                ]
             }
         ]
     },
@@ -537,8 +568,8 @@ console.log(app.getPath('pictures'))
 console.log(app.getPath('videos'))
 console.log(app.getFileIcon(app.getAppPath('home')))
  */
-ipcMain.on('changeLanguage', (evt, arg) => {
+/* ipcMain.on('changeLanguage', (evt, arg) => {
     console.log("langue :", arg)
     contents.reloadIgnoringCache()
 })
-console.log(store.get("localConfig")["langue"])
+console.log(store.get("localConfig")["langue"]) */

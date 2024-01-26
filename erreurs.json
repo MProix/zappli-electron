@@ -1,5 +1,5 @@
 {
-    "listeLangues" : ["fr","en","pl"],
+    "listeLangues" : ["fr","en"],
     "erNoPrevious" : {
         "fr": "Pas de tirage antérieur",
         "en": "No existing prenious draw"
