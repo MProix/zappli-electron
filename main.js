@@ -32,13 +32,11 @@ if (locales[0].indexOf("-") != -1) {
     firstLanguage = locales[0]
 }
 var localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
-console.log(localConfig)
-if (store.get("localConfig")["langue"] == "undefined") {
+if (store.get("localConfig")["langue"] == undefined) {
     setConfig()
 } else {
     var showLanguage = store.get("localConfig")["langue"]
 }
-
 console.log(showLanguage)
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
