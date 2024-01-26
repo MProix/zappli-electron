@@ -16,10 +16,11 @@ const erreurs = JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),
 const writtenLanguages = erreurs["listeLangues"] //liste des langues supportées par l'appli (qui ont un fichier home.html dans leur langue)
 let userStoragePath = app.getPath("userData")
 var platform = process.platform
+console.log(userStoragePath)
 
 // ================ variables globales stockées ================ //
 ///////////////////////////////////////////////////////////////////
-let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
+
 let autresDisques = []
 
 // on récupère la langue d'affichage principale du système
@@ -31,6 +32,8 @@ if (locales[0].indexOf("-") != -1) {
 } else {
     firstLanguage = locales[0]
 }
+var showLanguage = store.get("localConfig")["langue"]
+let localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
 
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
@@ -91,12 +94,12 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
 
 // ================ Initialisation de la fenêtre principale ================ //
 app.whenReady().then(() => {
-    if (writtenLanguages.includes(firstLanguage)) {
-        //console.log("LANGUAGE : "+firstLanguage)
-        mainWindow = createWindow("views/home/home_" + firstLanguage + ".html")
+    if (writtenLanguages.includes(showLanguage)) {
+        //console.log("LANGUAGE : "+showLanguage)
+        mainWindow = createWindow("views/home/home_" + showLanguage + ".html")
     } else {
-        firstLanguage = "fr"
-        mainWindow = createWindow("views/home/home_" + firstLanguage + ".html")
+        showLanguage = "fr"
+        mainWindow = createWindow("views/home/home_" + showLanguage + ".html")
     }
     mainWindow.webContents.once('did-finish-load', () => {
         mainWindow.send('store-data', dossiersRacineUtilisateur)
@@ -142,7 +145,7 @@ ipcMain.on('getDraw', (evt, arg) => {
 
 ipcMain.on('getPreviousDraw', (evt, arg) => {
     if (historiqueNum < 3) { // on vérifie qu'il existe effectivement un tirage antérieur : si non...
-        data = erreurs["erNoPrevious"][firstLanguage]
+        data = erreurs["erNoPrevious"][showLanguage]
         evt.sender.send('pasdhistorique', [data]) //... on renvoie un message d'erreur pour la console du navigateur
     } else { //...si c'est bon...
         historiqueNum = historiqueNum - 2 //... on revient sur ce tirage
@@ -192,7 +195,7 @@ ipcMain.handle('changeImage', async (evt, arg) => {
     }
     if (choosePertinentFiles(arg["routes"]).length == histList.length) { // on vérifie que toutes les images ne sont pas déjà utilisées
         console.log("probleme")
-        erreur = erreurs["erAllImages"][firstLanguage]
+        erreur = erreurs["erAllImages"][showLanguage]
         return { "erreur": erreur }
     } else { // si c'est bon on tire des images jusqu'à ce qu'on en ait une qui n'est pas déjà dans la liste
         while (listComp.includes(newImage[0])) {
@@ -273,10 +276,10 @@ function shuffleFolder(listeImages, num) {
     var shuffleImgToLoad = listeImages.sort((a, b) => 0.5 - Math.random());
     var listeImagesChoisies = shuffleImgToLoad.slice(0, num)
     if (listeImagesChoisies == 0) {
-        error = erreurs["erSelectFolder"][firstLanguage]
+        error = erreurs["erSelectFolder"][showLanguage]
     }
     else if (0 < listeImagesChoisies.length && listeImagesChoisies.length < num) {
-        error = erreurs["erTooBig"][firstLanguage][0] + listeImagesChoisies.length + erreurs["erTooBig"][firstLanguage][1]
+        error = erreurs["erTooBig"][showLanguage][0] + listeImagesChoisies.length + erreurs["erTooBig"][showLanguage][1]
     } else {
         var max = listeImages.length
         historiqueNum = historiqueNum + 1
@@ -324,7 +327,8 @@ function erraseFilesAndCopyNews(directory) {
 function setConfig() {
     store.set("localConfig", {
         "version": pjson.version,
-        "URL": "https://www.proix.eu/zapplis/superzappli.json"
+        "URL": "https://www.proix.eu/zapplis/superzappli.json",
+        "langue": firstLanguage
     })
 }
 
@@ -358,7 +362,7 @@ const templateMenu = [
             label: app.name,
             submenu: [
                 {
-                    label: menu["about"][firstLanguage],
+                    label: menu["about"][showLanguage],
                     click() {
                         openAboutWindow(
                             {
@@ -371,25 +375,25 @@ const templateMenu = [
                 },
                 { type: 'separator' },
                 {
-                    label: menu["services"][firstLanguage],
+                    label: menu["services"][showLanguage],
                     role: 'services'
                 },
                 { type: 'separator' },
                 {
-                    label: menu["hide"][firstLanguage],
+                    label: menu["hide"][showLanguage],
                     role: 'hide'
                 },
                 {
-                    label: menu["hideOthers"][firstLanguage],
+                    label: menu["hideOthers"][showLanguage],
                     role: 'hideOthers'
                 },
                 {
-                    label: menu["unhide"][firstLanguage],
+                    label: menu["unhide"][showLanguage],
                     role: 'unhide'
                 },
                 { type: 'separator' },
                 {
-                    label: menu["quit"][firstLanguage],
+                    label: menu["quit"][showLanguage],
                     role: 'quit'
                 }
             ]
@@ -399,7 +403,7 @@ const templateMenu = [
                 label: app.name,
                 submenu: [
                     {
-                        label: menu["about"][firstLanguage],
+                        label: menu["about"][showLanguage],
                         click() {
                             openAboutWindow(
                                 {
@@ -417,37 +421,37 @@ const templateMenu = [
         ]),
     // { role: 'fileMenu' }
     {
-        label: menu["file"][firstLanguage],
+        label: menu["file"][showLanguage],
         submenu: [
             isMac ? {
-                label: menu["close"][firstLanguage],
+                label: menu["close"][showLanguage],
                 role: 'close'
             } : {
-                label: menu["quit"][firstLanguage],
+                label: menu["quit"][showLanguage],
                 role: 'quit'
             }
         ]
     },
     {
-        label: menu["action"][firstLanguage],
+        label: menu["action"][showLanguage],
         submenu: [
             { role: 'toggleDevTools' },
             {
-                label: menu["chooseFolder"][firstLanguage],
+                label: menu["chooseFolder"][showLanguage],
                 accelerator: "CommandOrControl+F",
                 click() {
                     mainWindow.webContents.send("clickMenu", { "action": "2" })
                 }
             },
             {
-                label: menu["chooseNumber"][firstLanguage],
+                label: menu["chooseNumber"][showLanguage],
                 accelerator: "CommandOrControl+N",
                 click() {
                     mainWindow.webContents.send("clickMenu", { "action": "1" })
                 }
             },
             {
-                label: menu["chooseAction"][firstLanguage],
+                label: menu["chooseAction"][showLanguage],
                 accelerator: "CommandOrControl+A",
                 click() {
                     mainWindow.webContents.send("clickMenu", { "action": "3" })
@@ -455,11 +459,11 @@ const templateMenu = [
             },
             { type: 'separator' },
             {
-                label: menu["previousDraw"][firstLanguage],
+                label: menu["previousDraw"][showLanguage],
                 accelerator: "Backspace",
                 click() {
                     if (historiqueNum < 3) { // on vérifie qu'il existe effectivement un tirage antérieur : si non...
-                        data = erreurs["erNoPrevious"][firstLanguage]
+                        data = erreurs["erNoPrevious"][showLanguage]
                         mainWindow.webContents.send('pasdhistorique', [data]) //... on renvoie un message d'erreur pour la console du navigateur
                     } else { //...si c'est bon...
                         historiqueNum = historiqueNum - 2 //... on revient sur ce tirage
@@ -470,7 +474,7 @@ const templateMenu = [
                 }
             },
             {
-                label: menu["drawImages"][firstLanguage],
+                label: menu["drawImages"][showLanguage],
                 accelerator: "Return",
                 click() {
                     mainWindow.webContents.send("listenPlay")
@@ -480,23 +484,23 @@ const templateMenu = [
     },
     // { role: 'viewMenu' }
     {
-        label: menu["view"][firstLanguage],
+        label: menu["view"][showLanguage],
         submenu: [
             {
-                label: menu["resetZoom"][firstLanguage],
+                label: menu["resetZoom"][showLanguage],
                 role: 'resetZoom'
             },
             {
-                label: menu["zoomIn"][firstLanguage],
+                label: menu["zoomIn"][showLanguage],
                 role: 'zoomIn'
             },
             {
-                label: menu["zoomOut"][firstLanguage],
+                label: menu["zoomOut"][showLanguage],
                 role: 'zoomOut'
             },
             { type: 'separator' },
             {
-                label: menu["togglefullscreen"][firstLanguage],
+                label: menu["togglefullscreen"][showLanguage],
                 role: 'togglefullscreen'
             }
         ]
@@ -533,3 +537,8 @@ console.log(app.getPath('pictures'))
 console.log(app.getPath('videos'))
 console.log(app.getFileIcon(app.getAppPath('home')))
  */
+ipcMain.on('changeLanguage', (evt, arg) => {
+    console.log("langue :", arg)
+    contents.reloadIgnoringCache()
+})
+console.log(store.get("localConfig")["langue"])
