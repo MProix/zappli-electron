@@ -30,8 +30,13 @@ if (locales[0].indexOf("-") != -1) {
 } else {
     firstLanguage = locales[0]
 }
-var localConfig = store.has("localConfig") ? store.get("localConfig") : setConfig()
-console.log("TEST : ", localConfig["langue"])
+if(!store.has("localConfig")){
+    setConfig()
+    var localConfig = store.get("localConfig")
+}else{
+    var localConfig = store.get("localConfig")
+}
+
 if (localConfig["langue"] == undefined || !menu["listeLangues"].includes(localConfig["langue"])) {
     setConfig()
     var showLanguage = firstLanguage
