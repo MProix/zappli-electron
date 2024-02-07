@@ -130,9 +130,6 @@ autoUpdater.on("checking-for-update", (info) => {
     log.info("checking for updates")
     log.info("INFOS : ", info)
 })
-autoUpdater.on("download-progress", (progress) => {
-    log.info(progress)
-})
 autoUpdater.on("update-downloaded", () => {
     log.info("update-downloaded")
 })
