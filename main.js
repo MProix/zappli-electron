@@ -30,11 +30,13 @@ if (locales[0].indexOf("-") != -1) {
 } else {
     firstLanguage = locales[0]
 }
-if (!store.has("localConfig")){
+if(!store.has("localConfig")){
     setConfig()
+    var localConfig = store.get("localConfig")
+}else{
+    var localConfig = store.get("localConfig")
 }
-var localConfig = store.get("localConfig")
-console.log(localConfig)
+
 if (localConfig["langue"] == undefined || !menu["listeLangues"].includes(localConfig["langue"])) {
     setConfig()
     var showLanguage = firstLanguage
@@ -239,9 +241,13 @@ ipcMain.on("maximizeRestoreApp", (evt, arg) => {
 function choosePertinentFolders(folderList, basePath) {
     var finalFoldersList = []
     for (let elt of folderList) {
-        if (elt[0] !== '.' && fs.lstatSync(path.join(basePath, elt)).isDirectory()) {
-            var classes = checkImagesAndEmpty(basePath, elt)
-            finalFoldersList.push([elt, path.join(basePath, elt), classes])
+        if (elt[0] !== '.') {
+            try{
+                fs.lstatSync(path.join(basePath, elt)).isDirectory()
+                var classes = checkImagesAndEmpty(basePath, elt)
+                finalFoldersList.push([elt, path.join(basePath, elt), classes])
+            }catch (error){
+            }
         }
     }
     return finalFoldersList
@@ -250,9 +256,11 @@ function choosePertinentFolders(folderList, basePath) {
 function checkImagesAndEmpty(base, elt) {
     var classesToAdd = { "empty": true, "images": false, "folders": false }
     for (let element of fs.readdirSync(path.join(base, elt))) {
-        if (fs.lstatSync(path.join(base, elt, element)).isDirectory()) {
+        try{
+            fs.lstatSync(path.join(base, elt, element)).isDirectory()
             classesToAdd["folders"] = true
             classesToAdd["empty"] = false
+        }catch (error){
         }
         if (listOfValidExtensions.includes(path.extname(path.join(elt, element)))) {
             classesToAdd["images"] = true
