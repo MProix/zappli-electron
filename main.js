@@ -241,9 +241,13 @@ ipcMain.on("maximizeRestoreApp", (evt, arg) => {
 function choosePertinentFolders(folderList, basePath) {
     var finalFoldersList = []
     for (let elt of folderList) {
-        if (elt[0] !== '.' && fs.lstatSync(path.join(basePath, elt)).isDirectory()) {
-            var classes = checkImagesAndEmpty(basePath, elt)
-            finalFoldersList.push([elt, path.join(basePath, elt), classes])
+        if (elt[0] !== '.') {
+            try{
+                fs.lstatSync(path.join(basePath, elt)).isDirectory()
+                var classes = checkImagesAndEmpty(basePath, elt)
+                finalFoldersList.push([elt, path.join(basePath, elt), classes])
+            }catch (error){
+            }
         }
     }
     return finalFoldersList
@@ -252,9 +256,11 @@ function choosePertinentFolders(folderList, basePath) {
 function checkImagesAndEmpty(base, elt) {
     var classesToAdd = { "empty": true, "images": false, "folders": false }
     for (let element of fs.readdirSync(path.join(base, elt))) {
-        if (fs.lstatSync(path.join(base, elt, element)).isDirectory()) {
+        try{
+            fs.lstatSync(path.join(base, elt, element)).isDirectory()
             classesToAdd["folders"] = true
             classesToAdd["empty"] = false
+        }catch (error){
         }
         if (listOfValidExtensions.includes(path.extname(path.join(elt, element)))) {
             classesToAdd["images"] = true
