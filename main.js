@@ -137,6 +137,9 @@ autoUpdater.on("error", (info) => {
     log.info("error when updating")
     log.warn(info)
 })
+autoUpdater.on("before-quit-for-update", () => {
+    setTimeout(6000)
+})
 
 // =============== ROUTE BOUTON PLAY ===================
 
