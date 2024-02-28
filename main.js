@@ -30,10 +30,10 @@ if (locales[0].indexOf("-") != -1) {
 } else {
     firstLanguage = locales[0]
 }
-if(!store.has("localConfig")){
+if (!store.has("localConfig")) {
     setConfig()
     var localConfig = store.get("localConfig")
-}else{
+} else {
     var localConfig = store.get("localConfig")
 }
 
@@ -158,6 +158,9 @@ ipcMain.on('getPreviousDraw', (evt, arg) => {
         evt.sender.send('pasdhistorique', [data]) //... on renvoie un message d'erreur pour la console du navigateur
     } else { //...si c'est bon...
         historiqueNum = historiqueNum - 2 //... on revient sur ce tirage
+        while (!fs.existsSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"))) {
+            historiqueNum -= 1
+        }
         data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"))) // on récupère les données
         historiqueNum += 1 // on se remet au bon niveau d'historique
         evt.sender.send('givePreviousDraw', [data, historiqueNum - 1]) // on envoie les données au front end
@@ -250,11 +253,11 @@ function choosePertinentFolders(folderList, basePath) {
     var finalFoldersList = []
     for (let elt of folderList) {
         if (elt[0] !== '.') {
-            try{
+            try {
                 fs.lstatSync(path.join(basePath, elt)).isDirectory()
                 var classes = checkImagesAndEmpty(basePath, elt)
                 finalFoldersList.push([elt, path.join(basePath, elt), classes])
-            }catch (error){
+            } catch (error) {
             }
         }
     }
@@ -264,11 +267,11 @@ function choosePertinentFolders(folderList, basePath) {
 function checkImagesAndEmpty(base, elt) {
     var classesToAdd = { "empty": true, "images": false, "folders": false }
     for (let element of fs.readdirSync(path.join(base, elt))) {
-        try{
+        try {
             fs.lstatSync(path.join(base, elt, element)).isDirectory()
             classesToAdd["folders"] = true
             classesToAdd["empty"] = false
-        }catch (error){
+        } catch (error) {
         }
         if (listOfValidExtensions.includes(path.extname(path.join(elt, element)))) {
             classesToAdd["images"] = true
