@@ -14,7 +14,7 @@ body{
     width: 100vw;
     display: grid;
     grid-template-columns: 75px 200px calc(100vw - 280px);
-    grid-template-rows: 40px 75px 75px 75px calc(100vh - 420px) 150px;
+    grid-template-rows: 40px 75px 75px 75px 75px calc(100vh - 495px) 150px;
     /*background-image: url("logoZappli.png");
     background-repeat: no-repeat;
     background-size: 75px auto;
@@ -172,6 +172,14 @@ body{
             justify-self: stretch;
             align-self: stretch;
         }
+        #option4{
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 5;
+            grid-row-end: 6;
+            justify-self: stretch;
+            align-self: stretch;
+        }
     #optionText1{
         border: 1px solid grey;
         grid-column-start: 2;
@@ -225,8 +233,8 @@ body{
         height: 100%;
         grid-column-start: 1;
         grid-column-end: 2;
-        grid-row-start: 6;
-        grid-row-end: 7;
+        grid-row-start: 7;
+        grid-row-end: 8;
         align-self: center;
         justify-self: center;
         display: flex;
@@ -264,7 +272,7 @@ body{
         grid-column-start: 2;
         grid-column-end: 4;
         grid-row-start: 2;
-        grid-row-end: 7;
+        grid-row-end: 8;
         border-radius: 5px;
         background-color: white;
     }

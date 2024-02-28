@@ -108,6 +108,19 @@ function getSubfolders(event) {
     }
 };
 
+// ===================== Le bouton erase =========================== //
+$("#option4").on("click", () => {
+    ipcRenderer.send("erase")
+})
+ipcRenderer.on("efface", (evt, data) => {
+    $("#displayImages").html("")
+    $("#compteur").attr('value', data);
+    if (data > 1) {
+        $("#previous").removeClass("backButton");
+    } else {
+        $("#previous").addClass("backButton");
+    };
+})
 // ===================== fonctions ================================ //
 
 function appendSubfolders(location, liste) {

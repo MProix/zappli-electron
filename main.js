@@ -237,6 +237,14 @@ ipcMain.on("maximizeRestoreApp", (evt, arg) => {
     }
 })
 
+// =============== ROUTES ERASE ===============
+
+ipcMain.on("erase", (evt, arg) => {
+    historiqueNum += 1
+    var data = historiqueNum
+    evt.sender.send('efface', data)
+})
+
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
     var finalFoldersList = []
