@@ -15,3 +15,9 @@ Il clique sur le bouton "play" et le nombre choisi d'images s'affiche à l'écra
 En cliquant sur les images il peut au choix : effacer/réafficher l'image, l'entourer en jaune, change d'image (une image non présente à l'écran s'affiche alors à la place de celle qui a été cliquée).
 
 ## Applications possibles mais non exhaustives
+
+https://www.youtube.com/watch?v=OemV-aJXfLM&ab_channel=ESLExpertz
+https://www.youtube.com/watch?v=jN1OCmWPsRc&ab_channel=ESLExpertz
+https://www.youtube.com/watch?v=OvymUUYJywc&ab_channel=ESLExpertz
+https://www.youtube.com/watch?v=HIRATZNRRZQ&ab_channel=ESLExpertz
+https://www.youtube.com/watch?v=Z71-0xAVx9M&ab_channel=ESLExpertz
