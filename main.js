@@ -62,7 +62,7 @@ try {
 
 let mainWindow = null //on stocke la variable de fenêtre
 //let newVersionWin = null
-var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff"] // on stocke les extensions valides pour l'afichage des images
+var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff", ".PNG", ".JPG", ".JPEG", ".WEBP", ".GIF", ".TIFF"] // on stocke les extensions valides pour l'afichage des images
 //let disquesSysteme = [['Disque C','C:'],['Disque D','D:'],['Disque F','F:']]
 const userHomeDirectory = os.homedir() // on stocke le chemin du répertoire utilisateur pour construire l'arborescence de ses dossiers
 let dossiersRacineUtilisateur = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory) //on crée l'arborescence de la racine de l'utilisateur
@@ -470,6 +470,7 @@ const templateMenu = [
         label: menu["action"][showLanguage],
         submenu: [
             { role: 'toggleDevTools' },
+            { role: 'forceReload' },
             {
                 label: menu["chooseFolder"][showLanguage],
                 accelerator: "CommandOrControl+F",

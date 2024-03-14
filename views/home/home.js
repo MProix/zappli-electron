@@ -1,5 +1,5 @@
 const { ipcRenderer } = require('electron');
-var isLeftMenuActive = false;
+//var isLeftMenuActive = false;
 
 // ===================== On précharge les dossiers principaux
 
@@ -15,25 +15,6 @@ ipcRenderer.on('OS', (evt, arg) => {
         $("#header").addClass("headerBackground");
     }
 });
-/* ipcRenderer.on('autres-disques', (evt, arg) => {
-    console.log(arg);
-    if (arg.length != 0) {
-        $("#mainUl").append("<hr>");
-        if (arg.length == 1) {
-            $("#mainUl").append(
-                '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up ' + arg[0][2] + '" id="' + arg[0][1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + arg[0][0] + '</span></label></li>'
-            );
-        } else {
-            for (let elt of arg) {
-                console.log(elt);
-                $("#mainUl").append(
-                    '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up ' + elt[2] + '" id="' + elt[1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + elt[0] + '</span></label></li>'
-                );
-            };
-        }
-
-    }
-}) */
 
 // Ouverture des sous-menus en cliquant sur les icônes de la colonne de gauche
 $(".option").on("click", function () {
@@ -155,38 +136,7 @@ function displayImages(array) {
             'transform': 'scale(1)',
         });
     });
-    $(".image").on("click", function () {
-        if ($("#efface")[0].checked == true) {
-            $(this).toggleClass("cache");
-        } else if ($("#exergue")[0].checked == true) {
-            $(this).children().toggleClass("exergue");
-        } else if ($("#change")[0].checked == true) {
-            //console.log($(this).children()[0].id);
-            var checkedFolders = [];
-            for (let elt of $(".folderButton:checkbox:checked")) {
-                checkedFolders.push($(elt).next().children()[0].id);
-            }
-            var data = {
-                "imgToChange": $(this).children()[0].id,
-                "routes": checkedFolders
-            }
-            ipcRenderer.invoke("changeImage", data).then((data) => {
-                console.log("IMPDATA", data);
-                if (data["erreur"] != "") {
-                    alert(data["erreur"]);
-                } else {
-                    $($($("#displayImages").children()[data["index"]]).children()[0]).attr("src", data["nouvelleImage"][1])
-                    $($($("#displayImages").children()[data["index"]]).children()[0]).attr("id", data["nouvelleImage"][0])
-                };
-                $("#compteur").attr('value', data["historique"]);
-                if (data["historique"] > 1) {
-                    $("#previous").removeClass("backButton");
-                } else {
-                    $("#previous").addClass("backButton");
-                };
-            })
-        }
-    })
+    $(".image").on("mousedown", doOnClick)
 };
 
 var tableSizesCol = [
@@ -218,7 +168,121 @@ function imgSize(num) {
     })
 }
 
-$("#close").on("click", () => {
+/* $("#container").on("click", (e) => {
+    if (e.target.id != "showHideMenus" && isLeftMenuActive) {
+        $("#monMenu").css("opacity", "0");
+        isLeftMenuActive = false;
+    }
+}) */
+
+ipcRenderer.on("clickMenu", (evt, arg) => {
+    if (["1", "2", "3"].includes(arg["action"])) {
+        for (let elt of $(".optionText")) {
+            if (arg["action"] !== elt.id.charAt(elt.id.length - 1)) {
+                $(elt).removeClass('index');
+            }
+        }
+        var classe = "#optionText" + arg["action"];
+        $(classe).toggleClass("index");
+    } else {
+        alert("mauvais id")
+    }
+})
+ipcRenderer.on("listenPlay", (evt, arg) => {
+    var checkedFolders = [];
+    for (let elt of $(".folderButton:checkbox:checked")) {
+        checkedFolders.push($(elt).next().children()[0].id);
+    }
+    var data = { "listeDossiers": checkedFolders, "nombreImages": $("#cardsNumber").val() }
+    ipcRenderer.send('getDraw', data);
+})
+
+function doOnClick(e) {
+    switch ($("#optionText3>div input:checked")[0].id) {
+        case "efface":
+            $(this).toggleClass("cache");
+            break;
+        case "exergue":
+            $(this).children().toggleClass("exergue");
+            break;
+        case "change":
+            var checkedFolders = [];
+            for (let elt of $(".folderButton:checkbox:checked")) {
+                checkedFolders.push($(elt).next().children()[0].id);
+            }
+            var data = {
+                "imgToChange": $(this).children()[0].id,
+                "routes": checkedFolders
+            }
+            ipcRenderer.invoke("changeImage", data).then((data) => {
+                //console.log("IMPDATA", data);
+                if (data["erreur"] != "") {
+                    alert(data["erreur"]);
+                } else {
+                    $($($("#displayImages").children()[data["index"]]).children()[0]).attr("src", data["nouvelleImage"][1])
+                    $($($("#displayImages").children()[data["index"]]).children()[0]).attr("id", data["nouvelleImage"][0])
+                };
+                $("#compteur").attr('value', data["historique"]);
+                if (data["historique"] > 1) {
+                    $("#previous").removeClass("backButton");
+                } else {
+                    $("#previous").addClass("backButton");
+                };
+            });
+            break;
+        case "deplace":
+            this.ondragstart = function(){
+                return false
+            }
+            console.log("ON A CLIQUE SUR UNE IMAGE")
+            setDraggablePosition()
+            this.style.zIndex = 5
+            elt = this       
+            // centers the image at (pageX, pageY) coordinates = cursor
+            function moveAt(pageX, pageY) {
+                elt.style.left = pageX - elt.offsetWidth / 2 + 'px';
+                elt.style.top = pageY - elt.offsetHeight / 2 + 'px';
+            }
+            function onMouseMove(e) {
+                console.log("ON BOUGE")
+                moveAt(e.pageX, e.pageY);
+            }
+            document.addEventListener('mousemove', onMouseMove)
+            $(".image").on("mouseup", function () {
+                console.log("MOUSEUP")
+                document.removeEventListener('mousemove', onMouseMove);
+                this.onmouseup = null;
+            });
+            break;
+        default:
+            alert("not efface");
+    }
+}
+/* 
+function setDefaultPosition() {
+    imgSize($(".image").length)
+    for (let elt of $(".image")) {
+        $(elt).css({
+            position: "inherit",
+            zIndex: "auto"
+        })
+    }
+} */
+function setDraggablePosition() {
+    for (let elt of $(".image")) {
+        $(elt).css({
+            width: $(elt).css("width"),
+            height: $(elt).css("height"),
+            top: elt.offsetTop,
+            left: elt.offsetLeft
+        })
+    }
+    for (let elt of $(".image")) {
+        $(elt).css("position", "absolute")
+    }
+}
+
+/* $("#close").on("click", () => {
     ipcRenderer.send('closeApp');
 });
 $("#minimize").on("click", () => {
@@ -226,9 +290,29 @@ $("#minimize").on("click", () => {
 });
 $("#maxRes").on("click", () => {
     ipcRenderer.send('maximizeRestoreApp');
-});
+}); */
 
-function changeMaxResBtn(isMaximizedApp) {
+/* ipcRenderer.on('autres-disques', (evt, arg) => {
+    console.log(arg);
+    if (arg.length != 0) {
+        $("#mainUl").append("<hr>");
+        if (arg.length == 1) {
+            $("#mainUl").append(
+                '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up ' + arg[0][2] + '" id="' + arg[0][1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + arg[0][0] + '</span></label></li>'
+            );
+        } else {
+            for (let elt of arg) {
+                console.log(elt);
+                $("#mainUl").append(
+                    '<li><input type="checkbox" name="choix" class="folderButton"><label for="name"><span class="up ' + elt[2] + '" id="' + elt[1] + '" onclick="getSubfolders(event)">&#x1f4c1; ' + elt[0] + '</span></label></li>'
+                );
+            };
+        }
+
+    }
+}) */
+
+/* function changeMaxResBtn(isMaximizedApp) {
     if (isMaximizedApp) {
         $("#maxRes").attr('title', "Restaurer");
         $("#maxRes").removeClass("maximize");
@@ -240,7 +324,7 @@ function changeMaxResBtn(isMaximizedApp) {
     }
 }
 ipcRenderer.on("isMaximized", () => { changeMaxResBtn(true) });
-ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) });
+ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) }); */
 
 $("#showHideMenus").on("click", () => {
     /* if (isLeftMenuActive) {
@@ -253,32 +337,4 @@ $("#showHideMenus").on("click", () => {
         isLeftMenuActive = true;
     } */
     ipcRenderer.send('fireMenu')
-})
-$("#container").on("click", (e) => {
-    if (e.target.id != "showHideMenus" && isLeftMenuActive) {
-        $("#monMenu").css("opacity", "0");
-        isLeftMenuActive = false;
-    }
-})
-
-ipcRenderer.on("clickMenu", (evt, arg) => {
-    if (["1","2","3"].includes(arg["action"])) {
-        for (let elt of $(".optionText")) {
-            if (arg["action"] !== elt.id.charAt(elt.id.length - 1)) {
-                $(elt).removeClass('index');
-            }
-        }
-        var classe = "#optionText" + arg["action"];
-        $(classe).toggleClass("index");
-    } else { 
-        alert("mauvais id")
-    }
-})
-ipcRenderer.on("listenPlay", (evt,arg)=>{
-    var checkedFolders = [];
-    for (let elt of $(".folderButton:checkbox:checked")) {
-        checkedFolders.push($(elt).next().children()[0].id);
-    }
-    var data = { "listeDossiers": checkedFolders, "nombreImages": $("#cardsNumber").val() }
-    ipcRenderer.send('getDraw', data);
 })

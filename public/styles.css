@@ -224,6 +224,7 @@ body{
         background-color: white;
         display: flex;
         align-items: center;
+        height: fit-content;
     }
         #optionText3>div{
             padding-left: 10px;
@@ -279,7 +280,7 @@ body{
 
     /* CLASSES GENERALES */
 .index{
-    z-index: 2;
+    z-index: 6;
 }
 .up{
     cursor: pointer;
