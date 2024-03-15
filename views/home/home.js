@@ -102,6 +102,20 @@ ipcRenderer.on("efface", (evt, data) => {
         $("#previous").addClass("backButton");
     };
 })
+// ===================== Le bouton numéroter =========================== //
+$("#option5").on("click", () => {
+    if ($(".numero").length == 0) {
+        $(".image").each(function (index) {
+            console.log(index + 1)
+            $($(this).children()[0]).after('<div class="numero">' + parseInt(index + 1) + '</div>')
+            calculateNumPositions($(this).children()[0], $($(this).children()[0]).next())
+        })
+    } else {
+        $(".numero").remove()
+    }
+
+})
+
 // ===================== fonctions ================================ //
 
 function appendSubfolders(location, liste) {
@@ -231,13 +245,14 @@ function doOnClick(e) {
             });
             break;
         case "deplace":
-            this.ondragstart = function(){
+            this.ondragstart = function () {
                 return false
             }
             console.log("ON A CLIQUE SUR UNE IMAGE")
             setDraggablePosition()
+            $(".image").css("zIndex", "auto")
             this.style.zIndex = 5
-            elt = this       
+            elt = this
             // centers the image at (pageX, pageY) coordinates = cursor
             function moveAt(pageX, pageY) {
                 elt.style.left = pageX - elt.offsetWidth / 2 + 'px';
@@ -280,6 +295,10 @@ function setDraggablePosition() {
     for (let elt of $(".image")) {
         $(elt).css("position", "absolute")
     }
+}
+function calculateNumPositions(previous, elt) {
+    $(elt).offset({ "top": $(previous).offset().top + $(previous).height() })
+    $(elt).css("transform","translateY(-15px)");
 }
 
 /* $("#close").on("click", () => {

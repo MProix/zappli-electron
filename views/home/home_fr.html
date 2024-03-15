@@ -32,6 +32,7 @@
         <div id="option2" class="option" title="choisir un ou des dossiers"><i class="fa-regular fa-folder-open"></i></div>
         <div id="option3" class="option" title="choisir l'action à effectuer au clic"><i class="fa-solid fa-arrow-pointer"></i></div>
         <div id="option4" class="option" title="tout effacer"><i class="fa-solid fa-eraser"></i></div>
+        <div id="option5" class="option" title="numéroter les images"><img src="./../../public/image-solid.svg" style="width:30px"></div>
         <div id="optionText1" class="optionText">
             <div id="numbers">
                 <input id="cardsNumber" type="number" name="input_field" value="6" min="1" max="24">
@@ -45,14 +46,14 @@
         </div>
         <div id="optionText3" class="optionText">
             <div>
-                <input type="radio" name="action" value="efface" id="efface" checked>
+                <input type="radio" name="action" value="efface" id="efface">
                 <label for="efface">Efface l'image</label><br>
                 <input type="radio" name="action" value="exergue" id="exergue">
                 <label for="exergue">Entoure l'image</label><br>
                 <input type="radio" name="action" value="change" id="change">
                 <label for="change">Change l'image</label><br>
-                <input type="radio" name="action" value="deplace" id="deplace">
-                <label for="deplace">Déplacer l'image</label><br>
+                <input type="radio" name="action" value="deplace" id="deplace" checked>
+                <label for="deplace">Déplace l'image</label><br>
             </div>
         </div>
         <input id="compteur" type="number" value="0">
