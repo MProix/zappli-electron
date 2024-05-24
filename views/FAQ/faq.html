@@ -12,7 +12,22 @@
 
 </head>
 <body>
-    <h1>FAQ</h1>
-    <p>Cette partie se remplira avec les réponses à vos futures questions</p>
+    <div id="titleBar">
+        <div id="titre">zappli</div>   
+        <button class="topBtn minimize" id="minimize" title="Réduire"></button>
+        <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
+        <button class="topBtn close" id="close" title="Fermer"></button>
+    </div>
+    <div id="content">
+        <h1>FAQ</h1>
+        <p>Cette partie se remplira avec les réponses à vos futures questions</p>
+    </div>
+    <script>
+        window.jquery = window.$ = require('jquery');
+        global.jQuery = require('jquery')
+    </script>
+    <script src="../../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+    <script src="faq.js"></script>
+    
 </body>
 </html>

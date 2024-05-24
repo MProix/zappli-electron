@@ -59,6 +59,7 @@ log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : " + app.getVersion())
 
 let mainWindow = null //on stocke la variable de fenêtre
+let faq = null
 var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff", ".PNG", ".JPG", ".JPEG", ".WEBP", ".GIF", ".TIFF"] // on stocke les extensions valides pour l'afichage des images
 const userHomeDirectory = os.homedir() // on stocke le chemin du répertoire utilisateur pour construire l'arborescence de ses dossiers
 let dossiersRacineUtilisateur = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory) //on crée l'arborescence de la racine de l'utilisateur
@@ -81,7 +82,7 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
             nodeIntegration: true,
             contextIsolation: false,
             "web-security": false,
-            devTools: false // disabling devtools for distrib version
+            devTools: true // disabling devtools for distrib version
         },
         titleBarStyle: 'hidden'
         //frame: true
@@ -183,6 +184,22 @@ ipcMain.on("maximizeRestoreApp", (evt, arg) => {
     }
 })
 
+ipcMain.on("closeFaq", (evt, arg) => {
+    console.log("ferme")
+    faq.close()
+})
+ipcMain.on("minimizeFaq", (evt, arg) => {
+    faq.minimize()
+})
+ipcMain.on("maximizeRestoreFaq", (evt, arg) => {
+    if (faq.isMaximized()) {
+        faq.restore()
+        faq.webContents.send("isRestored")
+    } else {
+        faq.maximize()
+        faq.webContents.send("isMaximized")
+    }
+})
 // =============== ROUTES ERASE ===============
 
 ipcMain.on("erase", (evt, arg) => {
@@ -193,7 +210,7 @@ ipcMain.on("erase", (evt, arg) => {
 // =============== ROUTES AIDE ===============
 
 ipcMain.on("help", (evt,arg) => {
-    createWindow("views/FAQ/faq.html", winWidth = 600, winHeight = 400)
+    faq = createWindow("views/FAQ/faq.html", winWidth = 600, winHeight = 400)
 })
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
@@ -423,9 +440,9 @@ const templateMenu = [
     {
         label: menu["action"][showLanguage],
         submenu: [
-            /*{ role: 'toggleDevTools' },
-            //{ role: 'forceReload' },
-            {
+            { role: 'toggleDevTools' },
+            { role: 'forceReload' },
+            /*{
                 label: menu["chooseFolder"][showLanguage],
                 accelerator: "CommandOrControl+F",
                 click() {
