@@ -160,7 +160,14 @@ function calculerTaille(div) {
 applyPlayBtns(".submitOneFolder")
 // ============= LE BOUTON CHANGER DE FOND ============ //
 $("#fondPicker").on("change", (e) => {
-    $("#affichage").css("background-image", "url(" + e.target.files[0].path + ")")
+    if (userOS == "Win32") {
+        var fondURL = e.target.files[0].path.replace(/\\/g, '\/')
+        console.log(fondURL)
+        $("#affichage").css("background-image", "url(" + fondURL + ")")
+    } else {
+        $("#affichage").css("background-image", "url(" + e.target.files[0].path + ")")
+    }
+
 })
 // ============= LE BOUTON REMETTRE À ZÉRO ============ //
 
