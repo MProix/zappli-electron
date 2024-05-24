@@ -28,24 +28,26 @@ body {
     flex-direction: row;
     justify-content: end;
 }
-    #titleBar > .toggleButton{
+    #titleBar .toggleButton{
         width: 45px;
-        height: 40px;
+        height: 30px;
         border: none;
         outline: none;
         background-color: transparent;
         background-image: url("menu.png");
         background-repeat: no-repeat;
         background-position: center;
-        background-size: 50%;
+        background-size: 45%;
         transition: 0.2s;
-        cursor: pointer;
+        cursor: pointer !important;
         color: white;
+        z-index: 99;
     }
-    #titleBar > .toggleButton:hover{
+    #titleBar .toggleButton:hover{
         background-color: #343B48;
+        cursor: pointer !important;
     }
-    #titleBar > .toggleButton:active{
+    #titleBar .toggleButton:active{
         background-color: #4593d8;
     }
 #titre{
