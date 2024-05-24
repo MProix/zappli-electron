@@ -14,67 +14,136 @@
 </head>
 
 <body>
-    <div id="container">
-        <div id="mainMenu"><!--<i class="fa-solid fa-circle-info"></i>--></div>
-        <div id="header">
-            <div class="titleBar">
-                <button id="showHideMenus" class="toggleButton" title="menu"></button>
-                <div class="title">
+    <div id="zappliContainer">
+        <div id="titleBar">
+            <div id="titre">zappli<button id="showHideMenus" class="toggleButton" title="menu"></button></div>   
+            <button class="topBtn minimize" id="minimize" title="Réduire"></button>
+            <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
+            <button class="topBtn close" id="close" title="Fermer"></button>
+        </div>
+        <div id="actionsMenu">
+            <div id="baseActions">
+                <div id="deplace" class="actionBtn"><i class="fa-solid fa-maximize"></i>
+                    <p>Déplacer une carte</p>
+                </div>
+                <div id="efface" class="actionBtn"><i class="fa-solid fa-eraser"></i>
+                    <p>Effacer une carte</p>
+                </div>
+                <div id="change" class="actionBtn"><i class="fa-solid fa-rotate"></i>
+                    <p>Changer une carte</p>
+                </div>
+                <div id="surligne" class="actionBtn"><i class="fa-solid fa-highlighter"></i>
+                    <p>Surligner une carte</p>
+                </div>
+                <div id="numerote" class="actionBtn"><i class="fa-solid fa-hashtag"></i>
+                    <p>Numéroter les cartes</p>
+                </div>
+                <div id="fond" class="actionBtn">
+                    <input type="file" style="display: none;" id="fondPicker" class="fondPicker">
+                    <label for="fondPicker" style="text-align: center; cursor: pointer;"><i class="fa-solid fa-paintbrush"></i><br><p>Changer le fond</p></label>
                 </div>
             </div>
-            <div class="titleBarBtns">
-                <button class="topBtn minimize" id="minimize" title="Réduire"></button>
-                <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
-                <button class="topBtn close" id="close" title="Fermer"></button>
+            <div id="zero"><i class="fa-solid fa-rotate-left"></i>
+                <p>Remettre à zéro</p>
+            </div>
+            <div id="aideNotifs">
+                <div id="aide"><i class="fa-regular fa-circle-question"></i></div>
+                <div id="notifs"><i class="fa-solid fa-circle-exclamation"></i></div>
             </div>
         </div>
-        <div id="option1" class="option" title="choisir un nombre de cartes"><i class="fa-solid fa-images"></i></div>
-        <div id="option2" class="option" title="choisir un ou des dossiers"><i class="fa-regular fa-folder-open"></i></div>
-        <div id="option3" class="option" title="choisir l'action à effectuer au clic"><i class="fa-solid fa-arrow-pointer"></i></div>
-        <div id="option4" class="option" title="tout effacer"><i class="fa-solid fa-eraser"></i></div>
-        <div id="option5" class="option" title="numéroter les images"><img src="./../../public/image-solid.svg" style="width:30px"></div>
-        <div id="optionText1" class="optionText">
-            <div id="numbers">
-                <input id="cardsNumber" type="number" name="input_field" value="6" min="1" max="24">
+        <div id="topBottomMoving"></div>
+        <div id="mainContent">
+            <div id="folderChooser">
+                <div class="oneFolder" id="folder1">
+                    <div class="folderTitle" id="titleFolder1">
+                        <div></div>
+                    </div>
+                    <div class="folderSelector" id="folderSelector1">
+                        <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen1"
+                            class="filepicker">
+                        <label for="folderChosen1"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
+                    </div>
+                    <div class="cardsNumber" id="cardsNumber1">
+                        <div><input type="number" value="3" min="1" max="24"></div>
+                        <label for="cardsNumber1">Nombre de cartes à afficher</label>
+                    </div>
+                    <div class="submitOneFolder" id="submitOneFolder1">
+                        <i class="fa-regular fa-circle-play"></i>
+                        <div>Afficher les cartes</div>
+                    </div>
+                </div>
+                <div class="oneFolder" id="folder2">
+                    <div class="folderTitle" id="titleFolder2">
+                        <div></div>
+                    </div>
+                    <div class="folderSelector" id="folderSelector2">
+                        <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen2"
+                            class="filepicker">
+                        <label for="folderChosen2"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
+                    </div>
+                    <div class="cardsNumber" id="cardsNumber2">
+                        <div><input type="number" value="3" min="1" max="24"></div>
+                        <label for="cardsNumber2">Nombre de cartes à afficher</label>
+                    </div>
+                    <div class="submitOneFolder" id="submitOneFolder2">
+                        <i class="fa-regular fa-circle-play"></i>
+                        <div>Afficher les cartes</div>
+                    </div>
+                </div>
+                <div class="oneFolder" id="folder3">
+                    <div class="folderTitle" id="titleFolder3">
+                        <div></div>
+                    </div>
+                    <div class="folderSelector" id="folderSelector3">
+                        <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen3"
+                            class="filepicker">
+                        <label for="folderChosen3"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
+                    </div>
+                    <div class="cardsNumber" id="cardsNumber3">
+                        <div><input type="number" value="3" min="1" max="24"></div>
+                        <label for="cardsNumber3">Nombre de cartes à afficher</label>
+                    </div>
+                    <div class="submitOneFolder" id="submitOneFolder3">
+                        <i class="fa-regular fa-circle-play"></i>
+                        <div>Afficher les cartes</div>
+                    </div>
+                </div>
+                <div id="delAddFolderChooser">
+                    <div id="addFolderChooser" title="ajouter un dossier"><i class="fa-regular fa-square-plus"></i>
+                    </div>
+                    <div id="delFolderChooser" title="supprimer un dossier" style="display: none;"><i
+                            class="fa-regular fa-square-minus"></i></div>
+                </div>
             </div>
-        </div>
-        <div id="optionText2" class="optionText">
-            <div id="folder"></div>
-            <input type="hidden" name="currentFolder" id="currentFolder">
-            <ul id="mainUl">
-            </ul>
-        </div>
-        <div id="optionText3" class="optionText">
-            <div>
-                <input type="radio" name="action" value="efface" id="efface">
-                <label for="efface">Efface l'image</label><br>
-                <input type="radio" name="action" value="exergue" id="exergue">
-                <label for="exergue">Entoure l'image</label><br>
-                <input type="radio" name="action" value="change" id="change">
-                <label for="change">Change l'image</label><br>
-                <input type="radio" name="action" value="deplace" id="deplace" checked>
-                <label for="deplace">Déplace l'image</label><br>
+            <div id="leftRightMoving"></div>
+            <div id="cardsContainer">
+                <div id="affichage">
+                    <div class="nbDiv1" id="affichage1"></div>
+                </div>
+                <div id="affichageBtns">
+                    <div id="back"><i class="fa-solid fa-circle-play"></i>
+                        <div>Revenir en arrière</div>
+                    </div>
+                    <div id="play"><i class="fa-solid fa-circle-play"></i>
+                        <div>Nouveau tirage</div>
+                    </div>
+                    <div id="fullScreen">
+                        <i id="toFullScreen" class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                        <div id="toFullScreenText">Plein écran</div>
+                        <i id="toRegularScreen" style="display: none;"
+                            class="fa-solid fa-down-left-and-up-right-to-center"></i>
+                        <div id="toRegularScreenText" style="display: none;">Quitter le plein écran</div>
+                    </div>
+                </div>
+
             </div>
-        </div>
-        <input id="compteur" type="number" value="0">
-        <div id="cards">
-            <div id="displayImages"></div>
-        </div>
-        <div id="submitBlock">
-            <button id="previous" title="revenir au tirage précédent" class="submit backButton"><i class="fa-solid fa-arrow-rotate-left"></i></button>
-            <button title="tirer des cartes" class="submit" id="draw"><span><i class="fa-solid fa-circle-play"></i></span></button>
-        </div>
-    </div>
-    <div id="monMenu">
-        <div id="monMenuContent">
-            <div class="titreMenu"><span>Raccourcis clavier</span></div>
-            <div class="titreMenu"><span>Actions</span></div>
-            <div class="titreMenu"><span>Aide</span></div>
         </div>
     </div>
     <script>
         window.jquery = window.$ = require('jquery');
+        global.jQuery = require('jquery')
     </script>
+    <script src="../../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
     <script src="home.js"></script>
 </body>
 

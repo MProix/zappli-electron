@@ -7,7 +7,6 @@ const path = require("path")
 const https = require('https')
 const pjson = require('./package.json'); // pour incrire dans la base de données store
 const { autoUpdater } = require("electron-updater")
-const nodeDiskInfo = require('node-disk-info') // pour récupérer les différents disques durs
 const log = require("electron-log") // on initialise le système de log d'electron pour pouvoir débuguer à distance chez l'utilisateur
 
 const openAboutWindow = require('about-window').default;
@@ -23,47 +22,44 @@ console.log(userStoragePath)
 let autresDisques = []
 
 // on récupère la langue d'affichage principale du système
-var locales = app.getPreferredSystemLanguages()
-var firstLanguage = "fr"
+var locales = app.getPreferredSystemLanguages() // c'est une fonction de nodejs, on récupère la langue d'affichage du système
+var firstLanguage = "fr" // on passe le français en variable par défaut au cas ou la langue système ne serait pas reconnue
+//on remet dans un format lisible par défaut et on change le fr par la langue du système utilisateur
 if (locales[0].indexOf("-") != -1) {
     firstLanguage = locales[0].slice(0, locales[0].indexOf("-"))
 } else {
     firstLanguage = locales[0]
 }
-if (!store.has("localConfig")) {
+// on vérifie s'il existe une config locale
+if (!store.has("localConfig")) { // s'il n'y en a pas on la crée
     setConfig()
-    var localConfig = store.get("localConfig")
+    var localConfig = store.get("localConfig") // et on la récupère en variable
 } else {
-    var localConfig = store.get("localConfig")
+    var localConfig = store.get("localConfig") // et on la récupère en variable
 }
-
-if (localConfig["langue"] == undefined || !menu["listeLangues"].includes(localConfig["langue"])) {
+if (localConfig["langue"] == undefined || !menu["listeLangues"].includes(localConfig["langue"])) { // s'il n'y a pas de langue enregistrée ou si elle diffère de celles que l'appli connaît
     setConfig()
     var showLanguage = firstLanguage
 } else {
-    var showLanguage = localConfig["langue"]
+    var showLanguage = localConfig["langue"] // on aligne avec la langue qui va s'afficher
 }
-//console.log("showlanguage : ",showLanguage)
+
+// on vérifie s'il existe un historique
+if (!store.has("historique")) { // s'il n'y en a pas on le crée
+    store.set("historique", {
+    })
+    var historique = store.get("historique") // et on le récupère en variable
+} else {
+    var historique = store.get("historique") // et on le récupère en variable
+}
+console.log(historique)
+
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : " + app.getVersion())
 
-///////////////// chercher d'autres disques que c pour windows
-try {
-    const disks = nodeDiskInfo.getDiskInfoSync();
-    for (let disk of disks) {
-        if (disk.mounted != "C:") {
-            autresDisques.push([disk.mounted, disk.mounted, disk.filesystem])
-        }
-    }
-} catch (e) {
-    console.error(e);
-}
-
 let mainWindow = null //on stocke la variable de fenêtre
-//let newVersionWin = null
 var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff", ".PNG", ".JPG", ".JPEG", ".WEBP", ".GIF", ".TIFF"] // on stocke les extensions valides pour l'afichage des images
-//let disquesSysteme = [['Disque C','C:'],['Disque D','D:'],['Disque F','F:']]
 const userHomeDirectory = os.homedir() // on stocke le chemin du répertoire utilisateur pour construire l'arborescence de ses dossiers
 let dossiersRacineUtilisateur = choosePertinentFolders(fs.readdirSync(userHomeDirectory), userHomeDirectory) //on crée l'arborescence de la racine de l'utilisateur
 
@@ -73,8 +69,6 @@ if (fs.existsSync(path.join(userStoragePath, "historique"))) {
     fs.mkdirSync(path.join(userStoragePath, "historique")) //sinon on le crée
     fs.chmodSync(path.join(userStoragePath, "historique"), 0o777) // et on donne les bonnes permissions d'accès
 }
-
-var historiqueNum = 1 //on initialise l'incrémentation des fichiers d'historique
 
 // ================ NOUVELLE FENETRE D'APPLI ================ //
 
@@ -87,7 +81,7 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
             nodeIntegration: true,
             contextIsolation: false,
             "web-security": false,
-            devTools: true // disabling devtools for distrib version
+            devTools: false // disabling devtools for distrib version
         },
         titleBarStyle: 'hidden'
         //frame: true
@@ -111,9 +105,10 @@ app.whenReady().then(() => {
         mainWindow = createWindow("views/home/home_" + showLanguage + ".html")
     }
     mainWindow.webContents.once('did-finish-load', () => {
-        mainWindow.send('store-data', dossiersRacineUtilisateur)
-        mainWindow.send('autres-disques', autresDisques)
-        mainWindow.send('version', app.getVersion())
+        //mainWindow.send('store-data', dossiersRacineUtilisateur)
+        //mainWindow.send('autres-disques', autresDisques)
+        console.log(JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
+        mainWindow.send('erreurs', JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
         mainWindow.send('OS', process.platform)
     })
     autoUpdater.checkForUpdatesAndNotify()
@@ -146,80 +141,28 @@ autoUpdater.on("before-quit-for-update", () => {
 ipcMain.on('getDraw', (evt, arg) => {
     var listeOfImages = choosePertinentFiles(arg["listeDossiers"]) // on récupère une liste de toutes les images de ce ou ces dossier(s)
     var data = shuffleFolder(listeOfImages, arg["nombreImages"]) // on mélange et on ne garde que les premiers en fonction du nombre demandé
-    fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0])) //on crée un fichier d'historique
+    //fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0])) //on crée un fichier d'historique
     evt.sender.send('giveDraw', data) // on renvoie la liste d'images au front end
 })
-
-// =============== ROUTE BOUTON PREVIOUS ===============
-
-ipcMain.on('getPreviousDraw', (evt, arg) => {
-    if (historiqueNum < 3) { // on vérifie qu'il existe effectivement un tirage antérieur : si non...
-        data = erreurs["erNoPrevious"][showLanguage]
-        evt.sender.send('pasdhistorique', [data]) //... on renvoie un message d'erreur pour la console du navigateur
-    } else { //...si c'est bon...
-        historiqueNum = historiqueNum - 2 //... on revient sur ce tirage
-        while (!fs.existsSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"))) {
-            historiqueNum -= 1
-        }
-        data = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"))) // on récupère les données
-        historiqueNum += 1 // on se remet au bon niveau d'historique
-        evt.sender.send('givePreviousDraw', [data, historiqueNum - 1]) // on envoie les données au front end
-    }
-})
-
-// =============== ROUTE SUBFOLDERS ====================
-
-ipcMain.handle('getSubfolders', async (evt, arg) => {
-    var data = {
-        "subFolders": choosePertinentFolders(fs.readdirSync(arg), arg), // on crée la liste des sous-dossiers
-        "parentPath": arg // on récupère l'endroit où les insérer
-    }
-    return data // on renvoie direct au front end qui attend la réponse
-})
-
-// =============== ROUTE FOLDERS POUR LES DISQUES EXTERNES =======================
-
-/* ipcMain.on('getFolder', (evt, arg) => {
-    var d = require('diskinfo')
-    d.getDrives(function (err, aDrives) {
-        var disks = []
-        for (var i = 0; i < aDrives.length; i++) {
-            disks.push(aDrives[i].mounted);
-        }
-        evt.sender.send('giveFolders', disks)
-    });
-}) */
 
 // =============== ROUTE CHANGE IMAGE ==================
 
 ipcMain.handle('changeImage', async (evt, arg) => {
+    console.log(arg)
     var erreur = "" // on initialise le potentiel message d'erreur
-    historiqueNum = historiqueNum - 1 // on se remet dans le bon tirage
-    var histList = JSON.parse(fs.readFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), "utf-8")) // on récupère la liste des images
-    var listComp = [] // on initialise une liste avec juste les titres d'images
-    for (let elt of histList) {
-        listComp.push(elt[0]) // on la remplit
-    }
-    var newImage = shuffleFolder(choosePertinentFiles(arg["routes"], 1))[0][0] // on récupère une nouvelle image
-    var index = 0
-    while (histList[index][0] != arg["imgToChange"]) { // on parcourt la liste de l'historique pour trouver l'indice de l'image à changer
-        index += 1
-    }
-    if (choosePertinentFiles(arg["routes"]).length == histList.length) { // on vérifie que toutes les images ne sont pas déjà utilisées
-        console.log("probleme")
+    var listeOfImages = choosePertinentFiles([arg.chooserPath])
+    if (listeOfImages.length == arg.listeImagesPresentes.length) { // on vérifie que toutes les images ne sont pas déjà affichées
         erreur = erreurs["erAllImages"][showLanguage]
         return { "erreur": erreur }
-    } else { // si c'est bon on tire des images jusqu'à ce qu'on en ait une qui n'est pas déjà dans la liste
-        while (listComp.includes(newImage[0])) {
-            historiqueNum -= 1
-            newImage = shuffleFolder(choosePertinentFiles(arg["routes"], 1))[0][0]
+    } else { // si ce n'est pas le cas
+        // on récupère une image aléatoire
+        var imageChoisie = shuffleFolder(listeOfImages, 1)
+        // on vérifie qu'elle n'est pas déjà affichée
+        while (arg.listeImagesPresentes.includes(imageChoisie[0][0][0])) { // on tire tant que ce n'est pas bon
+            imageChoisie = shuffleFolder(listeOfImages, 1)
         }
-        histList[index] = newImage // on remplace au bon indice
-        fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + historiqueNum + ".json"), JSON.stringify(histList)) // on actualise le fichier d'historique
-        historiqueNum += 1 // on se remet au bon numéro d'historique
-        return { "nouvelleImage": newImage, "erreur": erreur, "index": index, "historique": historiqueNum - 1 } // on renvoie la bonne image et le bon indice au front end
+        return { "nouvelleImg": imageChoisie[0][0], "erreur": erreur }
     }
-
 })
 
 // =============== ROUTES BOUTONS CLOSE MINIMIZE AND MAXIMIZE POUR WINDOWS ===============
@@ -247,7 +190,11 @@ ipcMain.on("erase", (evt, arg) => {
     var data = historiqueNum
     evt.sender.send('efface', data)
 })
+// =============== ROUTES AIDE ===============
 
+ipcMain.on("help", (evt,arg) => {
+    createWindow("views/FAQ/faq.html", winWidth = 600, winHeight = 400)
+})
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
     var finalFoldersList = []
@@ -298,19 +245,19 @@ function choosePertinentFiles(listeOfPaths) {
 }
 
 function shuffleFolder(listeImages, num) {
-    var error = ""
+    /* var error = "" */
     var shuffleImgToLoad = listeImages.sort((a, b) => 0.5 - Math.random());
     var listeImagesChoisies = shuffleImgToLoad.slice(0, num)
-    if (listeImagesChoisies == 0) {
+    /* if (listeImagesChoisies == 0) {
         error = erreurs["erSelectFolder"][showLanguage]
     }
     else if (0 < listeImagesChoisies.length && listeImagesChoisies.length < num) {
         error = erreurs["erTooBig"][showLanguage][0] + listeImagesChoisies.length + erreurs["erTooBig"][showLanguage][1]
-    } else {
-        var max = listeImages.length
-        historiqueNum = historiqueNum + 1
-    }
-    return [listeImagesChoisies, error, max, historiqueNum - 1]
+    } else { */
+    var max = listeImages.length
+    //historiqueNum = historiqueNum + 1
+    /* } */
+    return [listeImagesChoisies, /* error, */ max/*, historiqueNum - 1*/]
 }
 
 function erraseFilesAndCopyNews(directory) {
@@ -324,13 +271,19 @@ function erraseFilesAndCopyNews(directory) {
     });
 }
 function changeLanguage(lang) {
-    console.log(lang)
     //contents.reloadIgnoringCache()
     firstLanguage = lang
     setConfig()
-    console.log(store.get("localConfig"))
     app.relaunch()
     app.exit()
+}
+function changeToExpert(level) {
+    if (level == "expert") {
+        mainWindow.send('mode', "expert")
+    } else if (level == "simple") {
+        mainWindow.send("mode", "simple")
+    }
+
 }
 /* function checkUrl() {
     let url = "https://www.proix.eu/zapplis/superzappli.json";
@@ -466,11 +419,12 @@ const templateMenu = [
             }
         ]
     },
+    // rôle ACTIONS
     {
         label: menu["action"][showLanguage],
         submenu: [
-            { role: 'toggleDevTools' },
-            { role: 'forceReload' },
+            /*{ role: 'toggleDevTools' },
+            //{ role: 'forceReload' },
             {
                 label: menu["chooseFolder"][showLanguage],
                 accelerator: "CommandOrControl+F",
@@ -515,7 +469,7 @@ const templateMenu = [
                     mainWindow.webContents.send("listenPlay")
                 }
             },
-            { type: 'separator' },
+            { type: 'separator' },*/
             {
                 label: menu["changeLanguage"][showLanguage],
                 submenu: [
@@ -532,7 +486,26 @@ const templateMenu = [
                         }
                     },
                 ]
-            }
+            },
+            /*{ type: 'separator' },
+            {
+                label: menu["chooseMode"][showLanguage],
+                submenu: [
+                    {
+                        label: "Expert",
+                        click() {
+                            changeToExpert("expert")
+                        }
+                    },
+                    {
+                        label: menu["beginner"][showLanguage],
+                        click() {
+                            changeToExpert("simple")
+                        }
+                    }
+                ]
+
+            }*/
         ]
     },
     // { role: 'viewMenu' }
@@ -563,6 +536,7 @@ if (platform == "darwin") {
     const menu = Menu.buildFromTemplate(templateMenu)
     Menu.setApplicationMenu(menu)
 }
+// pour ouvrir le menu sous windows
 ipcMain.on('fireMenu', (evt, arg) => {
     const menu = Menu.buildFromTemplate(templateMenu);
     menu.popup();
@@ -579,19 +553,25 @@ ipcMain.on('plusTard', (evt, arg) => {
     newVersionWin.close()
 }) */
 
-/* console.log(app.getPath('home'))
-console.log(app.getFileIcon(app.getPath('home')))
-console.log(app.getPath('module'))
-console.log(app.getPath('desktop'))
-console.log(app.getPath('documents'))
-console.log(app.getPath('downloads'))
-console.log(app.getPath('music'))
-console.log(app.getPath('pictures'))
-console.log(app.getPath('videos'))
-console.log(app.getFileIcon(app.getAppPath('home')))
- */
-/* ipcMain.on('changeLanguage', (evt, arg) => {
-    console.log("langue :", arg)
-    contents.reloadIgnoringCache()
+
+ipcMain.handle('getDraw2', async (evt, arg) => {
+    var cardsInFolder = getCardsInFolder(arg["folderPath"]) // on récupère une liste de toutes les images de ce dossier
+    if (cardsInFolder.length < arg["nbCards"]) { // on vérifie qu'il y a assez de cartes dans le dossier
+        return { error: erreurs["erTooBig"][showLanguage][0] + cardsInFolder.length + erreurs["erTooBig"][showLanguage][1]} // si non on renvoie une erreur
+    } else {
+        var data = shuffleFolder(cardsInFolder, arg["nbCards"]) // on mélange et on ne garde que les premiers en fonction du nombre demandé
+        //fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0])) //on crée un fichier d'historique
+        return data
+    }
+
 })
-console.log(store.get("localConfig")["langue"]) */
+
+function getCardsInFolder(folderPath) {
+    var listeImages = []
+    for (let elt of fs.readdirSync(folderPath)) {
+        if (listOfValidExtensions.includes(path.extname(path.join(folderPath, elt)))) {
+            listeImages.push([elt, path.join(folderPath, elt)])
+        }
+    }
+    return listeImages
+}

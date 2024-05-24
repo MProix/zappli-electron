@@ -9,8 +9,8 @@
         "en": "All the images of this/these folder(s) are already displayed"
     },
     "erSelectFolder" : {
-        "fr": "Sélectionnez d'abord un dossier contenant des images (couleur verte) en cochant la case devant son nom.",
-        "en": "Select a folder containing images (red color) by checking the checkbox before it."
+        "fr": "Sélectionnez un dossier.",
+        "en": "Select a folder."
     },
     "erTooBig" : {
         "fr": ["Ce dossier ne contient que "," image(s) !"],

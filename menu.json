@@ -79,5 +79,13 @@
     "changeLanguage" : {
         "fr": "Changer la langue d'affichage",
         "en": "Change display language"
+    },
+    "chooseMode" : {
+        "fr": "Choisir un mode",
+        "en": "Choose mode"
+    },
+    "beginner" : {
+        "fr": "Simple",
+        "en": "Simple"
     }
 }
