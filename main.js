@@ -212,7 +212,7 @@ ipcMain.on("erase", (evt, arg) => {
 ipcMain.on("help", (evt,arg) => {
     faq = createWindow("views/FAQ/faq.html", winWidth = 600, winHeight = 400)
     faq.webContents.once('did-finish-load', () => {
-        mainWindow.send('OS', process.platform)
+        faq.send('OS', process.platform)
     })
 })
 // =============== FONCTIONS ============================
