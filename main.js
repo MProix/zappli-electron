@@ -52,7 +52,7 @@ if (!store.has("historique")) { // s'il n'y en a pas on le crée
 } else {
     var historique = store.get("historique") // et on le récupère en variable
 }
-console.log(historique)
+//console.log(historique)
 
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
@@ -82,7 +82,7 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
             nodeIntegration: true,
             contextIsolation: false,
             "web-security": false,
-            devTools: true // disabling devtools for distrib version
+            devTools: false // disabling devtools for distrib version
         },
         titleBarStyle: 'hidden'
         //frame: true
@@ -108,7 +108,7 @@ app.whenReady().then(() => {
     mainWindow.webContents.once('did-finish-load', () => {
         //mainWindow.send('store-data', dossiersRacineUtilisateur)
         //mainWindow.send('autres-disques', autresDisques)
-        console.log(JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
+        //console.log(JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
         mainWindow.send('erreurs', JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
         mainWindow.send('OS', process.platform)
     })
@@ -149,7 +149,7 @@ ipcMain.on('getDraw', (evt, arg) => {
 // =============== ROUTE CHANGE IMAGE ==================
 
 ipcMain.handle('changeImage', async (evt, arg) => {
-    console.log(arg)
+    //console.log(arg)
     var erreur = "" // on initialise le potentiel message d'erreur
     var listeOfImages = choosePertinentFiles([arg.chooserPath])
     if (listeOfImages.length == arg.listeImagesPresentes.length) { // on vérifie que toutes les images ne sont pas déjà affichées
@@ -185,7 +185,7 @@ ipcMain.on("maximizeRestoreApp", (evt, arg) => {
 })
 
 ipcMain.on("closeFaq", (evt, arg) => {
-    console.log("ferme")
+    //console.log("ferme")
     faq.close()
 })
 ipcMain.on("minimizeFaq", (evt, arg) => {
@@ -440,9 +440,9 @@ const templateMenu = [
     {
         label: menu["action"][showLanguage],
         submenu: [
-            { role: 'toggleDevTools' },
+            /*{ role: 'toggleDevTools' },
             { role: 'forceReload' },
-            /*{
+            {
                 label: menu["chooseFolder"][showLanguage],
                 accelerator: "CommandOrControl+F",
                 click() {
