@@ -1,4 +1,9 @@
 const { ipcRenderer } = require('electron');
+ipcRenderer.on('OS', (evt, arg) => {
+    if (arg == "darwin") {
+        $("#titleBar").css("display", "none");
+    }
+});
 /* ==================== GESTION DES BOUTONS DE MENU SOUS WINDOWS ET LINUX ================== */
 $("#close").on("click", () => {
     ipcRenderer.send('closeFaq'); // on envoie au backend sur l'évènement de fermeture de fenêtre
