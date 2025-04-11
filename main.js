@@ -14,8 +14,9 @@ const menu = JSON.parse(fs.readFileSync(path.join(__dirname, "menu.json"), "utf-
 const erreurs = JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"), "utf-8"))
 const writtenLanguages = erreurs["listeLangues"] //liste des langues supportées par l'appli (qui ont un fichier home.html dans leur langue)
 let userStoragePath = app.getPath("userData")
+let mainDir = (__dirname)
 var platform = process.platform
-console.log(userStoragePath)
+//console.log(userStoragePath)
 // ================ variables globales stockées ================ //
 ///////////////////////////////////////////////////////////////////
 
@@ -117,13 +118,13 @@ app.whenReady().then(() => {
         // on vérifie s'il existe un dossier de listes
         if (fs.existsSync(path.join(userStoragePath, "listes.json"))) {
             if (fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8') != "") {
-                mainWindow.send('listes', JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')))
+                mainWindow.send('listes', [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')),mainDir])
             } else {
-                mainWindow.send('listes', "")
+                mainWindow.send('listes', ["",mainDir])
             }
         } else {
             fs.openSync(path.join(userStoragePath, "listes.json"), 'w')
-            mainWindow.send('listes', "")
+            mainWindow.send('listes', ["",mainDir])
         }
         mainWindow.send('erreurs', JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"), encoding = 'utf8')))
         mainWindow.send('OS', process.platform)
@@ -165,20 +166,37 @@ ipcMain.on('getDraw', (evt, arg) => {
 // =============== ROUTE CHANGE IMAGE ==================
 
 ipcMain.handle('changeImage', async (evt, arg) => {
-    //console.log(arg)
+    //console.log("changeimage : ", arg)
     var erreur = "" // on initialise le potentiel message d'erreur
-    var listeOfImages = choosePertinentFiles([arg.chooserPath])
-    if (listeOfImages.length == arg.listeImagesPresentes.length) { // on vérifie que toutes les images ne sont pas déjà affichées
-        erreur = erreurs["erAllImages"][showLanguage]
-        return { "erreur": erreur }
-    } else { // si ce n'est pas le cas
-        // on récupère une image aléatoire
-        var imageChoisie = shuffleFolder(listeOfImages, 1)
-        // on vérifie qu'elle n'est pas déjà affichée
-        while (arg.listeImagesPresentes.includes(imageChoisie[0][0][0])) { // on tire tant que ce n'est pas bon
-            imageChoisie = shuffleFolder(listeOfImages, 1)
+    if (!arg["titreListe"]) {
+        var listeOfImages = choosePertinentFiles([arg.chooserPath])
+        if (listeOfImages.length == arg.listeImagesPresentes.length) { // on vérifie que toutes les images ne sont pas déjà affichées
+            erreur = erreurs["erAllImages"][showLanguage]
+            return { "erreur": erreur }
+        } else { // si ce n'est pas le cas
+            // on récupère une image aléatoire
+            var imageChoisie = shuffleFolder(listeOfImages, 1)
+            // on vérifie qu'elle n'est pas déjà affichée
+            while (arg.listeImagesPresentes.includes(imageChoisie[0][0][0])) { // on tire tant que ce n'est pas bon
+                imageChoisie = shuffleFolder(listeOfImages, 1)
+            }
+            return { "nouvelleImg": imageChoisie[0][0], "erreur": erreur }
         }
-        return { "nouvelleImg": imageChoisie[0][0], "erreur": erreur }
+    } else {
+        var listeDesMots = (JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')))[arg["titreListe"]]
+        if (listeDesMots.length == arg.listeMots.length) { // on vérifie que toutes les images ne sont pas déjà affichées
+            erreur = erreurs["erAllWords"][showLanguage]
+            return { "erreur": erreur }
+        } else { // si ce n'est pas le cas
+            // on récupère un mot aléatoire
+            var motChoisi = shuffleFolder(listeDesMots, 1)
+            //console.log(motChoisi[0][0])
+            // on vérifie qu'il n'est pas déjà affiché
+            while (arg.listeMots.includes(motChoisi[0][0])) { // on tire tant que ce n'est pas bon
+                motChoisi = shuffleFolder(listeDesMots, 1)
+            }
+            return { "nouveauMot": motChoisi[0][0], "erreur": erreur }
+        }
     }
 })
 
@@ -255,7 +273,7 @@ ipcMain.on("editList", (evt, arg) => {
     })
 })
 ipcMain.on("changeLists", (evt, arg) => {
-    mainWindow.webContents.send("listes", JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')))
+    mainWindow.webContents.send("listes", [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')),mainDir])
 })
 ipcMain.on("deleteList", (evt, arg) => {
     var listeGlobale = JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8'))
@@ -637,12 +655,12 @@ ipcMain.handle('getDraw2', async (evt, arg) => {
     else {
         // à rédiger pour l'affichage des mots
         // on récupère les mots de la liste
-        var liste = JSON.parse(fs.readFileSync(path.join(userStoragePath,"listes.json")))[arg["list"]]
+        var liste = JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json")))[arg["list"]]
         // on vérifie qu'il y en a assez par rapport au nombre demandé
-        if (liste.length < arg["nbCards"]) { 
+        if (liste.length < arg["nbCards"]) {
             return { error: erreurs["erTooBig2"][showLanguage][0] + liste.length + erreurs["erTooBig2"][showLanguage][1] } // si non on renvoie une erreur
         } else {// on en renvoie le nombre adéquat après les avoir mélangés
-            var data = ["mots",shuffleFolder(liste, arg["nbCards"])]
+            var data = ["mots", shuffleFolder(liste, arg["nbCards"]), arg["list"]]
             return data
         }
     }

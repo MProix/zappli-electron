@@ -8,9 +8,13 @@
         "fr": "Toutes les images de ce(s) dossier(s) sont déjà affichées",
         "en": "All the images of this/these folder(s) are already displayed"
     },
+    "erAllWords" : {
+        "fr": "Tous les mots de cette liste sont déjà affichés",
+        "en": "All the words of this list are already displayed"
+    },
     "erSelectFolder" : {
-        "fr": "Sélectionnez un dossier.",
-        "en": "Select a folder."
+        "fr": "Sélectionnez un dossier ou une liste de mots.",
+        "en": "Select a folder or a list of words."
     },
     "erTooBig" : {
         "fr": ["Ce dossier ne contient que "," image(s) !"],
@@ -19,5 +23,13 @@
     "erTooBig2" : {
         "fr": ["Cette liste ne contient que "," mot(s) !"],
         "en": ["This list only contains "," word(s) !"]
+    },
+    "newList" : {
+        "fr": "Nouvelle liste",
+        "en": "New list"
+    },
+    "myLists" : {
+        "fr": "Mes listes de mots",
+        "en": "My lists of words"
     }
 }

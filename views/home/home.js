@@ -3,6 +3,7 @@ const userOS = navigator.platform
 const { ipcRenderer } = require('electron');
 const { get } = require('jquery');
 const path = require("path")
+const fs = require('fs')
 // ============= VARIABLES GLOBALES ============= //
 var selected = "deplace" // pour connaitre constamment l'action au click sélectionnnée par l'utilisateur
 var nbFolderChoosers = 1 // pour savoir combien de possibilités de tirages on a
@@ -10,7 +11,9 @@ var sensDAffichage = "portrait" // pour affiner au mieux l'affichage des tailles
 var draggableActive = true // pour savoir si draggable est déjà désactivé sur les images
 var pile = [] // pour créer un historique des modifications
 var erreurs = {}
-
+ipcRenderer.on('erreurs', (evt, arg) => {
+    erreurs = arg
+})
 // ============= Différenciation de la barre du haut selon l'OS ============= //
 ipcRenderer.on('OS', (evt, arg) => {
     if (arg == "darwin") {
@@ -22,25 +25,25 @@ ipcRenderer.on('OS', (evt, arg) => {
 });
 ipcRenderer.on('listes', (evt, arg) => {
     // on récupère les titres des listes pour pouvoir les ordonner
-    //console.log(arg)
+    var erreurs = JSON.parse(fs.readFileSync(path.join(arg[1], "erreurs.json"), encoding = 'utf-8'))
     var listes = []
-    if (arg != "") {
-        for (const [key, value] of Object.entries(arg)) {
+    if (arg[0] != "") {
+        for (const [key, value] of Object.entries(arg[0])) {
             listes.push(key)
         }
         listes.sort()
     }
     //on crée la listes affichée en html et on l'insère
     var listesHTML = ""
-    var listesHTMLselect = "<option value='mesListes'>Mes listes de mots</option>"
-    if (arg != "") {
+    var listesHTMLselect = "<option value='mesListes'>" + erreurs["myLists"][document.documentElement.lang] + "</option>"
+    if (arg[0] != "") {
         for (let elt of listes) {
             listesHTML += ("<li><p>" + elt + "</p><i class='fa-solid fa-pencil' ></i><i class='fa-solid fa-trash'></i></li>")
             listesHTMLselect += ("<option value=" + elt + ">" + elt + "</option>")
         }
     }
 
-    listesHTML += "<hr><li id='newList'>Nouvelle liste</li>"
+    listesHTML += "<hr><li id='newList'>" + erreurs["newList"][document.documentElement.lang] + "</li>"
     $("#listesMots").html(listesHTML)
     $(".listpicker").html(listesHTMLselect)
     $(".fa-pencil, #newList").on("click", function () { // on ouvre le popup
@@ -52,14 +55,12 @@ ipcRenderer.on('listes', (evt, arg) => {
         $("#listesMots").toggle()
     })
     $(".fa-trash").on("click", function () { // on affiche une alerte qui gèrera la suppression ou non de la liste
-        console.log(this)
-        console.log("supprimer liste : " + $(this).prev().prev().html())
+        //console.log(this)
+        //console.log("supprimer liste : " + $(this).prev().prev().html())
         ipcRenderer.send("deleteList", $(this).prev().prev().html())
     })
 })
-ipcRenderer.on('erreurs', (evt, arg) => {
-    erreurs = arg
-})
+
 // ============= AFFICHAGE DU MENU SOUS WINDOWS ============== //
 
 $("#showHideMenus").on("click", () => {
@@ -199,7 +200,7 @@ applyPlayBtns(".submitOneFolder")
 $("#fondPicker").on("change", (e) => {
     if (userOS == "Win32") {
         var fondURL = e.target.files[0].path.replace(/\\/g, '\/')
-        console.log(fondURL)
+        //console.log(fondURL)
         $("#affichage").css("background-image", "url(" + fondURL + ")")
     } else {
         $("#affichage").css("background-image", "url(" + e.target.files[0].path + ")")
@@ -223,7 +224,6 @@ $("#zero").on("click", (e) => {
 })
 
 // ============= LE BOUTON PLAY PRINCIPAL ============= //
-
 $("#play").on("click", () => {
     $(".submitOneFolder:visible").each(clickOnPlay)
     setTimeout(() => {  // obligé sinon l'info part avant que les images soient affichées et ne les prend pas en compte
@@ -232,7 +232,6 @@ $("#play").on("click", () => {
 }) // on tire les cartes de tous les choosers visibles de gauche
 function clickOnPlay() {
     var cible = this
-    console.log(cible)
     var error = ""
     data = {
         "nbCards": $($($($(cible).parent()).children(".cardsNumber")).children("div")).children("input").val(), // on envoie le nombre de cartes souhaité
@@ -247,19 +246,19 @@ function clickOnPlay() {
         ipcRenderer.invoke('getDraw2', data).then((data) => {
             if (data["error"] != undefined) { // si le backend renvoie une erreur on l'affiche
                 alert(data["error"])
-            } else if (data[0] == "mots") { // si c'est une liste de mots PB DATA CONTENT
-                console.log(data[1])
-                var quelDiv = (cible.id.slice(-1)) // sinon on récupère le numéro du chooser d'où est partie la requête
+            } else if (data[0] == "mots") { // si c'est une liste de mots
+                //console.log(data[1])
+                var quelDiv = (cible.id.slice(-1)) // on récupère le numéro du chooser d'où est partie la requête
                 $("#affichage").children()[quelDiv - 1].innerHTML = ""
                 $(data[1][0]).each(function (index, elt) {
-                    $($("#affichage").children()[quelDiv - 1]).append('<div class="image" id="imgDiv' + index + '"><div class="img"><p id="' + elt + '" class=number>' + elt + '</p></div></div>')
+                    $($("#affichage").children()[quelDiv - 1]).append('<div class="image" id="imgDiv' + index + '"><div class="img mot"><p id="' + elt + '" class="number ' + data[2] + '">' + elt + '</p></div></div>')
                 })
                 $(".img").draggable({ containment: "#affichage", scroll: false })
                 $("#affichage").children().each(function () { //on recalcule les tailles des images
                     calculerTaille(this)
                 })
                 var bonnesImages = "#affichage" + quelDiv + " img, #affichage" + quelDiv + " p" // on fabrique l'identifiant pour jquery
-                console.log(bonnesImages)
+                //console.log(bonnesImages)
                 $(bonnesImages).on("click", function () { // on applique la fonction uniquement sur les bonnes images parce que les autres l'ont déjà et qu'en la dupliquant on a de mauvaises surprises
                     clickOnImage(this)
                 })
@@ -272,7 +271,7 @@ function clickOnPlay() {
                 var quelDiv = (cible.id.slice(-1)) // sinon on récupère le numéro du chooser d'où est partie la requête
                 $("#affichage").children()[quelDiv - 1].innerHTML = ""
                 $(data[0]).each(function (index, elt) {
-                    $($("#affichage").children()[quelDiv - 1]).append('<div class="image" id="imgDiv' + index + '"><div class="img"><img src="' + elt[1] + '" id="' + elt[0] + '" class=number></div></div>')
+                    $($("#affichage").children()[quelDiv - 1]).append('<div class="image" id="imgDiv' + index + '"><div class="img"><img src="' + elt[1] + '" id="' + elt[0] + '" class="number"></div></div>')
                 })
                 $(".img").draggable({ containment: "#affichage", scroll: false })
                 $("#affichage").children().each(function () { //on recalcule les tailles des images
@@ -363,8 +362,14 @@ $("#back").on("click", () => {
 // ============= AUTRES FONCTIONS
 
 function calculateNumPositions(previous, elt) {
-    $(elt).offset({ "top": $(previous).offset().top + $(previous).height() })
-    $(elt).css("transform", "translateY(-15px)");
+    if ($(previous).prop("nodeName") == "P") {
+        $(elt).offset({ "top": $(previous).offset().top + $(previous).height() })
+        $(elt).css("transform", "translateY(20px)");
+    } else {
+        $(elt).offset({ "top": $(previous).offset().top + $(previous).height() })
+        $(elt).css("transform", "translateY(-15px)");
+    }
+
 }
 var tailles = {
     "portrait":
@@ -470,23 +475,45 @@ function draggableTest() { // pour tester si la fonction de déplacement est act
     }
 }
 function changeImage(cible) {
-    var listeImagesPresentes = []
-    var chooserSelector = "#titleFolder" + $(cible).parent().parent().parent().attr('id').charAt($(cible).parent().parent().parent().attr('id').length - 1) + ">div"
-    for (let elt of $(cible).parent().parent().parent().children().children()) {
-        listeImagesPresentes.push(($(elt).children()[0].id))
+    if ($(cible).prop("nodeName") == "P") {
+        var listeMotsDiv = []
+        for (let elt of $(cible).parent().parent().parent().children().children()) {
+            listeMotsDiv.push($(elt).children()[0].innerHTML)
+        }
+        var titreListe = (cible.classList)[1]
+        data = {
+            "titreListe": titreListe, // savoir dans quelle liste de mots on se situe
+            "listeMots": listeMotsDiv // la liste des mots déjà présente dans le div
+        }
+        ipcRenderer.invoke("changeImage", data).then((data) => {
+            //console.log(data)
+            if (data["erreur"] != "") {
+                alert(data["erreur"])
+            } else {
+                $(cible).html(data.nouveauMot)
+                $(cible).attr("id", data.nouveauMot)
+            };
+        })
+    } else {
+        var listeImagesPresentes = []
+        var chooserSelector = "#titleFolder" + $(cible).parent().parent().parent().attr('id').charAt($(cible).parent().parent().parent().attr('id').length - 1) + ">select"
+        for (let elt of $(cible).parent().parent().parent().children().children()) {
+            listeImagesPresentes.push(($(elt).children()[0].id))
+        }
+        data = { // on envoie
+            "listeImagesPresentes": listeImagesPresentes, // la liste des images déjà présentes
+            "chooserPath": $(chooserSelector).attr("id") // le chemin d'accès de ces images
+        }
+        ipcRenderer.invoke("changeImage", data).then((data) => {
+            if (data["erreur"] != "") {
+                alert(data["erreur"])
+            } else {
+                $(cible).attr("src", data.nouvelleImg[1])
+                $(cible).attr("id", data.nouvelleImg[0])
+            };
+        })
     }
-    data = { // on envoie
-        "listeImagesPresentes": listeImagesPresentes, // la liste des images déjà présentes
-        "chooserPath": $(chooserSelector).attr("id") // le chemin d'accès de ces images
-    }
-    ipcRenderer.invoke("changeImage", data).then((data) => {
-        if (data["erreur"] != "") {
-            alert(data["erreur"])
-        } else {
-            $(cible).attr("src", data.nouvelleImg[1])
-            $(cible).attr("id", data.nouvelleImg[0])
-        };
-    })
+
 }
 function actualisePile(pile) {
     pile.push({
