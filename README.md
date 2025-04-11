@@ -1,6 +1,6 @@
 # zappli-electron
 
-Une application electronqui permet à l'utilisateur d'afficher aléatoirement un nombre choisi d'images en provenance des dossiers de son disque dur.
+Une application electron qui permet à l'utilisateur d'afficher aléatoirement un nombre choisi d'images en provenance des dossiers de son disque dur.
 
 Cette application a été à l'oigine réalisée pour les Zexperts FLE, à destination des enseignants de Français Langue Etrangère. Elle permet d'exploiter au mieux des imagiers ou nuages de cartes avec les apprenants en présentiel ou en cours dématérialisé.
 
