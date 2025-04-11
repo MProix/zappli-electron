@@ -145,12 +145,44 @@ body {
     margin: 0px;
     font-family: "balsa";
     font-size: 80%;
+    text-align: center;
 }
 
 #deplace {
     background-color: #1c63a0;
 }
 
+#listesMots {
+    display : none;
+    position: absolute;
+    list-style-type: none;
+    padding: 10px;
+    margin: 0px;
+    background-color: #1c63a0;
+    font-size: 80%;
+    z-index: 99;
+}
+#listesMots li {
+    display: flex;
+}
+#listesMots li p {
+    flex-grow: 2;
+    padding: 0px;
+    margin: 0px;
+}
+#listesMots li i {
+    padding: 2px;
+    cursor: pointer;
+}
+#listesMots li i:hover {
+    color: #4593d8;
+}
+#newList{
+    cursor: pointer;
+}
+#newList:hover{
+    color: #4593d8;
+}
 #zero {
     width: 10%;
     display: flex;
@@ -177,6 +209,7 @@ body {
     margin: 0px;
     font-family: "balsa";
     font-size: 80%;
+    text-align: center;
 }
 
 #aideNotifs {
@@ -222,8 +255,12 @@ body {
     width: 220px;
     height: 100%;
     transition: all 0.5s ease-in-out;
-}
+    overflow: auto;
 
+}
+#folderChooser::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+}
 #folderChooser::before {
     content: '';
     position: absolute;
@@ -290,7 +327,9 @@ body {
     background-color: #185286;
     padding: 0px 5px;
 }
-
+.oneFolder>div .listpicker{
+    padding-bottom: 0px;
+}
 .cardsNumber input[type="number"] {
     height: 20px;
     font-size: 20px;
@@ -489,8 +528,11 @@ body {
     z-index: 5;
 }
 
-.number::after{
+/* .number::after{
     content: "attr(data-content)";
     z-index: 99;
     position: absolute;
+} */
+.lightBackground{
+    background-color: #4593d8;
 }

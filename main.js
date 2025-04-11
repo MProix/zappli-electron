@@ -54,6 +54,11 @@ if (!store.has("historique")) { // s'il n'y en a pas on le crée
 }
 //console.log(historique)
 
+
+//console.log(JSON.parse(listes))
+
+
+///////////////////
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
 log.info("////////////////////// hello, log ////////////////////////////////")
 log.log("Application version : " + app.getVersion())
@@ -82,7 +87,7 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
             nodeIntegration: true,
             contextIsolation: false,
             "web-security": false,
-            devTools: false // disabling devtools for distrib version
+            devTools: true // disabling devtools for distrib version
         },
         titleBarStyle: 'hidden'
         //frame: true
@@ -109,7 +114,18 @@ app.whenReady().then(() => {
         //mainWindow.send('store-data', dossiersRacineUtilisateur)
         //mainWindow.send('autres-disques', autresDisques)
         //console.log(JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
-        mainWindow.send('erreurs', JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
+        // on vérifie s'il existe un dossier de listes
+        if (fs.existsSync(path.join(userStoragePath, "listes.json"))) {
+            if (fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8') != "") {
+                mainWindow.send('listes', JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')))
+            } else {
+                mainWindow.send('listes', "")
+            }
+        } else {
+            fs.openSync(path.join(userStoragePath, "listes.json"), 'w')
+            mainWindow.send('listes', "")
+        }
+        mainWindow.send('erreurs', JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"), encoding = 'utf8')))
         mainWindow.send('OS', process.platform)
     })
     autoUpdater.checkForUpdatesAndNotify()
@@ -185,7 +201,6 @@ ipcMain.on("maximizeRestoreApp", (evt, arg) => {
 })
 
 ipcMain.on("closeFaq", (evt, arg) => {
-    //console.log("ferme")
     faq.close()
 })
 ipcMain.on("minimizeFaq", (evt, arg) => {
@@ -200,7 +215,22 @@ ipcMain.on("maximizeRestoreFaq", (evt, arg) => {
         faq.webContents.send("isMaximized")
     }
 })
-// =============== ROUTES ERASE ===============
+ipcMain.on("closeListes", (evt, arg) => {
+    editList.close()
+})
+ipcMain.on("minimizeListes", (evt, arg) => {
+    editList.minimize()
+})
+ipcMain.on("maximizeRestoreListes", (evt, arg) => {
+    if (editList.isMaximized()) {
+        editList.restore()
+        editList.webContents.send("isRestored")
+    } else {
+        editList.maximize()
+        editList.webContents.send("isMaximized")
+    }
+})
+// =============== ROUTES EFFACER ===============
 
 ipcMain.on("erase", (evt, arg) => {
     historiqueNum += 1
@@ -209,11 +239,29 @@ ipcMain.on("erase", (evt, arg) => {
 })
 // =============== ROUTES AIDE ===============
 
-ipcMain.on("help", (evt,arg) => {
+ipcMain.on("help", (evt, arg) => {
     faq = createWindow("views/FAQ/faq.html", winWidth = 600, winHeight = 400)
     faq.webContents.once('did-finish-load', () => {
         faq.send('OS', process.platform)
     })
+})
+// =============== ROUTES LISTES DE MOTS ===============
+ipcMain.on("editList", (evt, arg) => {
+    var argToSend = [arg, userStoragePath]
+    editList = createWindow("views/listes/liste.html", winWidth = 400, winHeight = 600)
+    editList.webContents.once('did-finish-load', () => {
+        editList.send('OS', process.platform)
+        editList.send('listeName', argToSend)
+    })
+})
+ipcMain.on("changeLists", (evt, arg) => {
+    mainWindow.webContents.send("listes", JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')))
+})
+ipcMain.on("deleteList", (evt, arg) => {
+    var listeGlobale = JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8'))
+    delete listeGlobale[arg]
+    fs.writeFileSync(path.join(userStoragePath, "listes.json"), JSON.stringify(listeGlobale))
+    mainWindow.webContents.send("listes", JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')))
 })
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
@@ -339,6 +387,7 @@ function setConfig() {
     })
 }
 
+
 /* function checkNewInfo() {
     //console.log(store.get("dontShowVersion"))
     //console.log(store.get("localConfig"))
@@ -443,7 +492,7 @@ const templateMenu = [
     {
         label: menu["action"][showLanguage],
         submenu: [
-            /*{ role: 'toggleDevTools' },
+            { role: 'toggleDevTools' },/*
             { role: 'forceReload' },
             {
                 label: menu["chooseFolder"][showLanguage],
@@ -575,15 +624,28 @@ ipcMain.on('plusTard', (evt, arg) => {
 
 
 ipcMain.handle('getDraw2', async (evt, arg) => {
-    var cardsInFolder = getCardsInFolder(arg["folderPath"]) // on récupère une liste de toutes les images de ce dossier
-    if (cardsInFolder.length < arg["nbCards"]) { // on vérifie qu'il y a assez de cartes dans le dossier
-        return { error: erreurs["erTooBig"][showLanguage][0] + cardsInFolder.length + erreurs["erTooBig"][showLanguage][1]} // si non on renvoie une erreur
-    } else {
-        var data = shuffleFolder(cardsInFolder, arg["nbCards"]) // on mélange et on ne garde que les premiers en fonction du nombre demandé
-        //fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0])) //on crée un fichier d'historique
-        return data
+    if (arg["list"] == "mesListes") {
+        var cardsInFolder = getCardsInFolder(arg["folderPath"]) // on récupère une liste de toutes les images de ce dossier
+        if (cardsInFolder.length < arg["nbCards"]) { // on vérifie qu'il y a assez de cartes dans le dossier
+            return { error: erreurs["erTooBig"][showLanguage][0] + cardsInFolder.length + erreurs["erTooBig"][showLanguage][1] } // si non on renvoie une erreur
+        } else {
+            var data = shuffleFolder(cardsInFolder, arg["nbCards"]) // on mélange et on ne garde que les premiers en fonction du nombre demandé
+            //fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0])) //on crée un fichier d'historique
+            return data
+        }
     }
-
+    else {
+        // à rédiger pour l'affichage des mots
+        // on récupère les mots de la liste
+        var liste = JSON.parse(fs.readFileSync(path.join(userStoragePath,"listes.json")))[arg["list"]]
+        // on vérifie qu'il y en a assez par rapport au nombre demandé
+        if (liste.length < arg["nbCards"]) { 
+            return { error: erreurs["erTooBig2"][showLanguage][0] + liste.length + erreurs["erTooBig2"][showLanguage][1] } // si non on renvoie une erreur
+        } else {// on en renvoie le nombre adéquat après les avoir mélangés
+            var data = ["mots",shuffleFolder(liste, arg["nbCards"])]
+            return data
+        }
+    }
 })
 
 function getCardsInFolder(folderPath) {

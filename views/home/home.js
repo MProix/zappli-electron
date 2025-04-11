@@ -20,6 +20,43 @@ ipcRenderer.on('OS', (evt, arg) => {
         //$("#header").addClass("headerBackground");
     }
 });
+ipcRenderer.on('listes', (evt, arg) => {
+    // on récupère les titres des listes pour pouvoir les ordonner
+    //console.log(arg)
+    var listes = []
+    if (arg != "") {
+        for (const [key, value] of Object.entries(arg)) {
+            listes.push(key)
+        }
+        listes.sort()
+    }
+    //on crée la listes affichée en html et on l'insère
+    var listesHTML = ""
+    var listesHTMLselect = "<option value='mesListes'>Mes listes de mots</option>"
+    if (arg != "") {
+        for (let elt of listes) {
+            listesHTML += ("<li><p>" + elt + "</p><i class='fa-solid fa-pencil' ></i><i class='fa-solid fa-trash'></i></li>")
+            listesHTMLselect += ("<option value=" + elt + ">" + elt + "</option>")
+        }
+    }
+
+    listesHTML += "<hr><li id='newList'>Nouvelle liste</li>"
+    $("#listesMots").html(listesHTML)
+    $(".listpicker").html(listesHTMLselect)
+    $(".fa-pencil, #newList").on("click", function () { // on ouvre le popup
+        if ($(this).prev().html()) {
+            ipcRenderer.send("editList", $(this).prev().html()) //on envoie le nom de la liste avec
+        } else {
+            ipcRenderer.send("editList", "noName") //on envoie un nom vide
+        }
+        $("#listesMots").toggle()
+    })
+    $(".fa-trash").on("click", function () { // on affiche une alerte qui gèrera la suppression ou non de la liste
+        console.log(this)
+        console.log("supprimer liste : " + $(this).prev().prev().html())
+        ipcRenderer.send("deleteList", $(this).prev().prev().html())
+    })
+})
 ipcRenderer.on('erreurs', (evt, arg) => {
     erreurs = arg
 })
@@ -167,7 +204,14 @@ $("#fondPicker").on("change", (e) => {
     } else {
         $("#affichage").css("background-image", "url(" + e.target.files[0].path + ")")
     }
-
+})
+// ============= LE BOUTON LISTES DE MOTS ============ //
+$("#listes").on("click", function () {
+    $("#listesMots").toggle()
+    $("#listesMots").css({
+        left: $("#listes").offset().left,
+        top: $("#listes").outerHeight(true) + 4
+    })
 })
 // ============= LE BOUTON REMETTRE À ZÉRO ============ //
 
@@ -188,12 +232,14 @@ $("#play").on("click", () => {
 }) // on tire les cartes de tous les choosers visibles de gauche
 function clickOnPlay() {
     var cible = this
+    console.log(cible)
     var error = ""
     data = {
         "nbCards": $($($($(cible).parent()).children(".cardsNumber")).children("div")).children("input").val(), // on envoie le nombre de cartes souhaité
-        "folderPath": $($(cible).parent().children(".folderTitle")).children("div").attr("id") // on envoie le chemin d'accès aux images
+        "folderPath": $($(cible).parent().children(".folderTitle")).children("div").attr("id"), // on envoie le chemin d'accès aux images
+        "list": $(cible).parent().children(".listSelector").children(".listpicker").find(":selected").val() // on envoie la liste de mots sélectionés
     }
-    if (data["folderPath"] == undefined || data["folderPath"] == "") { // on vérifie qu'un dossier a bien été sélectionéé sinon on affiche une erreur
+    if (data["list"] == "mesListes" && data["folderPath"] == undefined || data["folderPath"] == "") { // on vérifie qu'un dossier a bien été sélectionéé sinon on affiche une erreur
         error = erreurs["erSelectFolder"][document.documentElement.lang]
         alert(error)
     } else {
@@ -201,6 +247,26 @@ function clickOnPlay() {
         ipcRenderer.invoke('getDraw2', data).then((data) => {
             if (data["error"] != undefined) { // si le backend renvoie une erreur on l'affiche
                 alert(data["error"])
+            } else if (data[0] == "mots") { // si c'est une liste de mots PB DATA CONTENT
+                console.log(data[1])
+                var quelDiv = (cible.id.slice(-1)) // sinon on récupère le numéro du chooser d'où est partie la requête
+                $("#affichage").children()[quelDiv - 1].innerHTML = ""
+                $(data[1][0]).each(function (index, elt) {
+                    $($("#affichage").children()[quelDiv - 1]).append('<div class="image" id="imgDiv' + index + '"><div class="img"><p id="' + elt + '" class=number>' + elt + '</p></div></div>')
+                })
+                $(".img").draggable({ containment: "#affichage", scroll: false })
+                $("#affichage").children().each(function () { //on recalcule les tailles des images
+                    calculerTaille(this)
+                })
+                var bonnesImages = "#affichage" + quelDiv + " img, #affichage" + quelDiv + " p" // on fabrique l'identifiant pour jquery
+                console.log(bonnesImages)
+                $(bonnesImages).on("click", function () { // on applique la fonction uniquement sur les bonnes images parce que les autres l'ont déjà et qu'en la dupliquant on a de mauvaises surprises
+                    clickOnImage(this)
+                })
+                $(bonnesImages).on("mousedown", function () { // on fait passer au-dessus l'image qu'on manipule
+                    $("img").css("z-index", 1)
+                    $(this).css("z-index", 2)
+                })
             }
             else {
                 var quelDiv = (cible.id.slice(-1)) // sinon on récupère le numéro du chooser d'où est partie la requête

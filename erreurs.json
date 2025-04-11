@@ -15,5 +15,9 @@
     "erTooBig" : {
         "fr": ["Ce dossier ne contient que "," image(s) !"],
         "en": ["This folder only contains "," image(s) !"]
+    },
+    "erTooBig2" : {
+        "fr": ["Cette liste ne contient que "," mot(s) !"],
+        "en": ["This list only contains "," word(s) !"]
     }
 }

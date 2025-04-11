@@ -43,6 +43,11 @@
                     <input type="file" style="display: none;" id="fondPicker" class="fondPicker">
                     <label for="fondPicker" style="text-align: center; cursor: pointer;"><i class="fa-solid fa-paintbrush"></i><br><p>Changer le fond</p></label>
                 </div>
+                <div id="listes" class="actionBtn"><i class="fa-solid fa-list-check"></i>
+                    <p>Listes de mots</p>
+                </div>
+                <ul id="listesMots">
+                </ul>
             </div>
             <div id="zero"><i class="fa-solid fa-rotate-left"></i>
                 <p>Remettre à zéro</p>
@@ -64,6 +69,11 @@
                             class="filepicker">
                         <label for="folderChosen1"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
                     </div>
+                    <div class="listSelector" id="listSelector1">
+                        <label for="listChosen1">ou une liste de mots</label>
+                        <select name="listes" id="listChosen1"
+                        class="listpicker"></select>
+                    </div>
                     <div class="cardsNumber" id="cardsNumber1">
                         <div><input type="number" value="3" min="1" max="24"></div>
                         <label for="cardsNumber1">Nombre de cartes à afficher</label>
@@ -82,6 +92,11 @@
                             class="filepicker">
                         <label for="folderChosen2"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
                     </div>
+                    <div class="listSelector" id="listSelector2">
+                        <label for="listChosen2">ou une liste de mots</label>
+                        <select name="listes" id="listChosen2"
+                        class="listpicker"></select>
+                    </div>
                     <div class="cardsNumber" id="cardsNumber2">
                         <div><input type="number" value="3" min="1" max="24"></div>
                         <label for="cardsNumber2">Nombre de cartes à afficher</label>
@@ -99,6 +114,11 @@
                         <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen3"
                             class="filepicker">
                         <label for="folderChosen3"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
+                    </div>
+                    <div class="listSelector" id="listSelector3">
+                        <label for="listChosen3">ou une liste de mots</label>
+                        <select name="listes" id="listChosen3"
+                        class="listpicker"></select>
                     </div>
                     <div class="cardsNumber" id="cardsNumber3">
                         <div><input type="number" value="3" min="1" max="24"></div>
