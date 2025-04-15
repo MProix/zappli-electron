@@ -279,7 +279,7 @@ ipcMain.on("deleteList", (evt, arg) => {
     var listeGlobale = JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8'))
     delete listeGlobale[arg]
     fs.writeFileSync(path.join(userStoragePath, "listes.json"), JSON.stringify(listeGlobale))
-    mainWindow.webContents.send("listes", JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')))
+    mainWindow.webContents.send("listes", [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')),mainDir])
 })
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {

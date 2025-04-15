@@ -24,6 +24,7 @@ ipcRenderer.on('OS', (evt, arg) => {
     }
 });
 ipcRenderer.on('listes', (evt, arg) => {
+    console.log(arg)
     // on récupère les titres des listes pour pouvoir les ordonner
     var erreurs = JSON.parse(fs.readFileSync(path.join(arg[1], "erreurs.json"), encoding = 'utf-8'))
     var listes = []
