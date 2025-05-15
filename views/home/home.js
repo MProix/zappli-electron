@@ -24,7 +24,6 @@ ipcRenderer.on('OS', (evt, arg) => {
     }
 });
 ipcRenderer.on('listes', (evt, arg) => {
-    console.log(arg)
     // on récupère les titres des listes pour pouvoir les ordonner
     var erreurs = JSON.parse(fs.readFileSync(path.join(arg[1], "erreurs.json"), encoding = 'utf-8'))
     var listes = []
@@ -40,7 +39,7 @@ ipcRenderer.on('listes', (evt, arg) => {
     if (arg[0] != "") {
         for (let elt of listes) {
             listesHTML += ("<li><p>" + elt + "</p><i class='fa-solid fa-pencil' ></i><i class='fa-solid fa-trash'></i></li>")
-            listesHTMLselect += ("<option value=" + elt + ">" + elt + "</option>")
+            listesHTMLselect += ('<option value=' + elt + '>' + elt + '</option>')
         }
     }
 
@@ -137,7 +136,7 @@ $("#addFolderChooser").on("click", () => {
     $("#folder" + nbFolderChoosers).css("display", "flex")
     $("#affichage").append("<div></div>") // on ajoute un div dans l'affichage
     $("#affichage>div").removeClass() // on enlève la classe préexistante sur tous les divs de l'affichage
-    $("#affichage>div").addClass("nbDiv" + $("#affichage>div").length) // on remet la bonne classe
+    $("#affichage>div").addClass("nbDiv" + $("#affichage>div").length + " mainDiv") // on remet la bonne classe
     $("#affichage>div").last().attr("id", "affichage" + $("#affichage>div").length) // on ajoute un id
     $("#affichage").children().each(function () { //on recalcule les tailles des images
         calculerTaille(this)
@@ -237,8 +236,9 @@ function clickOnPlay() {
     data = {
         "nbCards": $($($($(cible).parent()).children(".cardsNumber")).children("div")).children("input").val(), // on envoie le nombre de cartes souhaité
         "folderPath": $($(cible).parent().children(".folderTitle")).children("div").attr("id"), // on envoie le chemin d'accès aux images
-        "list": $(cible).parent().children(".listSelector").children(".listpicker").find(":selected").val() // on envoie la liste de mots sélectionés
+        "list": $(cible).parent().children(".listSelector").children(".listpicker").find(":selected").text() // on envoie la liste de mots sélectionés
     }
+    //console.log(data)
     if (data["list"] == "mesListes" && data["folderPath"] == undefined || data["folderPath"] == "") { // on vérifie qu'un dossier a bien été sélectionéé sinon on affiche une erreur
         error = erreurs["erSelectFolder"][document.documentElement.lang]
         alert(error)
@@ -481,9 +481,11 @@ function changeImage(cible) {
         for (let elt of $(cible).parent().parent().parent().children().children()) {
             listeMotsDiv.push($(elt).children()[0].innerHTML)
         }
-        var titreListe = (cible.classList)[1]
+        var num = $(cible).parents(".mainDiv").attr("id").charAt($(cible).parents(".mainDiv").attr("id").length - 1)
+        var dossier = "#folder"+ num + " select option:selected"
+        console.log($(dossier))
         data = {
-            "titreListe": titreListe, // savoir dans quelle liste de mots on se situe
+            "titreListe": $(dossier).text(), // savoir dans quelle liste de mots on se situe
             "listeMots": listeMotsDiv // la liste des mots déjà présente dans le div
         }
         ipcRenderer.invoke("changeImage", data).then((data) => {
@@ -497,7 +499,7 @@ function changeImage(cible) {
         })
     } else {
         var listeImagesPresentes = []
-        var chooserSelector = "#titleFolder" + $(cible).parent().parent().parent().attr('id').charAt($(cible).parent().parent().parent().attr('id').length - 1) + ">select"
+        var chooserSelector = "#titleFolder" + $(cible).parent().parent().parent().attr('id').charAt($(cible).parent().parent().parent().attr('id').length - 1) + ">div"
         for (let elt of $(cible).parent().parent().parent().children().children()) {
             listeImagesPresentes.push(($(elt).children()[0].id))
         }

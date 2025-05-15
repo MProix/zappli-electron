@@ -14,6 +14,7 @@ const menu = JSON.parse(fs.readFileSync(path.join(__dirname, "menu.json"), "utf-
 const erreurs = JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"), "utf-8"))
 const writtenLanguages = erreurs["listeLangues"] //liste des langues supportées par l'appli (qui ont un fichier home.html dans leur langue)
 let userStoragePath = app.getPath("userData")
+console.log(userStoragePath)
 let mainDir = (__dirname)
 var platform = process.platform
 //console.log(userStoragePath)
@@ -168,8 +169,10 @@ ipcMain.on('getDraw', (evt, arg) => {
 ipcMain.handle('changeImage', async (evt, arg) => {
     //console.log("changeimage : ", arg)
     var erreur = "" // on initialise le potentiel message d'erreur
+    //console.log("arg", arg)
     if (!arg["titreListe"]) {
         var listeOfImages = choosePertinentFiles([arg.chooserPath])
+        //console.log(listeOfImages)
         if (listeOfImages.length == arg.listeImagesPresentes.length) { // on vérifie que toutes les images ne sont pas déjà affichées
             erreur = erreurs["erAllImages"][showLanguage]
             return { "erreur": erreur }
@@ -642,8 +645,10 @@ ipcMain.on('plusTard', (evt, arg) => {
 
 
 ipcMain.handle('getDraw2', async (evt, arg) => {
-    if (arg["list"] == "mesListes") {
+    //console.log(arg)
+    if (arg["list"] == "Mes listes de mots") {
         var cardsInFolder = getCardsInFolder(arg["folderPath"]) // on récupère une liste de toutes les images de ce dossier
+        //console.log(cardsInFolder)
         if (cardsInFolder.length < arg["nbCards"]) { // on vérifie qu'il y a assez de cartes dans le dossier
             return { error: erreurs["erTooBig"][showLanguage][0] + cardsInFolder.length + erreurs["erTooBig"][showLanguage][1] } // si non on renvoie une erreur
         } else {
@@ -656,6 +661,7 @@ ipcMain.handle('getDraw2', async (evt, arg) => {
         // à rédiger pour l'affichage des mots
         // on récupère les mots de la liste
         var liste = JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json")))[arg["list"]]
+        //console.log(liste)
         // on vérifie qu'il y en a assez par rapport au nombre demandé
         if (liste.length < arg["nbCards"]) {
             return { error: erreurs["erTooBig2"][showLanguage][0] + liste.length + erreurs["erTooBig2"][showLanguage][1] } // si non on renvoie une erreur
