@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>FAQ</title>
+    <link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="listeStyles.css">
+
+</head>
+<body>
+    <header>
+        <h1 contenteditable="true"></h1>
+    </header>
+    <form>
+        <div id="ajouterMot">Add a word</div>
+    </form>
+    <div id="enregistrerListe">Save</div>
+    <script>
+        window.jquery = window.$ = require('jquery');
+        global.jQuery = require('jquery')
+    </script>
+    <script src="../../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+    <script src="liste.js"></script> 
+</body>
+</html>

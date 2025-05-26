@@ -24,6 +24,7 @@ ipcRenderer.on('OS', (evt, arg) => {
     }
 });
 ipcRenderer.on('listes', (evt, arg) => {
+    //console.log(arg)
     // on récupère les titres des listes pour pouvoir les ordonner
     var erreurs = JSON.parse(fs.readFileSync(path.join(arg[1], "erreurs.json"), encoding = 'utf-8'))
     var listes = []
@@ -33,13 +34,15 @@ ipcRenderer.on('listes', (evt, arg) => {
         }
         listes.sort()
     }
+    //console.log(listes)
     //on crée la listes affichée en html et on l'insère
     var listesHTML = ""
     var listesHTMLselect = "<option value='mesListes'>" + erreurs["myLists"][document.documentElement.lang] + "</option>"
     if (arg[0] != "") {
         for (let elt of listes) {
+            //console.log(elt)
             listesHTML += ("<li><p>" + elt + "</p><i class='fa-solid fa-pencil' ></i><i class='fa-solid fa-trash'></i></li>")
-            listesHTMLselect += ('<option value=' + elt + '>' + elt + '</option>')
+            listesHTMLselect += ('<option>' + elt + '</option>')
         }
     }
 
@@ -260,7 +263,7 @@ function clickOnPlay() {
                 })
                 var bonnesImages = "#affichage" + quelDiv + " img, #affichage" + quelDiv + " p" // on fabrique l'identifiant pour jquery
                 //console.log(bonnesImages)
-                $(bonnesImages).on("click", function () { // on applique la fonction uniquement sur les bonnes images parce que les autres l'ont déjà et qu'en la dupliquant on a de mauvaises surprises
+                $(bonnesImages).on("click", function () { // on applique la fonction uniquement sur les bonnes images parce que les autres l'ont déjà et qu'en la dupliquant on a 
                     clickOnImage(this)
                 })
                 $(bonnesImages).on("mousedown", function () { // on fait passer au-dessus l'image qu'on manipule
@@ -460,6 +463,7 @@ function prepareAction() { // pour désactiver/réactiver la possibilité de dé
     }
 }
 function clickOnImage(image) { // pour gérer les clics sur images
+    //console.log(image)
     if (selected == "efface") {
         $(image).toggleClass("visible") // on ajoute ou enlève une classe qui joue sur l'opacité
     } else if (selected == "change") {
@@ -476,14 +480,16 @@ function draggableTest() { // pour tester si la fonction de déplacement est act
     }
 }
 function changeImage(cible) {
+    //console.log(cible)
     if ($(cible).prop("nodeName") == "P") {
         var listeMotsDiv = []
         for (let elt of $(cible).parent().parent().parent().children().children()) {
             listeMotsDiv.push($(elt).children()[0].innerHTML)
         }
+        //console.log($(cible).parents(".mainDiv"))
         var num = $(cible).parents(".mainDiv").attr("id").charAt($(cible).parents(".mainDiv").attr("id").length - 1)
         var dossier = "#folder"+ num + " select option:selected"
-        console.log($(dossier))
+        //console.log($(dossier))
         data = {
             "titreListe": $(dossier).text(), // savoir dans quelle liste de mots on se situe
             "listeMots": listeMotsDiv // la liste des mots déjà présente dans le div

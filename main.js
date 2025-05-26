@@ -268,8 +268,8 @@ ipcMain.on("help", (evt, arg) => {
 })
 // =============== ROUTES LISTES DE MOTS ===============
 ipcMain.on("editList", (evt, arg) => {
-    var argToSend = [arg, userStoragePath]
-    editList = createWindow("views/listes/liste.html", winWidth = 400, winHeight = 600)
+    var argToSend = [arg, userStoragePath, mainDir]
+    editList = createWindow("views/listes/liste_" + showLanguage + ".html", winWidth = 400, winHeight = 600)
     editList.webContents.once('did-finish-load', () => {
         editList.send('OS', process.platform)
         editList.send('listeName', argToSend)
@@ -646,7 +646,7 @@ ipcMain.on('plusTard', (evt, arg) => {
 
 ipcMain.handle('getDraw2', async (evt, arg) => {
     //console.log(arg)
-    if (arg["list"] == "Mes listes de mots") {
+    if (arg["list"] == "Mes listes de mots" || arg["list"] == "My lists of words") {
         var cardsInFolder = getCardsInFolder(arg["folderPath"]) // on récupère une liste de toutes les images de ce dossier
         //console.log(cardsInFolder)
         if (cardsInFolder.length < arg["nbCards"]) { // on vérifie qu'il y a assez de cartes dans le dossier
