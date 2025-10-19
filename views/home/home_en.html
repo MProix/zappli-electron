@@ -69,6 +69,11 @@
                             class="filepicker">
                         <label for="folderChosen1"><i class="fa-regular fa-folder-open"></i><br>Choose a folder</label>
                     </div>
+                    <p>OR</p>
+                    <div class="dropZone2" id="dropImages1">
+                        <p>Drop folders and files</p>
+                    </div>
+                    <div style="display:none;" id="dropedList1" class="dropedList"></div>
                     <div class="listSelector" id="listSelector1">
                         <label for="listChosen1">or a list of words</label>
                         <select name="listes" id="listChosen1"
@@ -92,6 +97,11 @@
                             class="filepicker">
                         <label for="folderChosen2"><i class="fa-regular fa-folder-open"></i><br>Choose a folder</label>
                     </div>
+                    <p>OR</p>
+                    <div class="dropZone2" id="dropImages2">
+                        <p>Drop folders and files</p>
+                    </div>
+                    <div style="display:none;" id="dropedList2" class="dropedList"></div>
                     <div class="listSelector" id="listSelector2">
                         <label for="listChosen2">or a list of words</label>
                         <select name="listes" id="listChosen2"
@@ -115,6 +125,11 @@
                             class="filepicker">
                         <label for="folderChosen3"><i class="fa-regular fa-folder-open"></i><br>Choose a folder</label>
                     </div>
+                    <p>OR</p>
+                    <div class="dropZone2" id="dropImages3">
+                        <p>Drop folders and files</p>
+                    </div>
+                    <div style="display:none;" id="dropedList3" class="dropedList"></div>
                     <div class="listSelector" id="listSelector3">
                         <label for="listChosen3">or a list of words</label>
                         <select name="listes" id="listChosen3"
@@ -135,6 +150,11 @@
                     <div id="delFolderChooser" title="supprimer un dossier" style="display: none;"><i
                             class="fa-regular fa-square-minus"></i></div>
                 </div>
+                <div id="dropZone">
+                    <p>Déposer ici les feuilles de calcul contenant vos listes pour les ajouter automatiquement.</p>
+                    <div id="dropZoneTuto" style="display: none;">Les fichiers csv doivent correspondre à des colonnes, la première case de la colonne sera le titre de votre liste. Les autres fichiers prennent le titre du fichier pour nom de liste et les autres cases pour éléments de la liste.</div>
+                </div>
+                <div id="output"></div>
             </div>
             <div id="leftRightMoving"></div>
             <div id="cardsContainer">

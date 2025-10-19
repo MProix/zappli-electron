@@ -31,5 +31,9 @@
     "myLists" : {
         "fr": "Mes listes de mots",
         "en": "My lists of words"
+    },
+    "listTitle" : {
+        "fr": "Cliquez sur le titre pour le modifier",
+        "en": "Click to modifie title"
     }
 }

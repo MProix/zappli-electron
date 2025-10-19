@@ -4,6 +4,8 @@ const { ipcRenderer } = require('electron');
 const { get } = require('jquery');
 const path = require("path")
 const fs = require('fs')
+const csvParser = require("csv-parser");
+const xlsx = require('node-xlsx');
 // ============= VARIABLES GLOBALES ============= //
 var selected = "deplace" // pour connaitre constamment l'action au click sélectionnnée par l'utilisateur
 var nbFolderChoosers = 1 // pour savoir combien de possibilités de tirages on a
@@ -22,7 +24,11 @@ ipcRenderer.on('OS', (evt, arg) => {
         $(".topBtn").css("display", "none");
         //$("#header").addClass("headerBackground");
     }
+    console.log(arg)
 });
+ipcRenderer.on("storage", (evt, arg) => {
+    $("#storage").html(arg)
+})
 ipcRenderer.on('listes', (evt, arg) => {
     //console.log(arg)
     // on récupère les titres des listes pour pouvoir les ordonner
@@ -58,9 +64,9 @@ ipcRenderer.on('listes', (evt, arg) => {
         $("#listesMots").toggle()
     })
     $(".fa-trash").on("click", function () { // on affiche une alerte qui gèrera la suppression ou non de la liste
-        //console.log(this)
-        //console.log("supprimer liste : " + $(this).prev().prev().html())
-        ipcRenderer.send("deleteList", $(this).prev().prev().html())
+        console.log(this)
+        console.log("supprimer liste : " + $(this).prev().prev().text())
+        ipcRenderer.send("deleteList", $(this).prev().prev().text())
     })
 })
 
@@ -164,7 +170,11 @@ $("#delFolderChooser").on("click", () => {
 // ============= AJOUTER LE NOM et l'ID DU DOSSIER EN HAUT DU FOLDER CHOOSER ============= //
 function addChangeOnFolderSelect(cible, OS) {
     $(cible).on("change", (e) => {
+        console.log(e)
+        var listAZero = "#listChosen" + e.target.id.slice(e.target.id.length - 1, e.target.id.length) + " option[value='mesListes']"
+        $(listAZero).attr("selected", true)// si une liste est sélectionnée on repasse sur les titres des listes
         let folderPath = e.target.files[0].path // on récupère le chemin du dossier
+        console.log(e.target.files[0].path)
         let folderPathSplit = (path.parse(folderPath))["dir"] // on le split en diverses parties et on récupère la partie "directory"
         if (OS == "Win32") {
             var endFolderPathSplit = folderPathSplit.slice(folderPathSplit.lastIndexOf("\\") + 1, folderPathSplit.length) // formatage windows
@@ -201,12 +211,19 @@ function calculerTaille(div) {
 applyPlayBtns(".submitOneFolder")
 // ============= LE BOUTON CHANGER DE FOND ============ //
 $("#fondPicker").on("change", (e) => {
+    console.log(userOS)
     if (userOS == "Win32") {
         var fondURL = e.target.files[0].path.replace(/\\/g, '\/')
-        //console.log(fondURL)
-        $("#affichage").css("background-image", "url(" + fondURL + ")")
+        console.log(fondURL)
+        $("#affichage").css("background-image", "url'(" + fondURL + "')")
+    } else if (userOS == "linux") {
+        console.log(e.target.files[0].path)
+        $("#affichage").css("background-image", 'url("' + e.target.files[0].path + '")')
+        console.log($("#affichage").css('background-image'));
     } else {
-        $("#affichage").css("background-image", "url(" + e.target.files[0].path + ")")
+        console.log(e.target.files[0].path)
+        $("#affichage").css("background-image", 'url("' + e.target.files[0].path + '")')
+        console.log($("#affichage"))
     }
 })
 // ============= LE BOUTON LISTES DE MOTS ============ //
@@ -236,22 +253,25 @@ $("#play").on("click", () => {
 function clickOnPlay() {
     var cible = this
     var error = ""
+    var dropedList = $(cible).parent().children(".dropedList").html().split("]}")
     data = {
         "nbCards": $($($($(cible).parent()).children(".cardsNumber")).children("div")).children("input").val(), // on envoie le nombre de cartes souhaité
         "folderPath": $($(cible).parent().children(".folderTitle")).children("div").attr("id"), // on envoie le chemin d'accès aux images
-        "list": $(cible).parent().children(".listSelector").children(".listpicker").find(":selected").text() // on envoie la liste de mots sélectionés
+        "list": $(cible).parent().children(".listSelector").children(".listpicker").find(":selected").text(), // on envoie la liste de mots sélectionés
+        "dropedList": dropedList.slice(0, dropedList.length - 1)
     }
-    //console.log(data)
+    console.log(data)
     if (data["list"] == "mesListes" && data["folderPath"] == undefined || data["folderPath"] == "") { // on vérifie qu'un dossier a bien été sélectionéé sinon on affiche une erreur
         error = erreurs["erSelectFolder"][document.documentElement.lang]
         alert(error)
     } else {
         // on envoie la requête au backend
         ipcRenderer.invoke('getDraw2', data).then((data) => {
+            //console.log(jQuery("#output2").html().split(","))
             if (data["error"] != undefined) { // si le backend renvoie une erreur on l'affiche
                 alert(data["error"])
             } else if (data[0] == "mots") { // si c'est une liste de mots
-                //console.log(data[1])
+                console.log(data[1])
                 var quelDiv = (cible.id.slice(-1)) // on récupère le numéro du chooser d'où est partie la requête
                 $("#affichage").children()[quelDiv - 1].innerHTML = ""
                 $(data[1][0]).each(function (index, elt) {
@@ -262,7 +282,7 @@ function clickOnPlay() {
                     calculerTaille(this)
                 })
                 var bonnesImages = "#affichage" + quelDiv + " img, #affichage" + quelDiv + " p" // on fabrique l'identifiant pour jquery
-                //console.log(bonnesImages)
+                console.log(bonnesImages)
                 $(bonnesImages).on("click", function () { // on applique la fonction uniquement sur les bonnes images parce que les autres l'ont déjà et qu'en la dupliquant on a 
                     clickOnImage(this)
                 })
@@ -463,7 +483,7 @@ function prepareAction() { // pour désactiver/réactiver la possibilité de dé
     }
 }
 function clickOnImage(image) { // pour gérer les clics sur images
-    //console.log(image)
+    console.log(image)
     if (selected == "efface") {
         $(image).toggleClass("visible") // on ajoute ou enlève une classe qui joue sur l'opacité
     } else if (selected == "change") {
@@ -480,22 +500,22 @@ function draggableTest() { // pour tester si la fonction de déplacement est act
     }
 }
 function changeImage(cible) {
-    //console.log(cible)
+    console.log(cible)
     if ($(cible).prop("nodeName") == "P") {
         var listeMotsDiv = []
         for (let elt of $(cible).parent().parent().parent().children().children()) {
             listeMotsDiv.push($(elt).children()[0].innerHTML)
         }
-        //console.log($(cible).parents(".mainDiv"))
+        console.log($(cible).parents(".mainDiv"))
         var num = $(cible).parents(".mainDiv").attr("id").charAt($(cible).parents(".mainDiv").attr("id").length - 1)
-        var dossier = "#folder"+ num + " select option:selected"
-        //console.log($(dossier))
+        var dossier = "#folder" + num + " select option:selected"
+        console.log($(dossier))
         data = {
             "titreListe": $(dossier).text(), // savoir dans quelle liste de mots on se situe
             "listeMots": listeMotsDiv // la liste des mots déjà présente dans le div
         }
         ipcRenderer.invoke("changeImage", data).then((data) => {
-            //console.log(data)
+            console.log(data)
             if (data["erreur"] != "") {
                 alert(data["erreur"])
             } else {
@@ -509,9 +529,13 @@ function changeImage(cible) {
         for (let elt of $(cible).parent().parent().parent().children().children()) {
             listeImagesPresentes.push(($(elt).children()[0].id))
         }
+        var goodChooser = "#dropedList"+$(cible).parent().parent().parent().attr('id').charAt($(cible).parent().parent().parent().attr('id').length - 1)
+        console.log(goodChooser)
+        var dropedList = $(goodChooser).html().split("]}")
         data = { // on envoie
             "listeImagesPresentes": listeImagesPresentes, // la liste des images déjà présentes
-            "chooserPath": $(chooserSelector).attr("id") // le chemin d'accès de ces images
+            "chooserPath": $(chooserSelector).attr("id"), // le chemin d'accès de ces images
+            "dropedList": dropedList.slice(0, dropedList.length - 1) //la liste des images s'il s'agit d'un drag and drop
         }
         ipcRenderer.invoke("changeImage", data).then((data) => {
             if (data["erreur"] != "") {
@@ -589,3 +613,194 @@ $("#aide").on("click", () => {
 $("#notifs").on("click", () => {
     alert("Lien à venir vers les nouvelles ressources")
 })
+
+// ============= CONFIGURATION DE LA ZONE DE DRAG AND DROP DES CSV ==================== //
+const dropZone = document.getElementById("dropZone");
+const output = document.getElementById("output");
+
+dropZone.addEventListener("drop", dropHandler);
+
+window.addEventListener("dragover", (e) => {
+    e.preventDefault();
+});
+window.addEventListener("drop", (e) => {
+    e.preventDefault();
+});
+function dropHandler(ev) {
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+    let result = "";
+    // Utiliser DataTransferItemList pour accéder au(x) fichier(s)
+    [...ev.dataTransfer.items].forEach((item, i) => {
+        // If dropped items aren't files, reject them
+        if (item.kind === "file") {
+            console.log(item.type)
+            if (item.type === "text/csv" || item.type === "application/vnd.oasis.opendocument.spreadsheet" || item.type === "application/vnd.oasis.opendocument.spreadsheet" || item.type === "application/vnd.ms-excel" || item.type === "application/x-iwork-numbers-sffnumbers" || item.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+                const file = item.getAsFile();
+                addListsToJSON(file);
+                result += "Vos listes ont bien été ajoutées."
+                setTimeout(() => {
+                    $("#output").toggle("slow");
+                }, "5000");
+            } else { // If dropped items aren't CSV files, reject them // autoriser xlsx ods xls numbers
+                result += "L'élément déposé n'est pas dans un format que la zappli peut lire. Utilisez les formats .csv, .xls, .xlsx, .ods ou .numbers"
+                setTimeout(() => {
+                    $("#output").toggle("slow");
+                }, "5000");
+            }
+
+        } else {
+            result += "L'élément déposé n'est pas un fichier."
+            setTimeout(() => {
+                $("#output").toggle("slow");
+            }, "5000");
+        }
+    });
+    output.textContent = result;
+}
+function addListsToJSON(calcFile) {
+    const result = []
+    // on règle le cas des fichiers xls et xslx
+    if (calcFile.type == "application/vnd.ms-excel" || calcFile.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || calcFile.type == "application/vnd.oasis.opendocument.spreadsheet" || calcFile.type == "application/x-iwork-numbers-sffnumbers") {
+        const obj = xlsx.parse(calcFile.path); // on parse la feuille de calcul
+        var rows = []
+        var writeStr = []
+        var listeGlobale = {}
+        // on charge les listes déjà existantes depuis le json
+        if (fs.readFileSync(path.join($("#storage").html(), "listes.json"), encoding = 'utf-8') != "") {
+            listeGlobale = JSON.parse(fs.readFileSync(path.join($("#storage").html(), "listes.json"), encoding = 'utf-8'))
+        }
+        //looping through all sheets
+        for (var i = 0; i < obj.length; i++) {
+            var sheet = obj[i]
+            //loop through all rows in the sheet
+            for (var j = 0; j < sheet['data'].length; j++) {
+                //add the row to the rows array
+                rows.push(sheet['data'][j])
+            }
+        }
+        console.log(rows)
+        if (rows[0].length == 1) { // DANS LE CAS D'UNE LISTE A UNE SEULE COLONNE
+            for (var i = 0; i < rows.length; i++) {
+                writeStr.push(rows[i].join(""))
+            }
+            listeGlobale[strUcFirst(calcFile.name.slice(0, calcFile.name.indexOf(".")))] = writeStr
+        } else {
+            console.log("plusieurs colonnes")
+            var clefs = []
+            rows[0].forEach(elt => {
+                clefs.push(elt)
+            })
+            clefs.forEach(elt => {
+                listeGlobale[elt] = [];
+            });
+            console.log(listeGlobale)
+            let i = 1
+            while (i < rows.length) {
+                console.log(rows[i])
+                let j = 0
+                while (j < rows[0].length) {
+                    console.log(rows[i][j])
+                    if (rows[0][j] == undefined) {
+                        j++
+                    } else {
+                        if (rows[i][j] != undefined) {
+                            listeGlobale[rows[0][j]].push(rows[i][j])
+                            j++
+                        }
+                        j++
+                    }
+                }
+                i++
+            }
+            console.log(listeGlobale)
+            /* var clefs = []
+            rows[0].forEach(element => {
+                console.log(element)
+                clefs.push(element)
+            });
+            clefs.forEach(elt => {
+                listeGlobale[elt] = [];
+            }); */
+        }
+        fs.writeFileSync(path.join($("#storage").html(), "listes.json"), JSON.stringify(listeGlobale))
+        ipcRenderer.send("changeLists", Object.keys(listeGlobale)) //on envoie le nom des listes pour actualiser dans la fenêtre principale
+
+    }
+    if (calcFile.type == "text/csv") {
+        fs.createReadStream(calcFile.path)
+            .pipe(csvParser())
+            .on("data", (data) => {
+                result.push(data);
+            })
+            .on("end", () => {
+                var listeGlobale = {}
+                if (fs.readFileSync(path.join($("#storage").html(), "listes.json"), encoding = 'utf-8') != "") {
+                    listeGlobale = JSON.parse(fs.readFileSync(path.join($("#storage").html(), "listes.json"), encoding = 'utf-8'))
+                }
+                console.log(result[0])
+                var clefs = Object.keys(result[0]);
+                clefs = clefs.filter(str => /\w+/.test(str))
+                console.log(clefs)
+                clefs.forEach(elt => {
+                    listeGlobale[elt] = [];
+                });
+                clefs.forEach(element => {
+                    result.forEach(elt => {
+                        if (elt[element] != "") {
+                            listeGlobale[element].push(elt[element])
+                        }
+                    })
+                });
+                console.log(listeGlobale)
+                fs.writeFileSync(path.join($("#storage").html(), "listes.json"), JSON.stringify(listeGlobale))
+                ipcRenderer.send("changeLists", Object.keys(listeGlobale)) //on envoie le nom des listes pour actualiser dans la fenêtre principale
+            });
+    }
+
+
+}
+$("#dropZone>p").hover(function () {
+    $("#dropZoneTuto").toggle()
+})
+
+function strUcFirst(a) {
+    return (a + '').charAt(0).toUpperCase() + (a + '').substr(1);
+}
+/////////////////////
+function traverseFileTree(item, path, elt) {
+    path = path || "";
+    if (item.isFile) {
+        // Get file
+        item.file(function (file) {
+            elt.parent().children(".dropedList").html(elt.parent().children(".dropedList").html()+ path +file.name+"]}")
+            //$(elt)(path + file.name);
+        });
+    } else if (item.isDirectory) {
+        // Get folder contents
+        var dirReader = item.createReader();
+        dirReader.readEntries(function (entries) {
+            for (var i = 0; i < entries.length; i++) {
+                traverseFileTree(entries[i], path + item.name + "/", elt);
+            }
+        });
+    }
+}
+var dropArea = document.getElementsByClassName("dropZone2")
+for (let elt of dropArea) {
+    elt.addEventListener("drop", function (event) {
+        event.preventDefault();
+        $($(this).parent().children(".folderTitle")).children("div").attr("id","droped")
+        var items = event.dataTransfer.items;
+        var path = event.dataTransfer.files[0].path.split("/")
+        var goodPath = (path.slice(0, path.length - 1)).join("/")
+        console.log(goodPath)
+        for (var i = 0; i < items.length; i++) {
+            // webkitGetAsEntry is where the magic happens
+            var item = items[i].webkitGetAsEntry();
+            if (item) {
+                traverseFileTree(item, goodPath+"/", $(this));
+            }
+        }
+    }, false);
+}

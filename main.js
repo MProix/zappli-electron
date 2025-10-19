@@ -17,7 +17,7 @@ let userStoragePath = app.getPath("userData")
 console.log(userStoragePath)
 let mainDir = (__dirname)
 var platform = process.platform
-//console.log(userStoragePath)
+console.log(userStoragePath)
 // ================ variables globales stockées ================ //
 ///////////////////////////////////////////////////////////////////
 
@@ -54,10 +54,6 @@ if (!store.has("historique")) { // s'il n'y en a pas on le crée
 } else {
     var historique = store.get("historique") // et on le récupère en variable
 }
-//console.log(historique)
-
-
-//console.log(JSON.parse(listes))
 
 
 ///////////////////
@@ -106,7 +102,7 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
 // ================ Initialisation de la fenêtre principale ================ //
 app.whenReady().then(() => {
     if (writtenLanguages.includes(showLanguage)) {
-        //console.log("LANGUAGE : "+showLanguage)
+        console.log("LANGUAGE : " + showLanguage)
         mainWindow = createWindow("views/home/home_" + showLanguage + ".html")
     } else {
         showLanguage = "fr"
@@ -115,20 +111,21 @@ app.whenReady().then(() => {
     mainWindow.webContents.once('did-finish-load', () => {
         //mainWindow.send('store-data', dossiersRacineUtilisateur)
         //mainWindow.send('autres-disques', autresDisques)
-        //console.log(JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"),encoding='utf8')))
+        console.log(JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"), encoding = 'utf8')))
         // on vérifie s'il existe un dossier de listes
         if (fs.existsSync(path.join(userStoragePath, "listes.json"))) {
             if (fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8') != "") {
-                mainWindow.send('listes', [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')),mainDir])
+                mainWindow.send('listes', [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')), mainDir])
             } else {
-                mainWindow.send('listes', ["",mainDir])
+                mainWindow.send('listes', ["", mainDir])
             }
         } else {
             fs.openSync(path.join(userStoragePath, "listes.json"), 'w')
-            mainWindow.send('listes', ["",mainDir])
+            mainWindow.send('listes', ["", mainDir])
         }
         mainWindow.send('erreurs', JSON.parse(fs.readFileSync(path.join(__dirname, "erreurs.json"), encoding = 'utf8')))
         mainWindow.send('OS', process.platform)
+        mainWindow.send("storage", userStoragePath)
     })
     autoUpdater.checkForUpdatesAndNotify()
 })
@@ -157,22 +154,26 @@ autoUpdater.on("before-quit-for-update", () => {
 
 // =============== ROUTE BOUTON PLAY ===================
 
-ipcMain.on('getDraw', (evt, arg) => {
+/* ipcMain.on('getDraw', (evt, arg) => {
+    console.log("AAAAAAAAAAAAAAAAAAAAA")
+    console.log(arg)
     var listeOfImages = choosePertinentFiles(arg["listeDossiers"]) // on récupère une liste de toutes les images de ce ou ces dossier(s)
     var data = shuffleFolder(listeOfImages, arg["nombreImages"]) // on mélange et on ne garde que les premiers en fonction du nombre demandé
     //fs.writeFileSync(path.join(userStoragePath, "historique", "historique" + data[3] + ".json"), JSON.stringify(data[0])) //on crée un fichier d'historique
     evt.sender.send('giveDraw', data) // on renvoie la liste d'images au front end
-})
+}) */
 
 // =============== ROUTE CHANGE IMAGE ==================
 
 ipcMain.handle('changeImage', async (evt, arg) => {
-    //console.log("changeimage : ", arg)
+    console.log("changeimage : ", arg)
     var erreur = "" // on initialise le potentiel message d'erreur
-    //console.log("arg", arg)
     if (!arg["titreListe"]) {
-        var listeOfImages = choosePertinentFiles([arg.chooserPath])
-        //console.log(listeOfImages)
+        if (arg["chooserPath"] == "droped") {
+            var listeOfImages = getCardsInList(arg["dropedList"])
+        } else {
+            var listeOfImages = choosePertinentFiles([arg.chooserPath])
+        }
         if (listeOfImages.length == arg.listeImagesPresentes.length) { // on vérifie que toutes les images ne sont pas déjà affichées
             erreur = erreurs["erAllImages"][showLanguage]
             return { "erreur": erreur }
@@ -193,7 +194,7 @@ ipcMain.handle('changeImage', async (evt, arg) => {
         } else { // si ce n'est pas le cas
             // on récupère un mot aléatoire
             var motChoisi = shuffleFolder(listeDesMots, 1)
-            //console.log(motChoisi[0][0])
+            console.log(motChoisi[0][0])
             // on vérifie qu'il n'est pas déjà affiché
             while (arg.listeMots.includes(motChoisi[0][0])) { // on tire tant que ce n'est pas bon
                 motChoisi = shuffleFolder(listeDesMots, 1)
@@ -276,13 +277,14 @@ ipcMain.on("editList", (evt, arg) => {
     })
 })
 ipcMain.on("changeLists", (evt, arg) => {
-    mainWindow.webContents.send("listes", [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')),mainDir])
+    mainWindow.webContents.send("listes", [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')), mainDir])
 })
 ipcMain.on("deleteList", (evt, arg) => {
+    console.log(arg)
     var listeGlobale = JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8'))
     delete listeGlobale[arg]
     fs.writeFileSync(path.join(userStoragePath, "listes.json"), JSON.stringify(listeGlobale))
-    mainWindow.webContents.send("listes", [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')),mainDir])
+    mainWindow.webContents.send("listes", [JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json"), encoding = 'utf-8')), mainDir])
 })
 // =============== FONCTIONS ============================
 function choosePertinentFolders(folderList, basePath) {
@@ -322,6 +324,8 @@ function checkImagesAndEmpty(base, elt) {
 }
 
 function choosePertinentFiles(listeOfPaths) {
+    console.log("LIST OF PATHS")
+    console.log(listeOfPaths)
     var listeImages = []
     for (let onePath of listeOfPaths) {
         for (let elt of fs.readdirSync(onePath)) {
@@ -385,7 +389,7 @@ function changeToExpert(level) {
         res.on("end", () => {
             try {
                 checkedUrl = JSON.parse(body);
-                //console.log("checkedurl", checkedUrl)
+                console.log("checkedurl", checkedUrl)
                 store.set("distantConfig", checkedUrl.config)
                 checkNewInfo()
             } catch (error) {
@@ -394,7 +398,7 @@ function changeToExpert(level) {
         });
 
     }).on("error", (error) => {
-        //console.log("localConfig", localConfig)
+        console.log("localConfig", localConfig)
         store.set("distantConfig", localConfig)
         console.error(error.message);
     });
@@ -410,14 +414,14 @@ function setConfig() {
 
 
 /* function checkNewInfo() {
-    //console.log(store.get("dontShowVersion"))
-    //console.log(store.get("localConfig"))
-    //console.log(store.get("distantConfig"))
+    console.log(store.get("dontShowVersion"))
+    console.log(store.get("localConfig"))
+    console.log(store.get("distantConfig"))
     if (store.get("localConfig").version != store.get("distantConfig").version) {
         var message = "Nouvelle version disponible : "
         var url = "https://www.eglise-ostwald-elsau-montagneverte.fr/wp-content/uploads/2023/01/Semaine-du-28-janvier-au-05-fevrier-2023.pdf"
         var version = store.get("distantConfig").version
-        //console.log("versions différentes")
+        console.log("versions différentes")
         if (store.get("distantConfig").version != store.get("dontShowVersion")) {
             newVersionWin = createWindow("views/newVersion/newVersion.html", 400, 300)
             newVersionWin.webContents.once('did-finish-load', () => {
@@ -426,7 +430,7 @@ function setConfig() {
         }
 
     } else {
-        //console.log("mêmes versions")
+        console.log("mêmes versions")
     }
 } */
 ////////////// config menu /////////////////
@@ -635,7 +639,7 @@ ipcMain.on('fireMenu', (evt, arg) => {
 ///////////////////////////////// ROUTES ET FONCTIONS DE LA PAGE NEWVERSION /////////////////////////////////////////////
 
 /* ipcMain.on('dontShow', (evt, arg) => {
-    //console.log("arg", arg)
+    console.log("arg", arg)
     store.set("dontShowVersion", arg)
     newVersionWin.close()
 })
@@ -645,10 +649,26 @@ ipcMain.on('plusTard', (evt, arg) => {
 
 
 ipcMain.handle('getDraw2', async (evt, arg) => {
-    //console.log(arg)
+    console.log(arg)
     if (arg["list"] == "Mes listes de mots" || arg["list"] == "My lists of words") {
+        if (arg["folderPath"] == undefined) {
+            return { error: erreurs["erSelectFolder"][showLanguage] }
+        } else if (arg["folderPath"] == "droped") {
+            console.log("images droppées")
+            var cardsInFolder = getCardsInList(arg["dropedList"]) // on récupère une liste de toutes les images de ce dossier
+            console.log(cardsInFolder)
+            if (cardsInFolder.length < arg["nbCards"]) { // on vérifie qu'il y a assez de cartes dans le dossier
+                return { error: erreurs["erTooBig"][showLanguage][0] + cardsInFolder.length + erreurs["erTooBig"][showLanguage][1] } // si non on renvoie une erreur
+            } else {
+                var data = shuffleFolder(cardsInFolder, arg["nbCards"]) // on mélange et on ne garde que les premiers en fonction du nombre demandé
+                console.log("DATA")
+                console.log(data)
+                return data
+            }
+        }
+        console.log("dossier seul")
         var cardsInFolder = getCardsInFolder(arg["folderPath"]) // on récupère une liste de toutes les images de ce dossier
-        //console.log(cardsInFolder)
+        console.log(cardsInFolder)
         if (cardsInFolder.length < arg["nbCards"]) { // on vérifie qu'il y a assez de cartes dans le dossier
             return { error: erreurs["erTooBig"][showLanguage][0] + cardsInFolder.length + erreurs["erTooBig"][showLanguage][1] } // si non on renvoie une erreur
         } else {
@@ -657,11 +677,10 @@ ipcMain.handle('getDraw2', async (evt, arg) => {
             return data
         }
     }
-    else {
-        // à rédiger pour l'affichage des mots
+    else { // SI LE TIRAGE EST DANS UNE LISTE DE MOTS
         // on récupère les mots de la liste
         var liste = JSON.parse(fs.readFileSync(path.join(userStoragePath, "listes.json")))[arg["list"]]
-        //console.log(liste)
+        console.log(liste)
         // on vérifie qu'il y en a assez par rapport au nombre demandé
         if (liste.length < arg["nbCards"]) {
             return { error: erreurs["erTooBig2"][showLanguage][0] + liste.length + erreurs["erTooBig2"][showLanguage][1] } // si non on renvoie une erreur
@@ -677,6 +696,17 @@ function getCardsInFolder(folderPath) {
     for (let elt of fs.readdirSync(folderPath)) {
         if (listOfValidExtensions.includes(path.extname(path.join(folderPath, elt)))) {
             listeImages.push([elt, path.join(folderPath, elt)])
+        }
+    }
+    return listeImages
+}
+function getCardsInList(dropedList) {
+    var listeImages = []
+    for (let elt of dropedList) {
+        console.log("ETELKOIJIOA")
+        console.log(elt)
+        if (listOfValidExtensions.includes(path.extname(path.join("/", elt)))) {
+            listeImages.push([elt.split("/")[elt.split("/").length - 1], elt])
         }
     }
     return listeImages

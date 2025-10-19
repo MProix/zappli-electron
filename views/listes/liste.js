@@ -21,10 +21,10 @@ ipcRenderer.on('listeName', (evt, arg) => {
         })
     } else {
         $("header>h1").html(arg[0])
-        //console.log(arg)
+        console.log(arg)
         var listeDesMots = JSON.parse(fs.readFileSync(path.join(arg[1], "listes.json"), encoding = 'utf-8'))[arg[0]]
         var mots = ""
-        //console.log(listeDesMots)
+        console.log(listeDesMots)
         for (let elt of listeDesMots) {
             mots += "<div><input type='text' class='word' value='" + elt + "'></input><i class='fa-solid fa-circle-xmark'></i></div>"
         }
@@ -45,13 +45,13 @@ ipcRenderer.on('listeName', (evt, arg) => {
                 words.push($(elt).val())
             }
         }
-        //console.log("words : ",words)
-        //console.log($("h1").html())
+        console.log("words : ",words)
+        console.log($("h1").html())
         listeGlobale[$("h1").text()] = words
-        //console.log(listeGlobale)
+        console.log(listeGlobale)
         fs.writeFileSync(path.join(arg[1], "listes.json"), JSON.stringify(listeGlobale))
         ipcRenderer.send("changeLists", Object.keys(listeGlobale)) //on envoie le nom de la liste avec)
-        //ipcRenderer.send('closeListes');
+        ipcRenderer.send('closeListes');
     })
 })
 $("#ajouterMot").on("click", function () {

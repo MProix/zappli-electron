@@ -17,7 +17,7 @@
     <div id="zappliContainer">
         <div id="titleBar">
             <button id="showHideMenus" class="toggleButton" title="menu"></button>
-            <div id="titre">zappli</div>   
+            <div id="titre">zappli</div>
             <button class="topBtn minimize" id="minimize" title="Réduire"></button>
             <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
             <button class="topBtn close" id="close" title="Fermer"></button>
@@ -41,7 +41,10 @@
                 </div>
                 <div id="fond" class="actionBtn">
                     <input type="file" style="display: none;" id="fondPicker" class="fondPicker">
-                    <label for="fondPicker" style="text-align: center; cursor: pointer;"><i class="fa-solid fa-paintbrush"></i><br><p>Changer le fond</p></label>
+                    <label for="fondPicker" style="text-align: center; cursor: pointer;"><i
+                            class="fa-solid fa-paintbrush"></i><br>
+                        <p>Changer le fond</p>
+                    </label>
                 </div>
                 <div id="listes" class="actionBtn"><i class="fa-solid fa-list-check"></i>
                     <p>Listes de mots</p>
@@ -67,12 +70,17 @@
                     <div class="folderSelector" id="folderSelector1">
                         <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen1"
                             class="filepicker">
-                        <label for="folderChosen1"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
+                        <label for="folderChosen1"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un
+                            dossier</label>
                     </div>
+                    <p>OU</p>
+                    <div class="dropZone2" id="dropImages1">
+                        <p>Déposer dossiers et fichiers</p>
+                    </div>
+                    <div style="display:none;" id="dropedList1" class="dropedList"></div>
                     <div class="listSelector" id="listSelector1">
                         <label for="listChosen1">ou une liste de mots</label>
-                        <select name="listes" id="listChosen1"
-                        class="listpicker"></select>
+                        <select name="listes" id="listChosen1" class="listpicker"></select>
                     </div>
                     <div class="cardsNumber" id="cardsNumber1">
                         <div><input type="number" value="3" min="1" max="24"></div>
@@ -90,12 +98,17 @@
                     <div class="folderSelector" id="folderSelector2">
                         <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen2"
                             class="filepicker">
-                        <label for="folderChosen2"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
+                        <label for="folderChosen2"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un
+                            dossier</label>
                     </div>
+                    <p>OU</p>
+                    <div class="dropZone2" id="dropImages2">
+                        <p>Déposer dossiers et fichiers</p>
+                    </div>
+                    <div style="display:none;" id="dropedList2" class="dropedList"></div>
                     <div class="listSelector" id="listSelector2">
                         <label for="listChosen2">ou une liste de mots</label>
-                        <select name="listes" id="listChosen2"
-                        class="listpicker"></select>
+                        <select name="listes" id="listChosen2" class="listpicker"></select>
                     </div>
                     <div class="cardsNumber" id="cardsNumber2">
                         <div><input type="number" value="3" min="1" max="24"></div>
@@ -113,12 +126,17 @@
                     <div class="folderSelector" id="folderSelector3">
                         <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen3"
                             class="filepicker">
-                        <label for="folderChosen3"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un dossier</label>
+                        <label for="folderChosen3"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un
+                            dossier</label>
                     </div>
+                    <p>OU</p>
+                    <div class="dropZone2" id="dropImages3">
+                        <p>Déposer dossiers et fichiers</p>
+                    </div>
+                    <div style="display:none;" id="dropedList3" class="dropedList"></div>
                     <div class="listSelector" id="listSelector3">
                         <label for="listChosen3">ou une liste de mots</label>
-                        <select name="listes" id="listChosen3"
-                        class="listpicker"></select>
+                        <select name="listes" id="listChosen3" class="listpicker"></select>
                     </div>
                     <div class="cardsNumber" id="cardsNumber3">
                         <div><input type="number" value="3" min="1" max="24"></div>
@@ -135,6 +153,13 @@
                     <div id="delFolderChooser" title="supprimer un dossier" style="display: none;"><i
                             class="fa-regular fa-square-minus"></i></div>
                 </div>
+                <div id="dropZone">
+                    <p>Déposer ici les feuilles de calcul contenant vos listes pour les ajouter automatiquement.</p>
+                    <div id="dropZoneTuto" style="display: none;">Les fichiers csv doivent correspondre à des colonnes,
+                        la première case de la colonne sera le titre de votre liste. Les autres fichiers prennent le
+                        titre du fichier pour nom de liste et les autres cases pour éléments de la liste.</div>
+                </div>
+                <div id="output"></div>
             </div>
             <div id="leftRightMoving"></div>
             <div id="cardsContainer">
@@ -166,6 +191,7 @@
     </script>
     <script src="../../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
     <script src="home.js"></script>
+    <div id="storage" style="display: none;"></div>
 </body>
 
 </html>
