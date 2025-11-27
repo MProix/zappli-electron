@@ -10,6 +10,7 @@ const { autoUpdater } = require("electron-updater")
 const menu = JSON.parse(fs.readFileSync(path.join(__dirname, "menu.json"), "utf-8")) // on récupère le JSON du fichier de menu
 const pjson = require('./package.json'); // pour incrire dans la base de données store
 const log = require("electron-log") // on initialise le système de log d'electron pour pouvoir débuguer à distance chez l'utilisateur
+const openAboutWindow = require('about-window').default;
 var csvList = {} // on génère une liste vide en cas d'import de csv
 let mainWindow = null //on stocke la variable de fenêtre
 let userStoragePath = app.getPath("userData")
@@ -287,7 +288,8 @@ const templateMenu = [
                             {
                                 icon_path: path.join(__dirname, 'public', 'iconAbout.png'),
                                 css_path: path.join(__dirname, "public", "aboutStyles.css"),
-                                homepage: "https://www.leszexpertsfle.com"
+                                homepage: "https://www.leszexpertsfle.com/zappli",
+                                description: "Tirez des cartes au hasard, jouez, surprenez vos apprenants…. pour mieux apprendre."
                             }
                         )
                     }
@@ -329,7 +331,8 @@ const templateMenu = [
                                     icon_path: path.join(__dirname, 'public', 'iconAbout.png'),
                                     //copyright: '(c) 2024 Les Zexperts FLE',
                                     css_path: path.join(__dirname, "public", "aboutStyles.css"),
-                                    homepage: "https://www.leszexpertsfle.com"
+                                    homepage: "https://www.leszexpertsfle.com/zappli",
+                                    description: "Tirez des cartes au hasard, jouez, surprenez vos apprenants…. pour mieux apprendre."
                                 }
                             )
                         }
@@ -372,26 +375,7 @@ const templateMenu = [
                         }
                     },
                 ]
-            },
-            /*{ type: 'separator' },
-            {
-                label: menu["chooseMode"][showLanguage],
-                submenu: [
-                    {
-                        label: "Expert",
-                        click() {
-                            changeToExpert("expert")
-                        }
-                    },
-                    {
-                        label: menu["beginner"][showLanguage],
-                        click() {
-                            changeToExpert("simple")
-                        }
-                    }
-                ]
-
-            }*/
+            }
         ]
     },
     // { role: 'viewMenu' }

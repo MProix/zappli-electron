@@ -6,6 +6,11 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+    border-width: 1px 1px 0px 1px;
+    border-color: white;
+    border-style: solid;
+    padding-top: 10px;
+    border-radius: 15px 15px 0px 0px;
 }
 .logo>img{
     width: 100px;
@@ -22,4 +27,32 @@ a{
 .versions{
     margin-top: 20px;
     padding-top: 20px;
+}
+h2{
+    border-style: solid;
+    border-width: 0px 1px 1px 1px;
+    width: 200px;
+    margin: 0px !important;
+    text-align: center;
+    padding-bottom: 10px;
+    border-radius: 0px 0px 15px 15px;
+}
+body:has(h2:hover) .logo{
+    background-color: #2EA3F2;
+}
+h2:hover{
+    background-color: #2EA3F2;
+}
+body:has(.logo:hover) h2{
+    background-color: #2EA3F2;
+}
+.logo:hover{
+    background-color: #2EA3F2;
+}
+h3{
+    max-width: 200px;
+    text-align: justify;
+    font-weight: 400;
+    padding-top: 20px;
+    line-height: 1.5;
 }

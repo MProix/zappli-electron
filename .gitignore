@@ -6,3 +6,4 @@ package-lock.json
 package.json
 zappli.p12
 main copy.js
+.DS_Store
