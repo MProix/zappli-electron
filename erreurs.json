@@ -5,8 +5,8 @@
         "en": "No existing prenious draw"
     },
     "erAllImages" : {
-        "fr": "Toutes les images de ce(s) dossier(s) sont déjà affichées",
-        "en": "All the images of this/these folder(s) are already displayed"
+        "fr": "Toutes les images sont déjà affichées",
+        "en": "All the images are already displayed"
     },
     "erAllWords" : {
         "fr": "Tous les mots de cette liste sont déjà affichés",
@@ -35,5 +35,53 @@
     "listTitle" : {
         "fr": "Cliquez sur le titre pour le modifier",
         "en": "Click to modifie title"
+    },
+    "erDossierVide" :{
+        "fr": "Il n'y a ni liste de mots ni images dans ce(s) dossier(s)",
+        "en": "There is no list of word nor images in this/theses folder(s)"
+    },
+    "erPlusieursListes" :{
+        "fr": "Il y a plusieurs listes de mots dans ce fichier",
+        "en": "There is more than a single list in this file"
+    },
+    "1":{
+        "fr":"Déposez un dossier",
+        "en":"Drag and drop a folder"
+    },
+    "2":{
+        "fr":"des images",
+        "en":"files"
+    },
+    "3":{
+        "fr":"une liste de mots",
+        "en":"or a spreasdsheet"
+    },
+    "4":{
+        "fr":"Sélectionnez un dossier",
+        "en":"Select a folder"
+    },
+    "5":{
+        "fr":"OU",
+        "en":"OR"
+    },
+    "6":{
+        "fr":"Sélectionnez un ou des fichiers",
+        "en":"Select one or several files"
+    },
+    "7":{
+        "fr":"C'est prêt, cliquez sur le bouton &#9655; pour tirer des cartes",
+        "en":"Ready to go! Click on &#9655; below to draw cards."
+    },
+    "8":{
+        "fr":"Nombre",
+        "en":"Cards"
+    },
+    "9":{
+        "fr":"de cartes",
+        "en":"number"
+    },
+    "10":{
+        "fr":"Zoom cartes",
+        "en":"Zoom cards"
     }
 }

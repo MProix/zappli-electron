@@ -39,21 +39,21 @@
                 <div id="numerote" class="actionBtn"><i class="fa-solid fa-hashtag"></i>
                     <p>Numéroter les cartes</p>
                 </div>
+                <div id="back" class="actionBtn" onclick="getBack(event)"><i class="fa-solid fa-circle-play"></i>
+                    <p>Revenir en arrière</p>
+                </div>
                 <div id="fond" class="actionBtn">
-                    <input type="file" style="display: none;" id="fondPicker" class="fondPicker">
+                    <input type="file" style="display: none;" id="fondPicker" class="fondPicker"
+                        onchange="changerFond(event)">
                     <label for="fondPicker" style="text-align: center; cursor: pointer;"><i
                             class="fa-solid fa-paintbrush"></i><br>
                         <p>Changer le fond</p>
                     </label>
                 </div>
-                <div id="listes" class="actionBtn"><i class="fa-solid fa-list-check"></i>
-                    <p>Listes de mots</p>
+                <div id="supprimerFond" class="actionBtn" onclick="supprimerFond(event)"><i
+                        class="fa-solid fa-xmark"></i>
+                    <p>Supprimer le fond</p>
                 </div>
-                <ul id="listesMots">
-                </ul>
-            </div>
-            <div id="zero"><i class="fa-solid fa-rotate-left"></i>
-                <p>Remettre à zéro</p>
             </div>
             <div id="aideNotifs">
                 <div id="aide"><i class="fa-regular fa-circle-question"></i></div>
@@ -62,126 +62,58 @@
         </div>
         <div id="topBottomMoving"></div>
         <div id="mainContent">
-            <div id="folderChooser">
-                <div class="oneFolder" id="folder1">
-                    <div class="folderTitle" id="titleFolder1">
-                        <div></div>
-                    </div>
-                    <div class="folderSelector" id="folderSelector1">
-                        <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen1"
-                            class="filepicker">
-                        <label for="folderChosen1"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un
-                            dossier</label>
-                    </div>
-                    <p>OU</p>
-                    <div class="dropZone2" id="dropImages1">
-                        <p>Déposer dossiers et fichiers</p>
-                    </div>
-                    <div style="display:none;" id="dropedList1" class="dropedList"></div>
-                    <div class="listSelector" id="listSelector1">
-                        <label for="listChosen1">ou une liste de mots</label>
-                        <select name="listes" id="listChosen1" class="listpicker"></select>
-                    </div>
-                    <div class="cardsNumber" id="cardsNumber1">
-                        <div><input type="number" value="3" min="1" max="24"></div>
-                        <label for="cardsNumber1">Nombre de cartes à afficher</label>
-                    </div>
-                    <div class="submitOneFolder" id="submitOneFolder1">
-                        <i class="fa-regular fa-circle-play"></i>
-                        <div>Afficher les cartes</div>
-                    </div>
-                </div>
-                <div class="oneFolder" id="folder2">
-                    <div class="folderTitle" id="titleFolder2">
-                        <div></div>
-                    </div>
-                    <div class="folderSelector" id="folderSelector2">
-                        <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen2"
-                            class="filepicker">
-                        <label for="folderChosen2"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un
-                            dossier</label>
-                    </div>
-                    <p>OU</p>
-                    <div class="dropZone2" id="dropImages2">
-                        <p>Déposer dossiers et fichiers</p>
-                    </div>
-                    <div style="display:none;" id="dropedList2" class="dropedList"></div>
-                    <div class="listSelector" id="listSelector2">
-                        <label for="listChosen2">ou une liste de mots</label>
-                        <select name="listes" id="listChosen2" class="listpicker"></select>
-                    </div>
-                    <div class="cardsNumber" id="cardsNumber2">
-                        <div><input type="number" value="3" min="1" max="24"></div>
-                        <label for="cardsNumber2">Nombre de cartes à afficher</label>
-                    </div>
-                    <div class="submitOneFolder" id="submitOneFolder2">
-                        <i class="fa-regular fa-circle-play"></i>
-                        <div>Afficher les cartes</div>
-                    </div>
-                </div>
-                <div class="oneFolder" id="folder3">
-                    <div class="folderTitle" id="titleFolder3">
-                        <div></div>
-                    </div>
-                    <div class="folderSelector" id="folderSelector3">
-                        <input type="file" webkitdirectory directory multiple style="display: none;" id="folderChosen3"
-                            class="filepicker">
-                        <label for="folderChosen3"><i class="fa-regular fa-folder-open"></i><br>Sélectionner un
-                            dossier</label>
-                    </div>
-                    <p>OU</p>
-                    <div class="dropZone2" id="dropImages3">
-                        <p>Déposer dossiers et fichiers</p>
-                    </div>
-                    <div style="display:none;" id="dropedList3" class="dropedList"></div>
-                    <div class="listSelector" id="listSelector3">
-                        <label for="listChosen3">ou une liste de mots</label>
-                        <select name="listes" id="listChosen3" class="listpicker"></select>
-                    </div>
-                    <div class="cardsNumber" id="cardsNumber3">
-                        <div><input type="number" value="3" min="1" max="24"></div>
-                        <label for="cardsNumber3">Nombre de cartes à afficher</label>
-                    </div>
-                    <div class="submitOneFolder" id="submitOneFolder3">
-                        <i class="fa-regular fa-circle-play"></i>
-                        <div>Afficher les cartes</div>
-                    </div>
-                </div>
-                <div id="delAddFolderChooser">
-                    <div id="addFolderChooser" title="ajouter un dossier"><i class="fa-regular fa-square-plus"></i>
-                    </div>
-                    <div id="delFolderChooser" title="supprimer un dossier" style="display: none;"><i
-                            class="fa-regular fa-square-minus"></i></div>
-                </div>
-                <div id="dropZone">
-                    <p>Déposer ici les feuilles de calcul contenant vos listes pour les ajouter automatiquement.</p>
-                    <div id="dropZoneTuto" style="display: none;">Les fichiers csv doivent correspondre à des colonnes,
-                        la première case de la colonne sera le titre de votre liste. Les autres fichiers prennent le
-                        titre du fichier pour nom de liste et les autres cases pour éléments de la liste.</div>
-                </div>
-                <div id="output"></div>
-            </div>
-            <div id="leftRightMoving"></div>
             <div id="cardsContainer">
                 <div id="affichage">
-                    <div class="nbDiv1 mainDiv" id="affichage1"></div>
+                    <div class="nbDiv1 mainDiv" id="affichage1" ondrop="getDropFiles(event)">
+                        <div class="oneCardContainer">
+                            <div class="dropZone2" id="dropImages1">
+                                <p>Déposez un dossier,<br> des images,<br> une liste de mots</p>
+                                <p>(.xlsx, .xls, .csv, .numbers, .ods) ou (.jpg, .png, .gif, .webp)</p>
+                            </div>
+                            <p>OU</p>
+                            <div class="folderSelector" id="folderSelector">
+                                <input type="file" webkitdirectory directory multiple style="display: none;"
+                                    id="folderChosen1" class="filepicker" onchange="getFilesOrFolders(event)">
+                                <label for="folderChosen1">Sélectionnez un dossier</label>
+                                <input type="file" multiple style="display: none;" id="folderChosen2-1"
+                                    class="filepicker" onchange="getFilesOrFolders(event)">
+                                <label for="folderChosen2-1">Sélectionnez un ou des fichiers</label>
+                            </div>
+                        </div>
+                        <div class="affichageMessage" id="affichageMessage1" style="display: none;">
+                            <p>C'est prêt, cliquez sur le bouton &#9655; pour tirer des cartes</p>
+                        </div>
+                        <div class="affichageDesCartes" id="affichageDesCartes1" style="display: none;">
+                        </div>
+                        <div class="affichageBtns" style="display: none;">
+                            <div id="top">
+                                <div class="cardsNumber" id="cardsNumber1">
+                                    <label for="cardsNumber1">Nombre<br>de cartes</label>
+                                    <div><input type="number" value="3" min="1" max="24"></div>
+                                </div>
+                                <div id="play" onclick="clickOnPlay(event)"><i class="fa-solid fa-circle-play"></i>
+                                </div>
+                                <div id="zero1" class="zero" onclick="erase(event)"><i class="fa-solid fa-eraser"></i>
+                                </div>
+                                <div class="backToChooser" onclick="backToChooser(event)"><i
+                                        class="fa-regular fa-folder-open"></i>
+                                </div>
+                            </div>
+                            <div id="bottom">
+                                <label for="vol">Zoom cartes : <span id="zoomValue1" class="zoomValue">100%</span> </label>
+                                <div class="zoom"><input type="range" id="vol1" name="vol" min="20" max="200" value="100" oninput="zommOnCards(event)"></div>
+                            </div>
+                        </div>
+                        <div id="delAddFolderChooser">
+                            <div class="addFolderChooser" id="addFolderChooser1" title="ajouter un dossier"
+                                onclick="ajouterZone(this)"><i class="fa-regular fa-square-plus"></i>
+                            </div>
+                            <div class="delFolderChooser" id="delFolderChooser1" title="supprimer un dossier"
+                                onclick="supprimerZone(this)"><i class="fa-regular fa-square-minus"></i></div>
+                        </div>
+                        <div class="listeAffichable" style="display:none"></div>
+                    </div>
                 </div>
-                <div id="affichageBtns">
-                    <div id="back"><i class="fa-solid fa-circle-play"></i>
-                        <div>Revenir en arrière</div>
-                    </div>
-                    <div id="play"><i class="fa-solid fa-circle-play"></i>
-                        <div>Nouveau tirage</div>
-                    </div>
-                    <div id="fullScreen">
-                        <i id="toFullScreen" class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                        <div id="toFullScreenText">Plein écran</div>
-                        <i id="toRegularScreen" style="display: none;"
-                            class="fa-solid fa-down-left-and-up-right-to-center"></i>
-                        <div id="toRegularScreenText" style="display: none;">Quitter le plein écran</div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
@@ -192,6 +124,7 @@
     <script src="../../node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
     <script src="home.js"></script>
     <div id="storage" style="display: none;"></div>
+    <div id="" class="mainDir" style="display: none;"></div>
 </body>
 
 </html>

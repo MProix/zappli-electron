@@ -5,14 +5,14 @@
 
 /* =========== TOUT L'ÉCRAN =========== */
 body {
-    background-color: #185286;
+    background-color: #175387;
     margin: 0px;
     overflow: hidden;
     font-family: "balsa";
 }
 
 #zappliContainer {
-    background-color: #185286;
+    background-color: hsl(208, 70%, 31%);
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -21,36 +21,40 @@ body {
 
 /* =========== MENU DES ACTIONS =========== */
 #titleBar {
-    background: linear-gradient(0deg, #185286 0%, #0c2943 100%);
+    background: linear-gradient(0deg, #185286 0%, #0c1446 100%);
     width: 100%;
     height: 30px;
     display: flex;
     flex-direction: row;
     justify-content: end;
 }
-    #titleBar .toggleButton{
-        width: 45px;
-        height: 30px;
-        border: none;
-        outline: none;
-        background-color: transparent;
-        background-image: url("menu.png");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: 45%;
-        transition: 0.2s;
-        cursor: pointer !important;
-        color: white;
-        z-index: 99;
-    }
-    #titleBar .toggleButton:hover{
-        background-color: #343B48;
-        cursor: pointer !important;
-    }
-    #titleBar .toggleButton:active{
-        background-color: #4593d8;
-    }
-#titre{
+
+#titleBar .toggleButton {
+    width: 45px;
+    height: 30px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    background-image: url("menu.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 45%;
+    transition: 0.2s;
+    cursor: pointer !important;
+    color: white;
+    z-index: 99;
+}
+
+#titleBar .toggleButton:hover {
+    background-color: #343B48;
+    cursor: pointer !important;
+}
+
+#titleBar .toggleButton:active {
+    background-color: #4593d8;
+}
+
+#titre {
     -webkit-app-region: drag;
     color: white;
     display: flex;
@@ -60,19 +64,24 @@ body {
     font-size: small;
     font-weight: lighter;
 }
-.minimize{
+
+.minimize {
     background-image: url("minimize.png");
 }
-.maximize{
+
+.maximize {
     background-image: url("maximize.png");
 }
-.close{
+
+.close {
     background-image: url("close.png");
 }
-.restore{
+
+.restore {
     background-image: url("restore.png");
 }
-.topBtn{
+
+.topBtn {
     width: 25px;
     height: 25px;
     border: none;
@@ -86,11 +95,13 @@ body {
     color: white;
     padding: 0px;
 }
-.topBtn:hover{
+
+.topBtn:hover {
     background-color: #343B48;
     cursor: pointer;
 }
-.topBtn:active{
+
+.topBtn:active {
     background-color: #4593d8;
 }
 
@@ -114,7 +125,7 @@ body {
 
 #baseActions {
     display: flex;
-    width: 85%;
+    width: 95%;
     height: 100%;
     justify-content: left;
 }
@@ -130,7 +141,9 @@ body {
     padding: 0px 5px;
     border-radius: 3px;
 }
-
+.actionBtn *{
+    cursor: pointer !important;
+} 
 .actionBtn:hover {
     background-color: #1c63a0;
     transition: all 0.3s ease-in-out;
@@ -152,66 +165,6 @@ body {
     background-color: #1c63a0;
 }
 
-#listesMots {
-    display : none;
-    position: absolute;
-    list-style-type: none;
-    padding: 10px;
-    margin: 0px;
-    background-color: #1c63a0;
-    font-size: 80%;
-    z-index: 99;
-}
-#listesMots li {
-    display: flex;
-}
-#listesMots li p {
-    flex-grow: 2;
-    padding: 0px;
-    margin: 0px;
-}
-#listesMots li i {
-    padding: 2px;
-    cursor: pointer;
-}
-#listesMots li i:hover {
-    color: #4593d8;
-}
-#newList{
-    cursor: pointer;
-}
-#newList:hover{
-    color: #4593d8;
-}
-#zero {
-    width: 10%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    padding: 0px 5px;
-    border-radius: 3px;
-}
-
-#zero:hover {
-    background-color: #1c63a0;
-    transition: all 0.3s ease-in-out;
-}
-
-#zero i {
-    font-size: 30px;
-}
-
-#zero p {
-    padding: 0px;
-    margin: 0px;
-    font-family: "balsa";
-    font-size: 80%;
-    text-align: center;
-}
-
 #aideNotifs {
     width: 5%;
     display: flex;
@@ -219,8 +172,9 @@ body {
     justify-content: center;
     align-items: center;
 }
-#aideNotifs>div:hover{
-    color:#FFD718;
+
+#aideNotifs>div:hover {
+    color: #FFD718;
 }
 
 #aide {
@@ -235,7 +189,7 @@ body {
 
 /* =========== BARRE DE RESIZAGE =========== */
 #topBottomMoving {
-    background-color: #0c2943;
+    background-color: #0c1446;
     height: 4px;
     width: 100%;
     cursor: ns-resize;
@@ -244,148 +198,176 @@ body {
 /* =========== PARTIE BASSE DE l'ÉCRAN =========== */
 #mainContent {
     width: 100%;
-    height: calc(100% - 60px);
+    height: calc(100% - 90px);
     display: flex;
 }
 
-/* =========== PARTIE GAUCHE DE l'ÉCRAN POUR CHOISIR LES DOSSIERS =========== */
-#folderChooser {
-    background-color: #185286;
+.mainDiv {
     position: relative;
-    width: 220px;
-    height: 100%;
-    transition: all 0.5s ease-in-out;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-
-}
-#folderChooser::-webkit-scrollbar { 
-    display: none;  /* Safari and Chrome */
-}
-#folderChooser::before {
-    content: '';
-    position: absolute;
-    right: 0;
-    width: 4px;
-    height: fit-content;
-    cursor: ew-resize;
 }
 
-.oneFolder {
-    display: flex;
-    flex-direction: column;
-    border: 2px solid white;
-    margin: 20px 10px 10px 10px;
-    border-radius: 3px;
-    color: white;
-    font-size: 80%;
-    align-items: center;
-}
+/* =========== AFFICHAGE DES BOUTONS DU BAS =========== */
 
-.oneFolder>div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-family: "balsa";
-    padding: 5px;
-    width: fit-content;
-    border-radius: 3px;
-    transition: all 0.3s ease-in-out;
-}
-
-.oneFolder>div:hover {
-    background-color: #1c63a0;
-    transition: all 0.3s ease-in-out;
-}
-
-.oneFolder>div i {
-    font-size: 25px;
-}
-
-.oneFolder>div>* {
-    padding-bottom: 5px;
-    cursor: pointer;
-}
-
-.folderTitle {
-    padding-bottom: 0px !important;
-    cursor: auto !important;
-    height: 10px;
-}
-
-.folderTitle * {
-    cursor: auto !important;
-}
-
-.folderTitle:hover {
-    background-color: #185286 !important;
-}
-
-.folderTitle>div {
-    transform: translateY(-10px);
-    background-color: #185286;
-    padding: 0px 5px;
-}
-.oneFolder>div .listpicker{
-    padding-bottom: 0px;
-}
 .cardsNumber input[type="number"] {
     height: 20px;
     font-size: 20px;
+    margin-left: 10px;
 }
-
+.cardsNumber{
+    display: flex;
+    align-items: center;
+}
+.cardsNumber label{
+    text-align: end;
+}
 #delAddFolderChooser {
     color: white;
-    font-size: 20px;
+    font-size: small;
     display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     margin: 0px 10px;
+    width: calc(50px);
+    position: absolute;
+    top: 5px;
+    left: calc(100% - 55px);
+    z-index: 99;
 }
 
-#addFolderChooser {
-    margin-right: 20px;
+.addFolderChooser,
+.delFolderChooser {
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 40%;
+    background-color: #68A4F1;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.delFolderChooser:hover,
+.addFolderChooser:hover {
+    background-color: #2a79bd;
+    transition: all 0.3s;
+}
+
+.addFolderChooser {
+    display: none;
+}
+#top{
+    height: 90%;
+    width: 100%;
+}
+#bottom{
+    height: 10%;
+    width: 100%;
+}
+.nbDiv1 .affichageBtns {
+    height: calc(15% - 6vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    font-family: "balsa";
+    color: white;
+    background-color: #0c1446;
+    font-size: medium;
+    padding: 2vh 3vw;
+    margin: 1vh 0vw;
+}
+
+.nbDiv1 .affichageBtns i {
+    font-size: 30px;
+}
+
+.nbDiv2 .affichageBtns {
+    height: calc(15% - 6vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    font-family: "balsa";
+    color: white;
+    background-color: #0c1446;
+    font-size: small;
+    padding: 2vh 3vw;
+    margin: 1vh 0vw;
+}
+
+.nbDiv2 .affichageBtns i {
+    font-size: 20px;
+}
+
+.nbDiv3 .affichageBtns {
+    height: calc(15% - 6vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    font-family: "balsa";
+    color: white;
+    background-color: #0c1446;
+    font-size: smaller;
+    padding: 2vh 1vw;
+    margin: 1vh 0vw;
+}
+
+.nbDiv3 .affichageBtns i {
+    font-size: 15px;
+}
+
+.nbDiv3 .affichageBtns>div {
+    margin: 5px 5px;
+}
+
+.affichageBtns>div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px 10px;
+}
+
+#back,
+#play,
+.zero,
+.backToChooser {
+    margin-right: 5px;
+    padding: 5px;
     cursor: pointer;
     transition: all 0.3s;
 }
 
-#delFolderChooser {
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-#delFolderChooser:hover,
-#addFolderChooser:hover {
+#back:hover,
+#play:hover,
+.zero:hover,
+.backToChooser:hover {
     color: #2a79bd;
     transition: all 0.3s;
 }
 
-#folder2,
-#folder3 {
-    display: none;
+#back i {
+    transform: rotate(-180deg);
 }
 
-/* =========== BARRE DE RESIZAGE =========== */
-#leftRightMoving {
-    width: 4px;
-    height: 100%;
-    background-color: #0c2943;
-    cursor: ew-resize;
-    transition: all 0.5s ease-in-out;
-}
+/*#folder2,
+#folder3 {
+    display: none;
+}*/
+
 
 /* =========== AFFICHAGE DES CARTES =========== */
 #cardsContainer {
     background-color: white;
     height: calc(100%);
-    width: calc(100% - 224px);
+    width: calc(100%);
     transition: all 0.5s ease-in-out;
 }
 
 #affichage {
     width: 100%;
-    height: calc(100% - 70px);
+    height: calc(100%);
     display: flex;
     background-size: contain;
     background-repeat: no-repeat;
@@ -406,119 +388,132 @@ body {
     border-left: 1px solid #185286;
 }
 
+.mainDiv:last-child .addFolderChooser {
+    display: block;
+}
+
+.nbDiv3 #addFolderChooser3 {
+    display: none !important;
+}
+
+.nbDiv1 .delFolderChooser {
+    display: none !important;
+}
+
 .nbDiv1 {
     width: 100%;
     height: 100%;
+    font-size: xx-large;
 }
 
 .nbDiv2 {
     width: 50%;
     height: 100%;
+    font-size: large;
 }
 
 .nbDiv3 {
     width: calc(100% / 3);
     height: 100%;
+    font-size: medium;
+}
+
+.oneCardContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #68A4F1;
+    width: 100%;
+    height: 90%;
+}
+
+.affichageMessage,
+.affichageDesCartes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: space-around;
+    width: 100%;
+    height: 85%;
+}
+
+.nbDiv1 .affichageMessage>p {
+    width: 50%
+}
+
+.affichageMessage>p {
+    width: 90%;
+    text-align: center;
+}
+
+.dropZone2 {
+    border: 6px dashed #68A4F1;
+    margin: 10px;
+    border-radius: 3px;
+    color: #68A4F1;
+    font-size: 80%;
+    text-align: center;
+    cursor: grab;
+    padding: 5vh 5vw;
+}
+
+.dropZone2 p {
+    padding-top: 5px;
+    font-size: 130% !important;
+}
+
+.folderSelector {
+    display: flex;
+    flex-direction: column;
+}
+
+.folderSelector label {
+    background-color: #68A4F1;
+    color: white;
+    padding: 1vh 2vw;
+    border-radius: 3px;
+    cursor: pointer;
+    border: outset 3px #1c63a0;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.folderSelector * {
+    cursor: pointer;
+}
+
+.folderSelector label:hover {
+    border-style: inset;
+    color: #0c1446;
 }
 
 .image {
     display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.img{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-}
-
-#affichage img {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-#affichageBtns {
-    width: 100%;
-    height: 70px;
-    display: flex;
     justify-content: center;
     align-items: center;
-    font-family: "balsa";
-    color: #185286;
 }
-
-#affichageBtns i {
-    font-size: 30px;
-}
-
-#affichageBtns>div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-#back,
-#play {
-    margin-right: 5px;
-    padding: 5px;
+.image p{
+    padding: 2% 3%;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
     cursor: pointer;
-    transition: all 0.3s;
+    background-color: white;
+    font-size: x-large;
 }
-
-#back:hover,
-#play:hover {
-    color: #2a79bd;
-    transition: all 0.3s;
-}
-
-#back i {
-    transform: rotate(-180deg);
-}
-
-#fullScreen {
-    position: absolute;
-    right: 10px;
+.img {
+    text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
+    box-shadow: 3px 3px 2px lightgrey;
+    border: 1px solid lightgray;
 }
-
-#fullScreen:hover {
-    transform: scale(1.2) translate(-10px, -10px);
-    transition: all 0.3s;
+.exergue {
+    box-shadow: 0px 0px 5px 5px #FFD718 !important;
 }
-
-/* classes annexes ajoutées en toggle jquery */
-
-.selected {
-    background-color: #0c2943;
-}
-
-.leftFullScreen {
-    width: 0px !important;
-    visibility: hidden;
-    opacity: 0;
-    transition: all 0.5s ease-in-out;
-}
-
-.rightFullScreen {
-    width: 100% !important;
-    transition: all 1s ease-in-out
-}
-
 .visible {
     opacity: 0;
 }
-
-.exergue {
-    box-shadow: 0px 0px 5px 5px #FFD718;
-}
-
 .numero{
-    position: absolute;
     min-width: 30px;
     min-height: 30px;
     background-color: white;
@@ -528,61 +523,20 @@ body {
     justify-content: center;
     box-shadow: 0 0 10px 0px rgb(126, 126, 126);
     z-index: 5;
+    font-size: large;
 }
-
-/* .number::after{
-    content: "attr(data-content)";
-    z-index: 99;
-    position: absolute;
-} */
-.lightBackground{
-    background-color: #4593d8;
+*, *::after, *::before {
+    user-select: none;
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-app-region: no-drag;
 }
-.mot>p{
-    padding: 15px 35px;
-    border: 3px solid grey;
-    border-radius: 3px;
-    background-color: white;
-    cursor: default;
-}
-#affichage1 .mot>p {
-    border-color: #009fe3;
-}
-#affichage2 .mot>p {
-    border-color: #29c4a9;
-}
-#affichage3 .mot>p {
-    border-color: #ff6900;
-}
-
-.oneFolder p{
-    margin-block-end: 0em;
-    margin-block-start: 0em;
-}
-
-#dropZone, .dropZone2 {
-    border: 2px dashed white;
-    margin: 10px;
-    border-radius: 3px;
-    color: white;
-    font-size: 80%;
-    text-align: center;
-    cursor: grab;
-    padding: 5px
-}
-.dropZone2 p{
-    padding-top: 5px;
-    font-size: 130% !important;
-}
-#output{
-    padding: 5px;
-    margin: 20px 10px 10px 10px;
-    color: orange;
-    font-size: 80%;
-    text-align: center;
-}
-#dropZoneTuto{
-    position: relative;
-    left: 0px;
-    top: 0px;
+.cardContainer{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0.5em;
 }

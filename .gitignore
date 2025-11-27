@@ -2,4 +2,7 @@ node_modules
 dist
 views/newVersion
 views/notification
-yarn.lock
+package-lock.json
+package.json
+zappli.p12
+main copy.js
