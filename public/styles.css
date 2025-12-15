@@ -141,9 +141,11 @@ body {
     padding: 0px 5px;
     border-radius: 3px;
 }
-.actionBtn *{
+
+.actionBtn * {
     cursor: pointer !important;
-} 
+}
+
 .actionBtn:hover {
     background-color: #1c63a0;
     transition: all 0.3s ease-in-out;
@@ -213,13 +215,16 @@ body {
     font-size: 20px;
     margin-left: 10px;
 }
-.cardsNumber{
+
+.cardsNumber {
     display: flex;
     align-items: center;
 }
-.cardsNumber label{
+
+.cardsNumber label {
     text-align: end;
 }
+
 #delAddFolderChooser {
     color: white;
     font-size: small;
@@ -256,14 +261,17 @@ body {
 .addFolderChooser {
     display: none;
 }
-#top{
+
+#top {
     height: 90%;
     width: 100%;
 }
-#bottom{
+
+#bottom {
     height: 10%;
     width: 100%;
 }
+
 .nbDiv1 .affichageBtns {
     height: calc(15% - 6vh);
     display: flex;
@@ -310,7 +318,7 @@ body {
     color: white;
     background-color: #0c1446;
     font-size: smaller;
-    padding: 2vh 1vw;
+    padding:1vh 0.5vw;
     margin: 1vh 0vw;
 }
 
@@ -321,6 +329,48 @@ body {
 .nbDiv3 .affichageBtns>div {
     margin: 5px 5px;
 }
+.nbDiv4 .affichageBtns {
+    height: calc(15% - 6vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    font-family: "balsa";
+    color: white;
+    background-color: #0c1446;
+    font-size: smaller;
+    padding: 1vh 0.5vw;
+    margin: 1vh 0vw;
+}
+
+.nbDiv4 .affichageBtns i {
+    font-size: 15px;
+}
+
+.nbDiv4 .affichageBtns>div {
+    margin: 5px 5px;
+}
+.nbDiv5 .affichageBtns {
+    height: calc(15% - 6vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    font-family: "balsa";
+    color: white;
+    background-color: #0c1446;
+    font-size: smaller;
+    padding: 1vh 0.5vw;
+    margin: 1vh 0vw;
+}
+
+.nbDiv5 .affichageBtns i {
+    font-size: 15px;
+}
+
+.nbDiv5 .affichageBtns>div {
+    margin: 5px 5px;
+}
 
 .affichageBtns>div {
     display: flex;
@@ -328,7 +378,9 @@ body {
     align-items: center;
     margin: 5px 10px;
 }
-
+.affichageBtns{
+    z-index: 99;
+}
 #back,
 #play,
 .zero,
@@ -384,7 +436,9 @@ body {
 }
 
 #affichage>div:nth-child(2),
-#affichage>div:nth-child(3) {
+#affichage>div:nth-child(3),
+#affichage>div:nth-child(4),
+#affichage>div:nth-child(5) {
     border-left: 1px solid #185286;
 }
 
@@ -392,7 +446,7 @@ body {
     display: block;
 }
 
-.nbDiv3 #addFolderChooser3 {
+.nbDiv5 #addFolderChooser5 {
     display: none !important;
 }
 
@@ -416,6 +470,18 @@ body {
     width: calc(100% / 3);
     height: 100%;
     font-size: medium;
+}
+
+.nbDiv4 {
+    width: 25%;
+    height: 100%;
+    font-size: medium;
+}
+
+.nbDiv5 {
+    width: 20%;
+    height: 100%;
+    font-size: small;
 }
 
 .oneCardContainer {
@@ -493,27 +559,33 @@ body {
     justify-content: center;
     align-items: center;
 }
-.image p{
-    padding: 2% 3%;
+
+.image p { 
+    padding: 5px;
     margin-block-start: 0em;
     margin-block-end: 0em;
     cursor: pointer;
     background-color: white;
     font-size: x-large;
 }
+
 .img {
     text-align: center;
     cursor: pointer;
     box-shadow: 3px 3px 2px lightgrey;
     border: 1px solid lightgray;
+    opacity: 0;
 }
+
 .exergue {
     box-shadow: 0px 0px 5px 5px #FFD718 !important;
 }
+
 .visible {
     opacity: 0;
 }
-.numero{
+
+.numero {
     min-width: 30px;
     min-height: 30px;
     background-color: white;
@@ -525,18 +597,21 @@ body {
     z-index: 5;
     font-size: large;
 }
-*, *::after, *::before {
+
+*,
+*::after,
+*::before {
     user-select: none;
-	-webkit-user-select: none;
-	-webkit-user-drag: none;
-	-webkit-app-region: no-drag;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-app-region: no-drag;
 }
-.cardContainer{
+
+.cardContainer {
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 0.5em;
 }

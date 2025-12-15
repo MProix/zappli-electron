@@ -53,7 +53,7 @@ var tailles = {
     }
 }
 var langue = document.documentElement.lang
-console.log(langue)
+//console.log(langue)
 
 // ============= Différenciation de la barre du haut selon l'OS ============= //
 ipcRenderer.on('OS', (evt, arg) => {
@@ -71,13 +71,10 @@ ipcRenderer.on('mainDir', (evt, arg) => {
 sleep(200).then(() => {
     erreurs = JSON.parse(fs.readFileSync(path.join($(".mainDir")[0].id, "erreurs.json"), encoding = 'utf-8'))
 })
-
 // ============= AFFICHAGE DU MENU SOUS WINDOWS ============= //
-
 $("#showHideMenus").on("click", () => {
     ipcRenderer.send('fireMenu')
 })
-
 // ============= RENDRE LES MENUS RESIZABLES ============= //
 
 $("#leftRightMoving").on("mousedown", (e) => {
@@ -109,19 +106,17 @@ $(document).on("mouseup", () => { // on supprime l'évènement quand le click se
     document.removeEventListener("mousemove", resizeGauche, false)
     document.removeEventListener("mousemove", resizeHaut, false)
 })
-
 //fonctions intermédiaires pour passer les paramètres en dehors de l'event
 function resizeGauche(e) { resize(e, 108, 320, "x") }
 function resizeHaut(e) { resize(e, 45, 150, "y") }
-
 // ============= ON GERE L'AJOUT OU LA SUPPRESSION DE ZONES D'AFFICHAGE DANS LA PARTIE PRINCIPALE ============= //
 function ajouterZone(elt) { //pour ajouter une zone --> l'appel de la fonction se gère dans le html avec un event handler onclik sur .addFolderChooser, mais aussi dans la zone supllémentaire insérée ci-dessous, de la même manière
-    if (nbZones < 3) {
+    if (nbZones < 5) {
         nbZones += 1
         identifiantZone += 1
         $("#affichage>div").removeClass() // on enlève la classe préexistante sur tous les divs de l'affichage
         $("#affichage>div").addClass("nbDiv" + nbZones + " mainDiv") // // on remet la bonne classe pour être sûr de savoir combien de zone on gère et gérer les affichages conditionnels dans le html
-        $("#affichage").append('<div class="nbDiv' + nbZones + ' mainDiv" id="affichage' + identifiantZone + '" ondrop="getDropFiles(event)"><div class="oneCardContainer"><div class="dropZone2" id="dropImages' + identifiantZone + '"><p>'+erreurs["1"][langue]+',<br> '+erreurs["2"][langue]+',<br> '+erreurs["3"][langue]+'</p><p>(.xlsx, .xls, .csv, .numbers, .ods) '+erreurs["5"][langue]+' (.jpg, .png, .gif, .webp)</p></div><p>'+erreurs["5"][langue]+'</p><div class="folderSelector" id="folderSelector' + identifiantZone + '"><input type="file" webkitdirectory directory multiple style="display: none;"id="folderChosen' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen' + identifiantZone + '">'+erreurs["4"][langue]+'</label><input type="file" multiple style="display: none;" id="folderChosen2-' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen2-' + identifiantZone + '">'+erreurs["6"][langue]+'</label></div></div><div class="affichageMessage" id="affichageMessage' + identifiantZone + '" style="display: none;"><p>'+erreurs["7"][langue]+'</p></div><div class="affichageDesCartes" id="affichageDesCartes' + identifiantZone + '" style="display: none;"></div><div class="affichageBtns" style="display: none;"><div id="top"><div class="cardsNumber" id="cardsNumber' + identifiantZone + '"><label for="cardsNumber' + identifiantZone + '">'+erreurs["8"][langue]+'<br>'+erreurs["9"][langue]+'</label><div><input type="number" value="3" min="1" max="24"></div></div><div id="play" onclick="clickOnPlay(event)"><i class="fa-solid fa-circle-play"></i></div><div id="zero' + identifiantZone + '" class="zero" onclick="erase(event)"><i class="fa-solid fa-eraser"></i></div><div class="backToChooser" onclick="backToChooser(event)"><i class="fa-regular fa-folder-open"></i></div></div><div id="bottom"><label for="vol">'+erreurs["10"][langue]+' : <span id="zoomValue' + identifiantZone + '" class="zoomValue">100%</span> </label><div class="zoom"><input type="range" id="vol' + identifiantZone + '" name="vol" min="20" max="200" value="100" oninput="zommOnCards(event)"></div></div></div><div id="delAddFolderChooser"><div class="addFolderChooser" id="addFolderChooser' + identifiantZone + '" title="ajouter un dossier" onclick="ajouterZone(this)"><i class="fa-regular fa-square-plus"></i></div><div class="delFolderChooser" id="delFolderChooser' + identifiantZone + '" title="supprimer un dossier" onclick="supprimerZone(this)"><i class="fa-regular fa-square-minus"></i></div></div><div class="listeAffichable" style="display:none"></div></div>')
+        $("#affichage").append('<div class="nbDiv' + nbZones + ' mainDiv" id="affichage' + identifiantZone + '" ondrop="getDropFiles(event)"><div class="oneCardContainer"><div class="dropZone2" id="dropImages' + identifiantZone + '"><p>' + erreurs["1"][langue] + ',<br> ' + erreurs["2"][langue] + ',<br> ' + erreurs["3"][langue] + '</p><p>(.xlsx, .xls, .csv, .numbers, .ods) ' + erreurs["5"][langue] + ' (.jpg, .png, .gif, .webp)</p></div><p>' + erreurs["5"][langue] + '</p><div class="folderSelector" id="folderSelector' + identifiantZone + '"><input type="file" webkitdirectory directory multiple style="display: none;"id="folderChosen' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen' + identifiantZone + '">' + erreurs["4"][langue] + '</label><input type="file" multiple style="display: none;" id="folderChosen2-' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen2-' + identifiantZone + '">' + erreurs["6"][langue] + '</label></div></div><div class="affichageMessage" id="affichageMessage' + identifiantZone + '" style="display: none;"><p>' + erreurs["7"][langue] + '</p></div><div class="affichageDesCartes" id="affichageDesCartes' + identifiantZone + '" style="display: none;"></div><div class="affichageBtns" style="display: none;"><div id="top"><div class="cardsNumber" id="cardsNumber' + identifiantZone + '"><label for="cardsNumber' + identifiantZone + '">' + erreurs["8"][langue] + '<br>' + erreurs["9"][langue] + '</label><div><input type="number" value="3" min="1" max="24"></div></div><div id="play" onclick="clickOnPlay(event)"><i class="fa-solid fa-circle-play"></i></div><div id="zero' + identifiantZone + '" class="zero" onclick="erase(event)"><i class="fa-solid fa-eraser"></i></div><div class="backToChooser" onclick="backToChooser(event)"><i class="fa-regular fa-folder-open"></i></div></div><div id="bottom"><label for="vol">' + erreurs["10"][langue] + ' : <span id="zoomValue' + identifiantZone + '" class="zoomValue">100%</span> </label><div class="zoom"><input type="range" id="vol' + identifiantZone + '" name="vol" min="20" max="200" value="100" oninput="zommOnCards(event.target)"></div></div></div><div id="delAddFolderChooser"><div class="addFolderChooser" id="addFolderChooser' + identifiantZone + '" title="ajouter un dossier" onclick="ajouterZone(this)"><i class="fa-regular fa-square-plus"></i></div><div class="delFolderChooser" id="delFolderChooser' + identifiantZone + '" title="supprimer un dossier" onclick="supprimerZone(this)"><i class="fa-regular fa-square-minus"></i></div></div><div class="listeAffichable" style="display:none"></div></div>')
         // on ajoute un div dans l'affichage
     }
     for (let elt of $(".affichageDesCartes")) {
@@ -139,9 +134,7 @@ function supprimerZone(elt) { //pour supprimer une zone --> l'appel de la foncti
         calculerTaille("#" + elt.id)
     }
 }
-
 // ============= GESTION DE LA ZONE DE DRAG AND DROP ============= //
-
 window.addEventListener("dragover", (e) => {
     e.preventDefault();
 });
@@ -185,7 +178,6 @@ function getDropFiles(event) { // on récupère les données du drop
     })
 }
 // ============= GESTION DU BOUTON TELECHARGER DOSSIER(S) ============= //
-
 function getFilesOrFolders(e) {
     //console.log(e)
     var listePaths = []
@@ -197,7 +189,6 @@ function getFilesOrFolders(e) {
     manageListeUploaded(goodList, e.target)
 }
 // ============= BOUTON POUR REVENIR AU CHOIX DE DOSSIER ============= //
-
 function backToChooser(e) {
     $(e.target).parents(".mainDiv").children(".affichageMessage").css("display", "none")
     $(e.target).parents(".mainDiv").children(".affichageBtns").css("display", "none")
@@ -211,7 +202,7 @@ function erase(e) {
 }
 // ================ BOUTON PLAY ================ //
 function clickOnPlay(event) {
-    var quelleZone = $(event.target).parents(".mainDiv").attr("id")[$(event.target).parents(".mainDiv").attr("id").length - 1]
+    var quelleZone = $(event.target).parents(".mainDiv").attr("id")[$(event.target).parents(".mainDiv").attr("id").length - 1] // on récupère le numéro de la zone dans laquelle on se trouve pour savoir où apporter des modifs
     //console.log($(event.target).parents(".mainDiv").children(".listeAffichable"))
     data = {
         "nombreDeCartes": parseInt($(event.target).parents(".mainDiv").children(".affichageBtns").children("#top").children(".cardsNumber").children("div").children("input").val()), // on envoie le nombre de cartes souhaité
@@ -239,8 +230,8 @@ function clickOnPlay(event) {
             $(zoneAMontrer).css("display", "flex")
             afficherCartes(data[1][0], quelleZone, zoneAMontrer, data[0])
         }
-        $("#vol" + quelleZone).val(100)
-        $("#zoomValue" + quelleZone).html("100%")
+        /* $("#vol" + quelleZone).val(100)
+        $("#zoomValue" + quelleZone).html("100%") */
     })
 }
 // ================ BOUTONS CHANGER ET SUPPRIMER LE FOND ================ //
@@ -254,12 +245,12 @@ function supprimerFond(event) {
 $("#numerote").on("click", () => {
     if ($(".numero").length == 0) {
         var i = 1
-        for(let elt of $(".img")){
-            if(!$(elt).parent().hasClass("visible")){
+        for (let elt of $(".img")) {
+            if (!$(elt).parent().hasClass("visible")) {
                 $(elt).after('<div class="numero">' + i + '</div>')
-                i ++
-            calculateNumPositions($(elt), $(elt).next())
-            }            
+                i++
+                calculateNumPositions($(elt), $(elt).next())
+            }
         }
     } else {
         $(".numero").remove()
@@ -364,18 +355,20 @@ function afficherCartes(liste, quelleZone, zoneAMontrer, type) {
         containment: "#affichage",
         scroll: false,
         cursor: "grabbing",
-        /* drag: function () {
-            calculateNumPositions($(this), $(this).next())
-        }, */
-        /* stop: function () {
-            calculateNumPositions($(this), $(this).next())
-        } */
     })
     calculerTaille(zoneAMontrer)
     setTimeout(() => {  // obligé sinon l'info part avant que les images soient affichées et ne les prend pas en compte
         actualisePile(pile)
+        for (let img of $("#affichage" + quelleZone).find(".img")) {
+            poserTaillesEtPlaces(img)
+        }
         //console.log(pile)
     }, 200);
+    setTimeout(() => {  // obligé sinon l'info part avant que les images soient affichées et ne les prend pas en compte
+        zommOnCards($("#vol" + quelleZone)[0])
+        $(".img").animate({ opacity: 1 })
+    }, 300);
+
 }
 function calculerTaille(div) {
     //console.log(div)
@@ -386,7 +379,7 @@ function calculerTaille(div) {
     }
     imgSize($(div).children().length, div)
 }
-function recadrer() {
+/* function recadrer() {
     $(".image").each(function (index) {
         if (this.clientHeight < $(this).children()[0].clientHeight) {
             $($(this).children()[0]).css({
@@ -400,7 +393,7 @@ function recadrer() {
             })
         }
     })
-}
+} */
 function imgSize(num, div, diviseur = 1) {
     //console.log(diviseur)
     //console.log(num, div)
@@ -421,13 +414,13 @@ function imgSize(num, div, diviseur = 1) {
     if (sensDAffichage == "paysage") {
         //console.log("paysage")
         $("img").css({
-            maxHeight: "calc(98% - 30px)",
+            maxHeight: "100%",
             maxWidth: "100%"
         })
     } else {
         //console.log("portrait")
         $("img").css({
-            maxHeight: "calc(98% - 30px)",
+            maxHeight: "100%",
             maxWidth: "100%"
         })
     }
@@ -524,39 +517,61 @@ function calculateNumPositions(previous, elt) {
     if ($(previous).prop("nodeName") == "P") {
         var rect = previous[0].getBoundingClientRect();
         //console.log(rect.top, rect.right, rect.bottom, rect.left);
-        $(elt).offset({ "top": rect.bottom})
-        $(elt).offset({ "left": (rect.left + (rect.right - rect.left) / 2) - 15}) 
+        $(elt).offset({ "top": rect.bottom })
+        $(elt).offset({ "left": (rect.left + (rect.right - rect.left) / 2) - 15 })
     } else {
         var rect = previous[0].getBoundingClientRect();
         //console.log(rect.top, rect.right, rect.bottom, rect.left);
-        $(elt).offset({ "top": rect.bottom - 10})
-        $(elt).offset({ "left": (rect.left + (rect.right - rect.left) / 2) - 15}) 
+        $(elt).offset({ "top": rect.bottom - 10 })
+        $(elt).offset({ "left": (rect.left + (rect.right - rect.left) / 2) - 15 })
     }
 
 }
 function actualisePile(pile) {
     pile.push($("#affichage").html())
+    //console.log("actualisée",pile)
 }
 function getBack(event) {
+    //console.log("avantpop",pile)
     lastPile = pile[pile.length - 2]
     //console.log(lastPile)
     $("#affichage").html(lastPile)
     pile.pop()
     $(".cardContainer").draggable({ containment: "#affichage", scroll: false, cursor: "grabbing" })
+    $(".img").animate({opacity:1})
+    //console.log("aprèspop",pile)
 }
-function zommOnCards(e) {
-    for (let elt of $(".cardContainer")) {
-        $(elt).css({
-            "width": "100%",
-            "height": "100%"
-        })
-    }
+function zommOnCards(target) {
     //console.log($(e.target).parents("#bottom").find(".zoomValue"))
-    $(e.target).parents("#bottom").find(".zoomValue").html(e.target.value + "%")
-    //console.log(e.target.value)
-    var div = "#" + $(e.target).parents(".mainDiv").children()[2].id
-    $(e.target).parents(".mainDiv").find(".img").css("transform","scale("+e.target.value / 100+")")
-    for(let elt of $(e.target).parents(".mainDiv").find(".img")){
-        calculateNumPositions($(elt), $(elt).next())
+    $(target).parents("#bottom").find(".zoomValue").html(target.value + "%")
+    var ratio = target.value / 100
+    for (let elt of $(target).parents(".mainDiv").find(".cardContainer")) {
+        //console.log(elt)
+        $(elt).width(elt.getAttribute("firstwidth") * ratio)
+        $(elt).height(elt.getAttribute("firstheight") * ratio)
+        //console.log($(elt).find("p").length)
+        if ($(elt).find("p").length > 0) {
+            //console.log("on a un mot")
+            $(elt).find("p").css("font-size", parseInt($(elt).find("p")[0].getAttribute("firstfont")) * ratio + "px")
+        }
     }
 }
+function poserTaillesEtPlaces(img) {
+    var rect = img.getBoundingClientRect()
+    //console.log(img)
+    img.setAttribute("firstwidth", rect["width"])
+    img.setAttribute("firstheight", rect["height"])
+    img.setAttribute("firstleft", rect["left"])
+    img.setAttribute("firsttop", rect["top"])
+    img.setAttribute("firstfont", $(img).css("font-size"))
+    img.parentNode.setAttribute("firstwidth", rect["width"])
+    img.parentNode.setAttribute("firstheight", rect["height"])
+    img.parentNode.setAttribute("firstleft", rect["left"])
+    img.parentNode.setAttribute("firsttop", rect["top"])
+    $(img.parentNode).css({
+        "width": rect["width"],
+        "height": rect["height"]
+    })
+}
+
+// resize pour empêcher de sortir de l'écran

@@ -42,42 +42,52 @@ if (localConfig["langue"] == undefined || !menu["listeLangues"].includes(localCo
 } else {
     var showLanguage = localConfig["langue"] // on aligne avec la langue qui va s'afficher
 }
-log.info("%cLe language utilisé est "+ showLanguage,"color:green")
+log.info("%cLe language utilisé est " + showLanguage, "color:green")
 // ================ ON GÈRE LES LOGS ================ //
 log.transports.file.resolvePathFn = () => path.join(userStoragePath, 'main.log') // on crée le fichier de log
-log.info("%c////// Zappli version " + app.getVersion() + " ouverte //////","color:red")
+log.info("%c////// Zappli version " + app.getVersion() + " ouverte //////", "color:red")
 log.errorHandler.startCatching()
 
 // ================ ON GÈRE L'UPDATE AUTOMATIQUE DES VERSIONS ================ //
 /* new update available */
 autoUpdater.on("update-not-available", (info) => {
-    log.info("%cpas de nouvelle version","color:blue")
-    lof.info("%c"+info, "color:blue")
+    log.info("%cpas de nouvelle version", "color:blue")
+    log.info("%c" + info, "color:blue")
 })
 autoUpdater.on("update-available", (info) => {
     log.info("%cil y a une nouvelle version", "color:blue")
-    lof.info("%c"+info, "color:blue")
-})
-autoUpdater.on("checking-for-update", (info) => {
-    log.info("%cchecking for updates","color:blue")
-    log.info("%c"+info,"color:blue")
-})
-autoUpdater.on("update-downloaded", () => {
     const dialogOpts = {
         type: 'info',
-        buttons: ['Restart', 'Later'],
-        title: 'Application Update',
-        message: process.platform === 'win32' ? releaseNotes : nomrelease,
-        détail:
-            "Une nouvelle version a été téléchargée. Redémarrez l'application pour appliquer les mises à jour."
+        buttons: ['Télécharger (redémarrage optionnel)', 'Ne pas télécharger'],
+        title: 'Mise à jour de la zappli',
+        detail:
+            "Une nouvelle version est disponible. Vous pouvez la télécharger maintenant sans que la zappli redémarre. Les modifications auront lieu au prochain démarrage"
     }
     dialog.showMessageBox(dialogOpts).then((returnValue) => {
-        if (returnValue.response === 0) autoUpdater.quitAndInstall()
+        if (returnValue.response === 0) {
+            autoUpdater.on("update-downloaded", () => {
+                const dialogOpts = {
+                    type: 'info',
+                    buttons: ['Redémarrer', 'Plus tard'],
+                    title: 'Mise à jour de la zappli',
+                    detail:
+                        "Une nouvelle version a été téléchargée. Redémarrez l'application pour appliquer les mises à jour."
+                }
+                log.info(returnValue.response)
+                dialog.showMessageBox(dialogOpts).then((returnValue) => {
+                    if (returnValue.response === 0) autoUpdater.quitAndInstall()
+                })
+            })
+        }
     })
 })
+autoUpdater.on("checking-for-update", (info) => {
+    log.info("%cchecking for updates", "color:blue")
+    log.info("%c" + info, "color:blue")
+})
 autoUpdater.on("error", (info) => {
-    log.info("%cerror when updating","color:blue")
-    log.warn("%c"+info,"color:blue")
+    log.info("%cerror when updating", "color:blue")
+    log.warn("%c" + info, "color:blue")
 })
 autoUpdater.on("before-quit-for-update", () => {
     setTimeout(6000)
@@ -94,7 +104,7 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
             nodeIntegration: true,
             contextIsolation: false,
             "web-security": false,
-            devTools: true // disabling devtools for distrib version
+            devTools: false // disabling devtools for distrib version
         },
         titleBarStyle: 'hidden'
     })
@@ -138,7 +148,7 @@ ipcMain.on("help", (evt, arg) => {
     faq.webContents.once('did-finish-load', () => {
         faq.send('OS', process.platform)
     })
-})  
+})
 
 // ================ ROUTES DES BOUTONS ================ //
 
@@ -165,16 +175,12 @@ ipcMain.handle('changeImage', async (evt, arg) => {
             return newImage
         }
     } else {
-        //console.log(arg)
         var words = getWordsFromCalcFile(arg["listeImagesOuMots"][0])
         if (words.length == arg["listeMotsAffiches"].length) {
             return { "error": "erAllWords" }
         } else {
             var newWord = getRandomValues(words, 1)
-            //console.log(words)
-            //console.log(newWord)
-
-            while (arg["listeMotsAffiches"].includes(newWord[0][0]) == true) {
+            while (arg["listeMotsAffiches"].includes(newWord[0][0][0]) == true) {
                 newWord = getRandomValues(words, 1)
             }
             return newWord
@@ -358,7 +364,7 @@ const templateMenu = [
     {
         label: menu["action"][showLanguage],
         submenu: [
-            { role: 'toggleDevTools' },
+            /* { role: 'toggleDevTools' }, */
             {
                 label: menu["changeLanguage"][showLanguage],
                 submenu: [
