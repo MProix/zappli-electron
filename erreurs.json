@@ -40,6 +40,34 @@
         "fr": "Il n'y a ni liste de mots ni images dans ce(s) dossier(s)",
         "en": "There is no list of words nor images in this/these folder(s)"
     },
+    "erTitre" : {
+        "fr": "Il y a un problème",
+        "en": "There is a problem"
+    },
+    "erSansChemin" : {
+        "fr": "Ces fichiers n'ont pas de chemin sur le disque. Copiez-les dans un dossier de l'ordinateur avant de les glisser ici.",
+        "en": "These files have no path on the disk. Copy them into a folder on the computer before dragging them here."
+    },
+    "erRienLu" : {
+        "fr": "Aucun fichier n'a pu être lu dans ce qui a été déposé",
+        "en": "None of the dropped files could be read"
+    },
+    "erMotsEtImages" : {
+        "fr": "Vous avez importé à la fois des listes de mots et des images",
+        "en": "You have imported both lists of words and images"
+    },
+    "choixMots" : {
+        "fr": "Je choisis les mots",
+        "en": "I choose the words"
+    },
+    "choixImages" : {
+        "fr": "Je choisis les images",
+        "en": "I choose the images"
+    },
+    "notifsAVenir" : {
+        "fr": "Lien à venir vers les nouvelles ressources",
+        "en": "A link to the new resources is coming soon"
+    },
     "erPlusieursListes" :{
         "fr": "Il y a plusieurs listes de mots dans ce fichier",
         "en": "There is more than a single list in this file"
@@ -95,9 +123,5 @@
     "13":{
         "fr":"supprimer un dossier",
         "en":"remove a folder"
-    },
-    "tirageEcoule":{
-        "fr":["Il ne reste plus assez de cartes à tirer",["recommencer le même paquet","choisir un autre paquet"]],
-        "en":["Not enough cards in this deck",["start again with the same cards","choose another deck"]]
     }
 }

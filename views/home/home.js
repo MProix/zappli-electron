@@ -190,7 +190,7 @@ function getDropFiles(event) { // on récupère les données du drop
     var premier = event.dataTransfer.files[0]
     var cheminPremier = premier ? cheminDeFichier(premier) : ""
     if (!cheminPremier) { // fichiers sans chemin disque : OneDrive à la demande, pièces jointes, archives…
-        swal("Il y a un problème", "Ces fichiers n'ont pas de chemin sur le disque. Copiez-les dans un dossier de l'ordinateur avant de les glisser ici.")
+        swal(erreurs["erTitre"][langue], erreurs["erSansChemin"][langue])
         return
     }
     var dossier = cheminPremier.split(/[\\/]/) // séparateur Windows ou macOS/Linux
@@ -206,7 +206,7 @@ function getDropFiles(event) { // on récupère les données du drop
     Promise.all(parcours).then(() => { // on attend la fin du parcours, pas un délai fixe
         console.log(liste)
         if (liste.length == 0) {
-            swal("Il y a un problème", "Aucun fichier n'a pu être lu dans ce qui a été déposé")
+            swal(erreurs["erTitre"][langue], erreurs["erRienLu"][langue])
             return
         }
         checkListFormats(liste, event.target)
@@ -490,7 +490,7 @@ $("#aide").on("click", () => {
     ipcRenderer.send("help")
 })
 $("#notifs").on("click", () => {
-    alert("Lien à venir vers les nouvelles ressources")
+    alert(erreurs["notifsAVenir"][langue])
 })
 // ============= Montrer quel bouton est sélectionné dans la barre du haut pour les actions au click ============= //
 $("#deplace, #efface, #change, #surligne").on("click", function () {
@@ -514,20 +514,20 @@ function appliquerListe(goodList, zone, type) { // on installe le paquet choisi 
 function manageListeUploaded(goodList, zone, typeImpose) { // zone : le .mainDiv concerné ; renvoie une promesse résolue quand le paquet est prêt
     console.log("goodlist", goodList)
     if (goodList[1] == false && goodList[0] == false) { // s'il n'y a ni listes de mots ni images
-        return swal("Il y a un problème", "Il n'y pas de liste de mots ni d'images dans ce dossier")
+        return swal(erreurs["erTitre"][langue], erreurs["erDossierVide"][langue])
     } else if (goodList[1] == true && goodList[0] == true) { // s'il y a les deux
         if (typeImpose == "mots" || typeImpose == "images") {
             appliquerListe(goodList, zone, typeImpose)
             return Promise.resolve()
         }
-        return swal("Il y a un problème", "Vous avez importé à la fois des listes de mots et des images", {
+        return swal(erreurs["erTitre"][langue], erreurs["erMotsEtImages"][langue], {
             buttons: {
                 catch1: {
-                    text: "Je choisis les mots",
+                    text: erreurs["choixMots"][langue],
                     value: "catch1",
                 },
                 catch2: {
-                    text: "Je choisis les images",
+                    text: erreurs["choixImages"][langue],
                     value: "catch2",
                 }
             },
