@@ -2,7 +2,7 @@
     "listeLangues" : ["fr","en"],
     "erNoPrevious" : {
         "fr": "Pas de tirage antérieur",
-        "en": "No existing prenious draw"
+        "en": "No previous draw"
     },
     "erAllImages" : {
         "fr": "Toutes les images sont déjà affichées",
@@ -18,11 +18,11 @@
     },
     "erTooBig" : {
         "fr": ["Ce dossier ne contient que "," image(s) !"],
-        "en": ["This folder only contains "," image(s) !"]
+        "en": ["This folder only contains "," image(s)!"]
     },
     "erTooBig2" : {
         "fr": ["Cette liste ne contient que "," mot(s) !"],
-        "en": ["This list only contains "," word(s) !"]
+        "en": ["This list only contains "," word(s)!"]
     },
     "newList" : {
         "fr": "Nouvelle liste",
@@ -34,11 +34,39 @@
     },
     "listTitle" : {
         "fr": "Cliquez sur le titre pour le modifier",
-        "en": "Click to modifie title"
+        "en": "Click on the title to change it"
     },
     "erDossierVide" :{
         "fr": "Il n'y a ni liste de mots ni images dans ce(s) dossier(s)",
-        "en": "There is no list of word nor images in this/theses folder(s)"
+        "en": "There is no list of words nor images in this/these folder(s)"
+    },
+    "erTitre" : {
+        "fr": "Il y a un problème",
+        "en": "There is a problem"
+    },
+    "erSansChemin" : {
+        "fr": "Ces fichiers n'ont pas de chemin sur le disque. Copiez-les dans un dossier de l'ordinateur avant de les glisser ici.",
+        "en": "These files have no path on the disk. Copy them into a folder on the computer before dragging them here."
+    },
+    "erRienLu" : {
+        "fr": "Aucun fichier n'a pu être lu dans ce qui a été déposé",
+        "en": "None of the dropped files could be read"
+    },
+    "erMotsEtImages" : {
+        "fr": "Vous avez importé à la fois des listes de mots et des images",
+        "en": "You have imported both lists of words and images"
+    },
+    "choixMots" : {
+        "fr": "Je choisis les mots",
+        "en": "I choose the words"
+    },
+    "choixImages" : {
+        "fr": "Je choisis les images",
+        "en": "I choose the images"
+    },
+    "notifsAVenir" : {
+        "fr": "Lien à venir vers les nouvelles ressources",
+        "en": "A link to the new resources is coming soon"
     },
     "erPlusieursListes" :{
         "fr": "Il y a plusieurs listes de mots dans ce fichier",
@@ -54,7 +82,7 @@
     },
     "3":{
         "fr":"une liste de mots",
-        "en":"or a spreasdsheet"
+        "en":"or a spreadsheet"
     },
     "4":{
         "fr":"Sélectionnez un dossier",
@@ -84,8 +112,16 @@
         "fr":"Zoom cartes",
         "en":"Zoom cards"
     },
-    "tirageEcoule":{
-        "fr":["Il ne reste plus assez de cartes à tirer",["recommencer le même paquet","choisir un autre paquet"]],
-        "en":["Not enought cards in this deck",["start again with the same cards","choose another deck"]]
+    "11":{
+        "fr":"Ne pas répéter les cartes",
+        "en":"Do not repeat cards"
+    },
+    "12":{
+        "fr":"ajouter un dossier",
+        "en":"add a folder"
+    },
+    "13":{
+        "fr":"supprimer un dossier",
+        "en":"remove a folder"
     }
 }

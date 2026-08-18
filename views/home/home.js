@@ -118,7 +118,7 @@ function ajouterZone(elt) { //pour ajouter une zone --> l'appel de la fonction s
         identifiantZone += 1
         $("#affichage>div").removeClass() // on enlève la classe préexistante sur tous les divs de l'affichage
         $("#affichage>div").addClass("nbDiv" + nbZones + " mainDiv") // // on remet la bonne classe pour être sûr de savoir combien de zone on gère et gérer les affichages conditionnels dans le html
-        $("#affichage").append('<div class="nbDiv' + nbZones + ' mainDiv" id="affichage' + identifiantZone + '" ondrop="getDropFiles(event)"><div class="oneCardContainer"><div class="dropZone2" id="dropImages' + identifiantZone + '"><p>' + erreurs["1"][langue] + ',<br> ' + erreurs["2"][langue] + ',<br> ' + erreurs["3"][langue] + '</p><p>(.xlsx, .xls, .csv, .numbers, .ods) ' + erreurs["5"][langue] + ' (.jpg, .png, .gif, .webp)</p></div><p>' + erreurs["5"][langue] + '</p><div class="folderSelector" id="folderSelector' + identifiantZone + '"><input type="file" webkitdirectory directory multiple style="display: none;"id="folderChosen' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen' + identifiantZone + '">' + erreurs["4"][langue] + '</label><input type="file" multiple style="display: none;" id="folderChosen2-' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen2-' + identifiantZone + '">' + erreurs["6"][langue] + '</label></div></div><div class="affichageMessage" id="affichageMessage' + identifiantZone + '" style="display: none;"><p>' + erreurs["7"][langue] + '</p></div><div class="affichageDesCartes" id="affichageDesCartes' + identifiantZone + '" style="display: none;"></div><div class="affichageBtns" style="display: none;"><div id="top"><div class="cardsNumber" id="cardsNumber' + identifiantZone + '"><label for="cardsNumber' + identifiantZone + '">' + erreurs["8"][langue] + '<br>' + erreurs["9"][langue] + '</label><div><input type="number" value="3" min="1" max="24"></div></div><div id="play" onclick="clickOnPlay(event)"><i class="fa-solid fa-circle-play"></i></div><div id="oneMore" onclick="addOne(event)"><i class="fa-solid fa-circle-plus"></i></div><div id="zero' + identifiantZone + '" class="zero" onclick="erase(event)"><i class="fa-solid fa-eraser"></i></div><div class="backToChooser" onclick="backToChooser(event)"><i class="fa-regular fa-folder-open"></i></div><div id="repetition"><input type="checkbox" checked id="repet" name="repet" value="0"><label for="repet">Ne pas répéter les cartes</label></label></div></div><div id="bottom"><label for="vol">' + erreurs["10"][langue] + ' : <span id="zoomValue' + identifiantZone + '" class="zoomValue">100%</span> </label><div class="zoom"><input type="range" id="vol' + identifiantZone + '" name="vol" min="20" max="200" value="100" oninput="zommOnCards(event.target)"></div></div></div><div id="delAddFolderChooser"><div class="addFolderChooser" id="addFolderChooser' + identifiantZone + '" title="ajouter un dossier" onclick="ajouterZone(this)"><i class="fa-regular fa-square-plus"></i></div><div class="delFolderChooser" id="delFolderChooser' + identifiantZone + '" title="supprimer un dossier" onclick="supprimerZone(this)"><i class="fa-regular fa-square-minus"></i></div></div><div class="listeAffichable" style="display:none"></div><div class="listeAffichableMots" style="display:none"></div><div class="nbTirages" style="display:none"></div></div>')
+        $("#affichage").append('<div class="nbDiv' + nbZones + ' mainDiv" id="affichage' + identifiantZone + '" ondrop="getDropFiles(event)" ondragover="allowDrop(event)"><div class="oneCardContainer"><div class="dropZone2" id="dropImages' + identifiantZone + '"><p>' + erreurs["1"][langue] + ',<br> ' + erreurs["2"][langue] + ',<br> ' + erreurs["3"][langue] + '</p><p>(.xlsx, .xls, .csv, .numbers, .ods) ' + erreurs["5"][langue] + ' (.jpg, .png, .gif, .webp)</p></div><p>' + erreurs["5"][langue] + '</p><div class="folderSelector" id="folderSelector' + identifiantZone + '"><input type="file" webkitdirectory directory multiple style="display: none;"id="folderChosen' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen' + identifiantZone + '">' + erreurs["4"][langue] + '</label><input type="file" multiple style="display: none;" id="folderChosen2-' + identifiantZone + '" class="filepicker" onchange="getFilesOrFolders(event)"><label for="folderChosen2-' + identifiantZone + '">' + erreurs["6"][langue] + '</label></div></div><div class="affichageMessage" id="affichageMessage' + identifiantZone + '" style="display: none;"><p>' + erreurs["7"][langue] + '</p></div><div class="affichageDesCartes" id="affichageDesCartes' + identifiantZone + '" style="display: none;"></div><div class="affichageBtns" style="display: none;"><div id="top"><div class="cardsNumber" id="cardsNumber' + identifiantZone + '"><label for="cardsNumber' + identifiantZone + '">' + erreurs["8"][langue] + '<br>' + erreurs["9"][langue] + '</label><div><input type="number" value="3" min="1" max="24"></div></div><div id="play" onclick="clickOnPlay(event)"><i class="fa-solid fa-circle-play"></i></div><div id="oneMore" onclick="addOne(event)"><i class="fa-solid fa-circle-plus"></i></div><div id="zero' + identifiantZone + '" class="zero" onclick="erase(event)"><i class="fa-solid fa-eraser"></i></div><div class="backToChooser" onclick="backToChooser(event)"><i class="fa-regular fa-folder-open"></i></div><div id="repetition"><input type="checkbox" checked id="repet" name="repet" value="0"><label for="repet">' + erreurs["11"][langue] + '</label></div></div><div id="bottom"><label for="vol">' + erreurs["10"][langue] + ' : <span id="zoomValue' + identifiantZone + '" class="zoomValue">100%</span> </label><div class="zoom"><input type="range" id="vol' + identifiantZone + '" name="vol" min="20" max="200" value="100" oninput="zommOnCards(event.target)"></div></div></div><div id="delAddFolderChooser"><div class="addFolderChooser" id="addFolderChooser' + identifiantZone + '" title="' + erreurs["12"][langue] + '" onclick="ajouterZone(this)"><i class="fa-regular fa-square-plus"></i></div><div class="delFolderChooser" id="delFolderChooser' + identifiantZone + '" title="' + erreurs["13"][langue] + '" onclick="supprimerZone(this)"><i class="fa-regular fa-square-minus"></i></div></div><div class="listeAffichable" style="display:none"></div><div class="listeAffichableMots" style="display:none"></div><div class="nbTirages" style="display:none"></div></div>')
         // on ajoute un div dans l'affichage
     }
     for (let elt of $(".affichageDesCartes")) {
@@ -190,7 +190,7 @@ function getDropFiles(event) { // on récupère les données du drop
     var premier = event.dataTransfer.files[0]
     var cheminPremier = premier ? cheminDeFichier(premier) : ""
     if (!cheminPremier) { // fichiers sans chemin disque : OneDrive à la demande, pièces jointes, archives…
-        swal("Il y a un problème", "Ces fichiers n'ont pas de chemin sur le disque. Copiez-les dans un dossier de l'ordinateur avant de les glisser ici.")
+        swal(erreurs["erTitre"][langue], erreurs["erSansChemin"][langue])
         return
     }
     var dossier = cheminPremier.split(/[\\/]/) // séparateur Windows ou macOS/Linux
@@ -206,7 +206,7 @@ function getDropFiles(event) { // on récupère les données du drop
     Promise.all(parcours).then(() => { // on attend la fin du parcours, pas un délai fixe
         console.log(liste)
         if (liste.length == 0) {
-            swal("Il y a un problème", "Aucun fichier n'a pu être lu dans ce qui a été déposé")
+            swal(erreurs["erTitre"][langue], erreurs["erRienLu"][langue])
             return
         }
         checkListFormats(liste, event.target)
@@ -490,7 +490,7 @@ $("#aide").on("click", () => {
     ipcRenderer.send("help")
 })
 $("#notifs").on("click", () => {
-    alert("Lien à venir vers les nouvelles ressources")
+    alert(erreurs["notifsAVenir"][langue])
 })
 // ============= Montrer quel bouton est sélectionné dans la barre du haut pour les actions au click ============= //
 $("#deplace, #efface, #change, #surligne").on("click", function () {
@@ -514,20 +514,20 @@ function appliquerListe(goodList, zone, type) { // on installe le paquet choisi 
 function manageListeUploaded(goodList, zone, typeImpose) { // zone : le .mainDiv concerné ; renvoie une promesse résolue quand le paquet est prêt
     console.log("goodlist", goodList)
     if (goodList[1] == false && goodList[0] == false) { // s'il n'y a ni listes de mots ni images
-        return swal("Il y a un problème", "Il n'y pas de liste de mots ni d'images dans ce dossier")
+        return swal(erreurs["erTitre"][langue], erreurs["erDossierVide"][langue])
     } else if (goodList[1] == true && goodList[0] == true) { // s'il y a les deux
         if (typeImpose == "mots" || typeImpose == "images") {
             appliquerListe(goodList, zone, typeImpose)
             return Promise.resolve()
         }
-        return swal("Il y a un problème", "Vous avez importé à la fois des listes de mots et des images", {
+        return swal(erreurs["erTitre"][langue], erreurs["erMotsEtImages"][langue], {
             buttons: {
                 catch1: {
-                    text: "Je choisis les mots",
+                    text: erreurs["choixMots"][langue],
                     value: "catch1",
                 },
                 catch2: {
-                    text: "Je choisis les images",
+                    text: erreurs["choixImages"][langue],
                     value: "catch2",
                 }
             },
