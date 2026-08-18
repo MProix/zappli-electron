@@ -1,2 +1,5 @@
 node_modules
+dist
+.DS_Store
 zappli.p12
+main copy.js
