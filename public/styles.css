@@ -384,6 +384,7 @@ body {
 #back,
 #play,
 .zero,
+#oneMore,
 .backToChooser {
     margin-right: 5px;
     padding: 5px;
@@ -394,6 +395,7 @@ body {
 #back:hover,
 #play:hover,
 .zero:hover,
+#oneMore:hover,
 .backToChooser:hover {
     color: #2a79bd;
     transition: all 0.3s;
@@ -575,6 +577,7 @@ body {
     box-shadow: 3px 3px 2px lightgrey;
     border: 1px solid lightgray;
     opacity: 0;
+    z-index: 1;
 }
 
 .exergue {

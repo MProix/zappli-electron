@@ -83,5 +83,9 @@
     "10":{
         "fr":"Zoom cartes",
         "en":"Zoom cards"
+    },
+    "tirageEcoule":{
+        "fr":["Il ne reste plus assez de cartes à tirer",["recommencer le même paquet","choisir un autre paquet"]],
+        "en":["Not enought cards in this deck",["start again with the same cards","choose another deck"]]
     }
 }

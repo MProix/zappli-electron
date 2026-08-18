@@ -1,34 +1,30 @@
-const { app, BrowserWindow, ipcMain, Menu } = require("electron"), // import des modules d'electron
+const { app, BrowserWindow, ipcMain, Menu, dialog } = require("electron"), // import des modules d'electron
     Store = require("electron-store"),
     store = new Store() // on crée la base de données qui collectera les infos pour les notifications
 const fs = require('fs')
 const path = require("path")
-const xlsx = require('node-xlsx');
+//const xlsx = require('node-xlsx');
 const XLSX = require('xlsx')
-const { parse } = require("csv-parse");
+//const { parse } = require("csv-parse");
 const { autoUpdater } = require("electron-updater")
 const menu = JSON.parse(fs.readFileSync(path.join(__dirname, "menu.json"), "utf-8")) // on récupère le JSON du fichier de menu
 const pjson = require('./package.json'); // pour incrire dans la base de données store
 const log = require("electron-log") // on initialise le système de log d'electron pour pouvoir débuguer à distance chez l'utilisateur
 const openAboutWindow = require('about-window').default;
-var csvList = {} // on génère une liste vide en cas d'import de csv
+//var csvList = {} // on génère une liste vide en cas d'import de csv
 let mainWindow = null //on stocke la variable de fenêtre
 let userStoragePath = app.getPath("userData")
 let mainDir = (__dirname)
 var platform = process.platform // pour savoir sous quel OS on tourne
-var listOfValidListsOfWordsExtensions = [".numbers", ".xlsx", ".xsl", ".ods", ".csv"] // on stocke les extensions valides pour l'affichage de listes de mots
+//var listOfValidListsOfWordsExtensions = [".numbers", ".xlsx", ".xsl", ".ods", ".csv"] // on stocke les extensions valides pour l'affichage de listes de mots
 
 // ================ GESTION DE LA LANGUE D'AFFICHAGE ================ //
 
 // on récupère la langue d'affichage principale du système
-var locales = app.getPreferredSystemLanguages() // c'est une fonction de nodejs, on récupère la langue d'affichage du système
+//var locales = app.getPreferredSystemLanguages() // c'est une fonction de nodejs, on récupère la langue d'affichage du système
 var firstLanguage = "fr" // on passe le français en variable par défaut au cas ou la langue système ne serait pas reconnue
 //on remet dans un format lisible par défaut et on change le fr par la langue du système utilisateur
-if (locales[0].indexOf("-") != -1) {
-    firstLanguage = locales[0].slice(0, locales[0].indexOf("-"))
-} else {
-    firstLanguage = locales[0]
-}
+log.info("firstLanguage :", firstLanguage)
 // on vérifie s'il existe une config locale
 if (!store.has("localConfig")) { // s'il n'y en a pas on la crée
     setConfig()
@@ -104,7 +100,7 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
             nodeIntegration: true,
             contextIsolation: false,
             "web-security": false,
-            devTools: false // disabling devtools for distrib version
+            devTools: true // disabling devtools for distrib version
         },
         titleBarStyle: 'hidden'
     })
@@ -118,6 +114,8 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
 }
 
 // ================ INITIALISATION DE LA FENÊTRE PRINCIPALE ================ //
+log.info("langue utilisée :" + showLanguage)
+log.info(("on ouvre : views/home/home_" + showLanguage + ".html"))
 
 app.whenReady().then(() => {
     mainWindow = createWindow("views/home/home_" + showLanguage + ".html")
@@ -140,7 +138,11 @@ app.whenReady().then(() => {
     log.info
     autoUpdater.checkForUpdatesAndNotify()
 })
-
+// =============== ROUTE POUR RECUPERER LES MOTS ===============
+ipcMain.handle('getWords', async (evt, arg) => {
+    //console.log(arg)
+    return [getWordsFromCalcFile(arg[0]), arg[1]]
+})
 // =============== ROUTES AIDE ===============
 
 ipcMain.on("help", (evt, arg) => {
@@ -158,20 +160,57 @@ ipcMain.handle('tirage', async (evt, arg) => {
         var cartes = tirerDesImages(arg["nombreDeCartes"], arg["listeImagesOuMots"])
         return ["cartes", cartes]
     } else {
-        var mots = tirerDesMots(arg["nombreDeCartes"], arg["listeImagesOuMots"])
-        return ["mots", mots]
+        //console.log(arg)
+        var mots = tirerDesMots(arg["nombreDeCartes"], arg["listeMots"])
+        if(mots["erreur"] == "erPlusieursListes"){
+            return ["mots", mots]
+        } else if(mots["erreur"] == "erTooBig"){
+            return ["mots", mots]
+        } else {
+            return ["mots", mots[0], mots[1]]
+        }        
+    }
+})
+ipcMain.handle('addOne', async (evt, arg) => {
+    // deux possibiltés : des images, des mots
+    //console.log(arg)
+
+    if (arg["typeDeTirage"] == "images") {
+        if (arg["listeImagesOuMots"].length == arg["listeAffichee"].length) {
+            return { "erreur": "erAllImages" }
+        } else {
+            //console.log(arg["typeDeTirage"])
+            var newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
+            while (arg["listeAffichee"].includes(newElt)) {
+                newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
+            }
+            return [newElt,"images"]
+        }
+    } else {
+        if (arg["listeImagesOuMots"].length == arg["listeAffichee"].length) {
+            return { "erreur": "erAllWords" }
+        } else {
+            //console.log(arg["typeDeTirage"])
+            var newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
+            //console.log("newElt",newElt[0])
+            //console.log("listeAffichee",arg["listeAffichee"])
+            while (arg["listeAffichee"].includes(newElt[0])) {
+                newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
+                //console.log("nouveau", newElt)
+            }
+            return [newElt,"mots"]
+        }
     }
 })
 ipcMain.handle('changeImage', async (evt, arg) => {
+    //console.log(arg)
     // deux possibiltés : des images, des mots
     if (arg["typeDeTirage"] == "images") {
-        if (arg["listeImagesOuMots"].length == arg["srcImagesAffichees"].length) {
+        if (arg["listeImagesOuMots"].length == 0) {
             return { "error": "erAllImages" }
         } else {
             var newImage = getRandomValues(arg["listeImagesOuMots"], 1)
-            while (arg["srcImagesAffichees"].includes(newImage[0][0]) == true) {
-                newImage = getRandomValues(arg["listeImagesOuMots"], 1)
-            }
+            //console.log(newImage)
             return newImage
         }
     } else {
@@ -192,21 +231,35 @@ ipcMain.handle('changeImage', async (evt, arg) => {
 
 function tirerDesImages(nbCartes, liste) {
     if (liste.length < nbCartes) {
-        //console.log("Il n'y a que " + liste.length + " image(s) dans cette liste.")
+        console.log("Il n'y a que " + liste.length + " image(s) dans cette liste.")
         return { "erreur": "erTooBig", "nb": liste.length }
     } else {
         return getRandomValues(liste, nbCartes)
     }
 }
 function tirerDesMots(nbCartes, liste) {
-    var mots = getWordsFromCalcFile(liste[0])
+    console.log(liste.length)
+    console.log(liste)
+    if (liste.length < nbCartes) {
+        console.log("Il n'y a que " + liste.length + " mot(s) dans cette liste.")
+        return { "erreur": "erTooBig", "nb": liste.length }
+    } else {
+        //console.log("assez de cartes")
+        return [getRandomValues(liste, nbCartes),liste]
+    }
+    /* var mots = getWordsFromCalcFile(liste[0])
+    //console.log("------------------")
+    //console.log(mots)
+    //console.log("------------------")
     if (mots[0].length == 1) {
-        return getRandomValues(mots, nbCartes)
+        return [getRandomValues(mots, nbCartes),mots]
     } else {
         return { "erreur": "erPlusieursListes" }
-    }
+    } */
 }
 function getWordsFromCalcFile(calcFilePath) {
+    //console.log("tatatatat")
+    //console.log(calcFilePath)
     if (calcFilePath.includes('.csv')) {
         var buffer = fs.readFileSync(calcFilePath, { encoding: "utf-8" });
         var workbook = XLSX.read(buffer, { type: "string" });
@@ -226,7 +279,7 @@ function getWordsFromCalcFile(calcFilePath) {
         if (row.length > max) { max = row.length }
         newResult.push(row)
     }
-    //console.log(newResult)
+    //console.log("newresult",newResult)
     if (max == 1) {
         return newResult
     } else {
@@ -246,10 +299,10 @@ function getWordsFromCalcFile(calcFilePath) {
                 i++
             }
         }
+        //console.log("lastResult",lastResult)
         return lastResult
     }
 }
-
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -364,7 +417,7 @@ const templateMenu = [
     {
         label: menu["action"][showLanguage],
         submenu: [
-            /* { role: 'toggleDevTools' }, */
+            { role: 'toggleDevTools' },
             {
                 label: menu["changeLanguage"][showLanguage],
                 submenu: [
@@ -417,3 +470,57 @@ ipcMain.on('fireMenu', (evt, arg) => {
     const menu = Menu.buildFromTemplate(templateMenu);
     menu.popup();
 })
+// =============== ROUTES BOUTONS CLOSE MINIMIZE AND MAXIMIZE POUR WINDOWS ===============
+
+ipcMain.on("closeApp", (evt, arg) => {
+    mainWindow.close()
+})
+ipcMain.on("minimizeApp", (evt, arg) => {
+    mainWindow.minimize()
+})
+ipcMain.on("maximizeRestoreApp", (evt, arg) => {
+    if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize()
+        mainWindow.webContents.send("isRestored")
+    } else {
+        mainWindow.maximize()
+        mainWindow.webContents.send("isMaximized")
+    }
+})
+
+ipcMain.on("closeFaq", (evt, arg) => {
+    faq.close()
+})
+ipcMain.on("minimizeFaq", (evt, arg) => {
+    faq.minimize()
+})
+ipcMain.on("maximizeRestoreFaq", (evt, arg) => {
+    if (faq.isMaximized()) {
+        faq.restore()
+        faq.webContents.send("isRestored")
+    } else {
+        faq.maximize()
+        faq.webContents.send("isMaximized")
+    }
+})
+ipcMain.on("closeListes", (evt, arg) => {
+    editList.close()
+})
+ipcMain.on("minimizeListes", (evt, arg) => {
+    editList.minimize()
+})
+ipcMain.on("maximizeRestoreListes", (evt, arg) => {
+    if (editList.isMaximized()) {
+        editList.restore()
+        editList.webContents.send("isRestored")
+    } else {
+        editList.maximize()
+        editList.webContents.send("isMaximized")
+    }
+})
+process.on('uncaughtException', function (err) {
+    if (err) {
+        log.info("caughtException but no error msg" + err.stack);
+        process.exit(1);
+    }
+});
