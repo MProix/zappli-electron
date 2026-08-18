@@ -421,13 +421,13 @@ function addOne(event) {
     })
 }
 // ================ BOUTONS CHANGER ET SUPPRIMER LE FOND ================ //
+function cheminVersUrl(chemin) { // un chemin disque n'est pas une URL : Windows, espaces et accents la cassent
+    var normalise = chemin.split(path.sep).join("/")
+    if (!normalise.startsWith("/")) { normalise = "/" + normalise } // "C:/Images/fond.jpg" -> "/C:/Images/fond.jpg"
+    return "file://" + encodeURI(normalise).replace(/\(/g, "%28").replace(/\)/g, "%29")
+}
 function changerFond(event) {
-    if (userOS == "Win32" || userOS == "Win16") {
-        var chemin4 = (event.target.files[0].path.split(path.sep).join("//"))
-        $("#affichage").css('background-image', 'url(' + chemin4 + ')')
-    } else {
-        $("#affichage").css('background-image', 'url(' + event.target.files[0].path + ')')
-    }
+    $("#affichage").css('background-image', 'url("' + cheminVersUrl(event.target.files[0].path) + '")')
 }
 function supprimerFond(event) {
     $("#affichage").css('background-image', "none")
