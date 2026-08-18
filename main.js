@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu } = require("electron"), // import des modules d'electron
+const { app, BrowserWindow, dialog, ipcMain, Menu } = require("electron"), // import des modules d'electron
     Store = require("electron-store"),
     store = new Store() // on crée la base de données qui collectera les infos pour les notifications
 const fs = require('fs')
@@ -111,6 +111,9 @@ function createWindow(windowPath, winWidth = 1200, winHeight = 800) {
 
     win.loadFile(windowPath)
 
+    win.on('maximize', () => win.send('isMaximized'))
+    win.on('unmaximize', () => win.send('isRestored'))
+
     win.on('closed', () => {
         win = null
     })
@@ -148,6 +151,25 @@ ipcMain.on("help", (evt, arg) => {
     faq.webContents.once('did-finish-load', () => {
         faq.send('OS', process.platform)
     })
+})
+
+// ================ ROUTES DE LA BARRE DE TITRE (windows et linux) ================ //
+// la barre de titre native est masquée (titleBarStyle: hidden), les boutons sont donc gérés ici
+
+ipcMain.on('closeWindow', (evt) => {
+    BrowserWindow.fromWebContents(evt.sender)?.close()
+})
+ipcMain.on('minimizeWindow', (evt) => {
+    BrowserWindow.fromWebContents(evt.sender)?.minimize()
+})
+ipcMain.on('maximizeRestoreWindow', (evt) => {
+    const win = BrowserWindow.fromWebContents(evt.sender)
+    if (!win) return
+    if (win.isMaximized()) {
+        win.unmaximize()
+    } else {
+        win.maximize()
+    }
 })
 
 // ================ ROUTES DES BOUTONS ================ //

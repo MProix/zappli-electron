@@ -6,13 +6,13 @@ ipcRenderer.on('OS', (evt, arg) => {
 });
 /* ==================== GESTION DES BOUTONS DE MENU SOUS WINDOWS ET LINUX ================== */
 $("#close").on("click", () => {
-    ipcRenderer.send('closeFaq'); // on envoie au backend sur l'évènement de fermeture de fenêtre
+    ipcRenderer.send('closeWindow'); // on envoie au backend sur l'évènement de fermeture de fenêtre
 });
 $("#minimize").on("click", () => {
-    ipcRenderer.send('minimizeFaq'); // on envoie au backend sur l'évènement de réduction de fenêtre
+    ipcRenderer.send('minimizeWindow'); // on envoie au backend sur l'évènement de réduction de fenêtre
 });
 $("#maxRes").on("click", () => {
-    ipcRenderer.send('maximizeRestoreFaq'); // on envoie au backend sur l'évènement d'agrandissement de fenêtre
+    ipcRenderer.send('maximizeRestoreWindow'); // on envoie au backend sur l'évènement d'agrandissement de fenêtre
 });
 function changeMaxResBtn(isMaximizedFaq) { // on gère les deux options : déjà maximisé ou pas encore
     if (isMaximizedFaq) {

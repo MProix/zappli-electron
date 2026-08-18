@@ -75,6 +75,29 @@ sleep(200).then(() => {
 $("#showHideMenus").on("click", () => {
     ipcRenderer.send('fireMenu')
 })
+// ============= GESTION DES BOUTONS DE LA BARRE DE TITRE SOUS WINDOWS ET LINUX ============= //
+$("#close").on("click", () => {
+    ipcRenderer.send('closeWindow')
+})
+$("#minimize").on("click", () => {
+    ipcRenderer.send('minimizeWindow')
+})
+$("#maxRes").on("click", () => {
+    ipcRenderer.send('maximizeRestoreWindow')
+})
+function changeMaxResBtn(isMaximized) { // on gère les deux options : déjà maximisé ou pas encore
+    if (isMaximized) {
+        $("#maxRes").attr('title', "Restaurer")
+        $("#maxRes").removeClass("maximize")
+        $("#maxRes").addClass("restore")
+    } else {
+        $("#maxRes").attr("title", "Agrandir")
+        $("#maxRes").removeClass("restore")
+        $("#maxRes").addClass("maximize")
+    }
+}
+ipcRenderer.on("isMaximized", () => { changeMaxResBtn(true) })
+ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) })
 // ============= RENDRE LES MENUS RESIZABLES ============= //
 
 $("#leftRightMoving").on("mousedown", (e) => {

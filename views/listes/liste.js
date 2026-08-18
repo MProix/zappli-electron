@@ -51,7 +51,7 @@ ipcRenderer.on('listeName', (evt, arg) => {
         console.log(listeGlobale)
         fs.writeFileSync(path.join(arg[1], "listes.json"), JSON.stringify(listeGlobale))
         ipcRenderer.send("changeLists", Object.keys(listeGlobale)) //on envoie le nom de la liste avec)
-        ipcRenderer.send('closeListes');
+        ipcRenderer.send('closeWindow');
     })
 })
 $("#ajouterMot").on("click", function () {
@@ -63,13 +63,13 @@ $("#ajouterMot").on("click", function () {
 
 /* ==================== GESTION DES BOUTONS DE MENU SOUS WINDOWS ET LINUX ================== */
 $("#close").on("click", () => {
-    ipcRenderer.send('closeListes'); // on envoie au backend sur l'évènement de fermeture de fenêtre
+    ipcRenderer.send('closeWindow'); // on envoie au backend sur l'évènement de fermeture de fenêtre
 });
 $("#minimize").on("click", () => {
-    ipcRenderer.send('minimizeListes'); // on envoie au backend sur l'évènement de réduction de fenêtre
+    ipcRenderer.send('minimizeWindow'); // on envoie au backend sur l'évènement de réduction de fenêtre
 });
 $("#maxRes").on("click", () => {
-    ipcRenderer.send('maximizeRestoreListes'); // on envoie au backend sur l'évènement d'agrandissement de fenêtre
+    ipcRenderer.send('maximizeRestoreWindow'); // on envoie au backend sur l'évènement d'agrandissement de fenêtre
 });
 function changeMaxResBtn(isMaximizedListes) { // on gère les deux options : déjà maximisé ou pas encore
     if (isMaximizedListes) {
