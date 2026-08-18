@@ -192,13 +192,13 @@ function getDropFiles(event) { // on récupère les données du drop
     })
 }
 // ============= GESTION DU BOUTON TELECHARGER DOSSIER(S) ============= //
-function getFilesOrFolders(e, typeImpose) {
+function getFilesOrFolders(e) {
     var listePaths = []
     for (let elt of e.target.files) {
         listePaths.push(elt.path)
     }
     console.log(listePaths)
-    return checkListFormats(listePaths, e.target, typeImpose)
+    return checkListFormats(listePaths, e.target)
 }
 // ============= BOUTON POUR REVENIR AU CHOIX DE DOSSIER ============= //
 function backToChooser(e) {
@@ -233,13 +233,6 @@ function clickOnPlay(event) {
     console.log(data)
     ipcRenderer.invoke('tirage', data).then((data) => {
         console.log(data)
-        var selector = ""
-        if ($("#folderChosen" + quelleZone).prop("files").length > 0) {
-            selector = "#folderChosen" + quelleZone
-        } else {
-            selector = "#folderChosen2-" + quelleZone
-        }
-        console.log(selector)
         if (data[1]["erreur"]) {
             console.log(data)
             console.log(erreurs[data[1]["erreur"]][langue])
@@ -253,8 +246,8 @@ function clickOnPlay(event) {
                     zone.children(".affichageBtns").css("display", "none")
                     zone.children(".oneCardContainer").css({ "display": "flex", "opacity": 0 })
                     zone.children(".affichageDesCartes").css("display", "none")
-                    // on rejoue une fois le rechargement terminé, et sans reposer la question mots/images
-                    getFilesOrFolders({ "target": document.querySelector(selector) }, zone.attr("data-type")).then(() => {
+                    // on repart de la liste importée (le drag and drop ne remplit aucun input), sans reposer la question mots/images
+                    checkListFormats(JSON.parse(divSource(zone).html() || "[]"), zone, zone.attr("data-type")).then(() => {
                         zone.find("#play").trigger("click")
                         zone.children(".affichageMessage").css("opacity", 1)
                         zone.children(".oneCardContainer").css("opacity", 1)
@@ -538,9 +531,16 @@ function manageListeUploaded(goodList, zone, typeImpose) { // zone : le .mainDiv
 function numeroDeZone(elt) { // le numéro de la zone (.mainDiv) qui contient l'élément
     return $(elt).parents(".mainDiv").attr("id").replace("affichage", "")
 }
+function divSource(zone) { // le div où l'on garde la liste importée, pour pouvoir recharger le même paquet
+    if (zone.children(".listeSource").length == 0) {
+        zone.append('<div class="listeSource" style="display:none"></div>')
+    }
+    return zone.children(".listeSource")
+}
 function checkListFormats(liste, cible, typeImpose) { // cible : un élément de la zone (le drop peut viser un enfant sans id)
     var zone = $(cible).closest(".mainDiv")
     console.log(liste)
+    divSource(zone).html(JSON.stringify(liste))
     var imagesList = []
     var wordsList = []
     var image = false
