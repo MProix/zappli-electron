@@ -13,6 +13,7 @@ const log = require("electron-log") // on initialise le système de log d'electr
 const openAboutWindow = require('about-window').default;
 //var csvList = {} // on génère une liste vide en cas d'import de csv
 let mainWindow = null //on stocke la variable de fenêtre
+let faq = null // fenêtre d'aide
 let userStoragePath = app.getPath("userData")
 let mainDir = (__dirname)
 var platform = process.platform // pour savoir sous quel OS on tourne
@@ -21,8 +22,11 @@ var platform = process.platform // pour savoir sous quel OS on tourne
 // ================ GESTION DE LA LANGUE D'AFFICHAGE ================ //
 
 // on récupère la langue d'affichage principale du système
-//var locales = app.getPreferredSystemLanguages() // c'est une fonction de nodejs, on récupère la langue d'affichage du système
+var locales = app.getPreferredSystemLanguages() // on récupère la langue d'affichage du système
 var firstLanguage = "fr" // on passe le français en variable par défaut au cas ou la langue système ne serait pas reconnue
+if (Array.isArray(locales) && locales.length > 0 && menu["listeLangues"].includes(locales[0].slice(0, 2))) {
+    firstLanguage = locales[0].slice(0, 2)
+}
 //on remet dans un format lisible par défaut et on change le fr par la langue du système utilisateur
 log.info("firstLanguage :", firstLanguage)
 // on vérifie s'il existe une config locale
@@ -141,7 +145,7 @@ app.whenReady().then(() => {
 // =============== ROUTE POUR RECUPERER LES MOTS ===============
 ipcMain.handle('getWords', async (evt, arg) => {
     //console.log(arg)
-    return [getWordsFromCalcFile(arg[0]), arg[1]]
+    return getWordsFromCalcFile(arg[0])
 })
 // =============== ROUTES AIDE ===============
 
@@ -206,10 +210,13 @@ ipcMain.handle('changeImage', async (evt, arg) => {
     //console.log(arg)
     // deux possibiltés : des images, des mots
     if (arg["typeDeTirage"] == "images") {
-        if (arg["listeImagesOuMots"].length == 0) {
+        if (arg["listeImagesOuMots"].length <= arg["srcImagesAffichees"].length) {
             return { "error": "erAllImages" }
         } else {
             var newImage = getRandomValues(arg["listeImagesOuMots"], 1)
+            while (arg["srcImagesAffichees"].includes(newImage[0][0])) { // on ne remet pas une carte déjà à l'écran
+                newImage = getRandomValues(arg["listeImagesOuMots"], 1)
+            }
             //console.log(newImage)
             return newImage
         }
@@ -472,55 +479,30 @@ ipcMain.on('fireMenu', (evt, arg) => {
 })
 // =============== ROUTES BOUTONS CLOSE MINIMIZE AND MAXIMIZE POUR WINDOWS ===============
 
-ipcMain.on("closeApp", (evt, arg) => {
-    mainWindow.close()
-})
-ipcMain.on("minimizeApp", (evt, arg) => {
-    mainWindow.minimize()
-})
-ipcMain.on("maximizeRestoreApp", (evt, arg) => {
-    if (mainWindow.isMaximized()) {
-        mainWindow.unmaximize()
-        mainWindow.webContents.send("isRestored")
-    } else {
-        mainWindow.maximize()
-        mainWindow.webContents.send("isMaximized")
-    }
-})
-
-ipcMain.on("closeFaq", (evt, arg) => {
-    faq.close()
-})
-ipcMain.on("minimizeFaq", (evt, arg) => {
-    faq.minimize()
-})
-ipcMain.on("maximizeRestoreFaq", (evt, arg) => {
-    if (faq.isMaximized()) {
-        faq.restore()
-        faq.webContents.send("isRestored")
-    } else {
-        faq.maximize()
-        faq.webContents.send("isMaximized")
-    }
-})
-ipcMain.on("closeListes", (evt, arg) => {
-    editList.close()
-})
-ipcMain.on("minimizeListes", (evt, arg) => {
-    editList.minimize()
-})
-ipcMain.on("maximizeRestoreListes", (evt, arg) => {
-    if (editList.isMaximized()) {
-        editList.restore()
-        editList.webContents.send("isRestored")
-    } else {
-        editList.maximize()
-        editList.webContents.send("isMaximized")
-    }
-})
+// la fenêtre visée est toujours celle qui a envoyé le message, quelle que soit la vue
+for (const suffixe of ["App", "Faq", "Listes"]) {
+    ipcMain.on("close" + suffixe, (evt) => {
+        const win = BrowserWindow.fromWebContents(evt.sender)
+        if (win) { win.close() }
+    })
+    ipcMain.on("minimize" + suffixe, (evt) => {
+        const win = BrowserWindow.fromWebContents(evt.sender)
+        if (win) { win.minimize() }
+    })
+    ipcMain.on("maximizeRestore" + suffixe, (evt) => {
+        const win = BrowserWindow.fromWebContents(evt.sender)
+        if (!win) { return }
+        if (win.isMaximized()) {
+            win.unmaximize()
+            win.webContents.send("isRestored")
+        } else {
+            win.maximize()
+            win.webContents.send("isMaximized")
+        }
+    })
+}
 process.on('uncaughtException', function (err) {
     if (err) {
-        log.info("caughtException but no error msg" + err.stack);
-        process.exit(1);
+        log.error("caughtException : " + err.stack);
     }
 });
