@@ -1,0 +1,108 @@
+{
+  "name": "zappli",
+  "version": "2.3.14",
+  "description": "Une application pour générer des tirages aléatoires à partir de votre propre banque d'images.",
+  "repository": "https://github.com/MProix/zappli-electron",
+  "main": "main.js",
+  "scripts": {
+    "dist": "electron-builder --mac --universal --win  nsis:x64 --linux deb:x64 -p always",
+    "macdist": "electron-builder --mac --universal",
+    "linuxdist": "electron-builder --linux deb:x64 -p always",
+    "windist": "electron-builder --win  nsis:x64",
+    "start": "electron .",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-builder publish"
+  },
+  "build": {
+    "publish": {
+      "provider": "github",
+      "owner": "MProix",
+      "repo": "zappli-electron"
+    },
+    "appId": "com.lesZexpertsFLE.zappli",
+    "icon": "public/icon.icns",
+    "productName": "zappli",
+    "mac": {
+      "appId": "com.lesZexpertsFLE.zappli",
+      "target": [
+        {
+          "target": "default",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "icon": "public/icon.icns",
+      "category": "public.app-category.utilities",
+      "hardenedRuntime": true,
+      "entitlements": "./node_modules/electron-builder-notarize/entitlements.mac.inherit.plist"
+    },
+    "dmg": {
+      "background": "public/dmg_background.tiff",
+      "icon": "public/icon.icns",
+      "iconSize": 80,
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "publish": {
+        "provider": "github",
+        "owner": "MProix",
+        "repo": "zappli-electron"
+      },
+      "target": {
+        "target": "nsis",
+        "arch": "x64"
+      },
+      "icon": "public/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "snap"
+      ],
+      "category": "Utility"
+    },
+    "nsis": {
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico",
+      "license": "LICENSE",
+      "runAfterFinish": "true",
+      "deleteAppDataOnUninstall": "true"
+    }
+  },
+  "author": "Mélanie Proix - Les zexperts FLE <melanie@proix.eu>",
+  "license": "GNU GPL",
+  "devDependencies": {
+    "@electron/fuses": "^2.0.0",
+    "electron": "^28.1.2",
+    "electron-builder": "^26.15.3",
+    "electron-builder-notarize": "^1.1.2"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "about-window": "^1.15.2",
+    "electron-log": "^5.0.3",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.7",
+    "jquery": "^4.0.0",
+    "jquery-ui-dist": "^1.13.3",
+    "sweetalert": "^2.1.2",
+    "xlsx": "^0.18.5"
+  }
+}
