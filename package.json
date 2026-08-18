@@ -101,8 +101,8 @@
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.7",
     "jquery": "^4.0.0",
-    "jquery-ui-dist": "^1.13.3",
+    "jquery-ui": "^1.14.1",
     "sweetalert": "^2.1.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }
 }

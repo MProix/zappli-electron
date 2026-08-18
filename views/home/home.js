@@ -1,5 +1,5 @@
 // IMPORTS
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, webUtils } = require('electron')
 const path = require("path")
 //const { type } = require('process')
 const swal = require('sweetalert')
@@ -137,6 +137,13 @@ function supprimerZone(elt) { //pour supprimer une zone --> l'appel de la foncti
     }
 }
 
+// ============= CHEMIN DISQUE D'UN FICHIER ============= //
+function cheminDeFichier(file) { // File.path disparaît à partir d'Electron 32, remplacé par webUtils.getPathForFile
+    if (webUtils && webUtils.getPathForFile) {
+        return webUtils.getPathForFile(file)
+    }
+    return file.path
+}
 // ============= GESTION DE LA ZONE DE DRAG AND DROP ============= //
 window.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -181,11 +188,12 @@ function getDropFiles(event) { // on récupère les données du drop
     $(event.target).closest(".mainDiv").children(".listeAffichable").html("") // on vide le div de secours des données
     var items = event.dataTransfer.items;
     var premier = event.dataTransfer.files[0]
-    if (!premier || !premier.path) { // fichiers sans chemin disque : OneDrive à la demande, pièces jointes, archives…
+    var cheminPremier = premier ? cheminDeFichier(premier) : ""
+    if (!cheminPremier) { // fichiers sans chemin disque : OneDrive à la demande, pièces jointes, archives…
         swal("Il y a un problème", "Ces fichiers n'ont pas de chemin sur le disque. Copiez-les dans un dossier de l'ordinateur avant de les glisser ici.")
         return
     }
-    var dossier = premier.path.split(/[\\/]/) // séparateur Windows ou macOS/Linux
+    var dossier = cheminPremier.split(/[\\/]/) // séparateur Windows ou macOS/Linux
     var goodPath = (dossier.slice(0, dossier.length - 1)).join("/")
     var parcours = []
     for (var i = 0; i < items.length; i++) {
@@ -208,7 +216,7 @@ function getDropFiles(event) { // on récupère les données du drop
 function getFilesOrFolders(e) {
     var listePaths = []
     for (let elt of e.target.files) {
-        listePaths.push(elt.path)
+        listePaths.push(cheminDeFichier(elt))
     }
     console.log(listePaths)
     return checkListFormats(listePaths, e.target)
@@ -433,7 +441,7 @@ function cheminVersUrl(chemin) { // un chemin disque n'est pas une URL : Windows
     return "file://" + encodeURI(normalise).replace(/\(/g, "%28").replace(/\)/g, "%29")
 }
 function changerFond(event) {
-    $("#affichage").css('background-image', 'url("' + cheminVersUrl(event.target.files[0].path) + '")')
+    $("#affichage").css('background-image', 'url("' + cheminVersUrl(cheminDeFichier(event.target.files[0])) + '")')
 }
 function supprimerFond(event) {
     $("#affichage").css('background-image', "none")
