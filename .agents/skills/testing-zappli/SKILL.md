@@ -7,7 +7,9 @@ description: How to run and end-to-end test the Zappli Electron app (card drawin
 
 ## Lancer l'appli
 - `npm install` puis `npm start` (= `electron .`) depuis la racine du repo.
-- Tuer une instance existante avant de relancer : `pkill -f "electron ."`.
+- Tuer **toutes** les instances avant de relancer : `pkill -f "electron/dist/electron"` (vérifier avec `pgrep -af electron`).
+  Une instance survivante garde le port CDP : `http://127.0.0.1:9222/json` renvoie alors l'ancienne vue
+  (par ex. `home_fr.html`) alors que la fenêtre visible est déjà en anglais.
 - Les erreurs `bus.cc(407)`, `viz_main_impl.cc` et `GPU process launch failed` dans les logs sont du bruit de VM headless, pas des bugs.
 - Pour capturer la console du renderer, lancer plutôt :
   `./node_modules/.bin/electron . --remote-debugging-port=9222`
@@ -34,6 +36,18 @@ description: How to run and end-to-end test the Zappli Electron app (card drawin
 - Barre du haut : Tout mélanger, Revenir en arrière, Déplacer / Effacer / Changer / Surligner une carte, Numéroter, Changer le fond (`#fondPicker`), Supprimer le fond.
 - Dossier contenant à la fois images et tableur → popup swal « Vous avez importé à la fois des listes de mots et des images » avec « Je choisis les mots » / « Je choisis les images ».
 
+## Changer la langue de l'interface
+- Menu de la fenêtre : `Action` → `Changer la langue d'affichage` / `Change display language` → `English` / `Français`.
+- `changeLanguage()` fait `app.relaunch()` + `app.exit()` : le flag `--remote-debugging-port=9222` est bien conservé,
+  mais le logger CDP doit être **relancé** après chaque changement de langue (le target précédent disparaît).
+- `home.js` lit `document.documentElement.lang` ; contrôle rapide après bascule :
+  `{lang, melange:!!#melange, oneMore:!!#oneMore, repet:!!#repet, dragover:#affichage1[ondragover]}`.
+- Textes de la 2e zone générée par `ajouterZone()` : vérifier `#repetition label` et les attributs `title`
+  des boutons `+`/`-` (`add a folder` / `remove a folder` vs `ajouter un dossier` / `supprimer un dossier`).
+- La langue est persistée dans `~/.config/zappli/config.json` : elle survit à un redémarrage manuel.
+- Tous les textes affichés viennent de `erreurs.json`, popups compris (`erTitre`, `erMotsEtImages`,
+  `choixMots`/`choixImages`, `erDossierVide`, `notifsAVenir`…) : un texte français en mode anglais est une régression.
+
 ## Jeux de test
 Générer sur disque (par ex. `~/test-zappli/`) : un dossier de ~150 png (pour la limite `readEntries` à 100),
 un dossier avec un seul .csv/.xlsx, un dossier MIXTE images + tableur de ~5 mots (épuisement rapide du paquet),
@@ -49,6 +63,9 @@ Créer un .xlsx sans dépendance Python : `node -e` avec le module `xlsx` déjà
   (`wmctrl -r Zappli -b remove,maximized_vert,maximized_horz` puis `wmctrl -r Zappli -e 0,x,y,w,h`).
 - Le drag inter-applications fonctionne : `mouse_move` sur l'icône du dossier, `left_mouse_down`, plusieurs
   `mouse_move` jusqu'à la zone de dépôt, screenshot pendant le maintien, puis `left_mouse_up`.
+- Piège : si la fenêtre Zappli n'a pas été activée récemment, le `drop` peut être ignoré silencieusement
+  (aucun log `getDropFiles`). Cliquer d'abord dans la fenêtre Zappli pour lui donner le focus, puis repartir
+  de Dolphin ; faire plusieurs petits `mouse_move` près de la cible et attendre 2-3 s avant de relâcher.
 
 ## Devin Secrets Needed
 Aucun.
