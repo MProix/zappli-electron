@@ -18,12 +18,18 @@
         <div id="titleBar">
             <button id="showHideMenus" class="toggleButton" title="menu"></button>
             <div id="titre">zappli</div>
-            <button class="topBtn minimize" id="minimize" title="Réduire"></button>
-            <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
-            <button class="topBtn close" id="close" title="Fermer"></button>
+            <button class="topBtn minimize" id="minimize" title="Minimize"></button>
+            <button class="topBtn maximize" id="maxRes" title="Maximize"></button>
+            <button class="topBtn close" id="close" title="Close"></button>
         </div>
         <div id="actionsMenu">
             <div id="baseActions">
+                <div id="melange" class="actionBtn" onclick="melanger(event)"><i class="fa-solid fa-circle-play"></i>
+                    <p>Shuffle all</p>
+                </div>
+                <div id="back" class="actionBtn" onclick="getBack(event)"><i class="fa-solid fa-circle-play"></i>
+                    <p>Back</p>
+                </div>
                 <div id="deplace" class="actionBtn"><i class="fa-solid fa-maximize"></i>
                     <p>Move image</p>
                 </div>
@@ -38,9 +44,6 @@
                 </div>
                 <div id="numerote" class="actionBtn"><i class="fa-solid fa-hashtag"></i>
                     <p>Number pictures</p>
-                </div>
-                <div id="back" class="actionBtn" onclick="getBack(event)"><i class="fa-solid fa-circle-play"></i>
-                    <p>Back</p>
                 </div>
                 <div id="fond" class="actionBtn">
                     <input type="file" style="display: none;" id="fondPicker" class="fondPicker"
@@ -64,11 +67,12 @@
         <div id="mainContent">
             <div id="cardsContainer">
                 <div id="affichage">
-                    <div class="nbDiv1 mainDiv" id="affichage1" ondrop="getDropFiles(event)">
+                    <div class="nbDiv1 mainDiv" id="affichage1" ondrop="getDropFiles(event)"
+                        ondragover="allowDrop(event)">
                         <div class="oneCardContainer">
                             <div class="dropZone2" id="dropImages1">
-                                <p>Drag and drop a folder,<br> files <br> or a spreadsheet</p>
-                                <p>(.xlsx, .xls, .csv, .numbers, .ods) ou (.jpg, .png, .gif, .webp)</p>
+                                <p>Drag and drop a folder,<br> files,<br> or a spreadsheet</p>
+                                <p>(.xlsx, .xls, .csv, .numbers, .ods) or (.jpg, .png, .gif, .webp)</p>
                             </div>
                             <p>OR</p>
                             <div class="folderSelector" id="folderSelector">
@@ -89,29 +93,36 @@
                             <div id="top">
                                 <div class="cardsNumber" id="cardsNumber1">
                                     <label for="cardsNumber1">Cards<br>number</label>
-                                    <div><input type="number" value="3" min="1" max="24"></div>
+                                    <div><input type="number" value="3" min="1" max="24" id="nbImg"></div>
                                 </div>
                                 <div id="play" onclick="clickOnPlay(event)"><i class="fa-solid fa-circle-play"></i>
+                                </div>
+                                <div id="oneMore" onclick="addOne(event)"><i class="fa-solid fa-circle-plus"></i>
                                 </div>
                                 <div id="zero1" class="zero" onclick="erase(event)"><i class="fa-solid fa-eraser"></i>
                                 </div>
                                 <div class="backToChooser" onclick="backToChooser(event)"><i
                                         class="fa-regular fa-folder-open"></i>
                                 </div>
+                                <div id="repetition"><input type="checkbox" checked id="repet" name="repet" value="0"><label for="repet">Do not repeat cards</label></div>
                             </div>
                             <div id="bottom">
-                                <label for="vol">Zoom cards : <span id="zoomValue1" class="zoomValue">100%</span> </label>
-                                <div class="zoom"><input type="range" id="vol1" name="vol" min="20" max="200" value="100" oninput="zommOnCards(event.target)"></div>
+                                <label for="vol">Zoom cards : <span id="zoomValue1" class="zoomValue">100%</span>
+                                </label>
+                                <div class="zoom"><input type="range" id="vol1" name="vol" min="20" max="200"
+                                        value="100" oninput="zommOnCards(event.target)"></div>
                             </div>
                         </div>
                         <div id="delAddFolderChooser">
-                            <div class="addFolderChooser" id="addFolderChooser1" title="ajouter un dossier"
+                            <div class="addFolderChooser" id="addFolderChooser1" title="add a folder"
                                 onclick="ajouterZone(this)"><i class="fa-regular fa-square-plus"></i>
                             </div>
-                            <div class="delFolderChooser" id="delFolderChooser1" title="supprimer un dossier"
+                            <div class="delFolderChooser" id="delFolderChooser1" title="remove a folder"
                                 onclick="supprimerZone(this)"><i class="fa-regular fa-square-minus"></i></div>
                         </div>
                         <div class="listeAffichable" style="display:none"></div>
+                        <div class="listeAffichableMots" style="display:none"></div>
+                        <div class="nbTirages" style="display:none"></div>
                     </div>
                 </div>
             </div>
