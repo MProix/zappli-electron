@@ -1,5 +1,4 @@
 // IMPORTS
-const userOS = navigator.platform
 const { ipcRenderer } = require('electron')
 const path = require("path")
 //const { type } = require('process')
@@ -17,7 +16,6 @@ var listOfValidExtensions = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".tiff", 
 var listOfValidListsOfWordsExtensions = [".numbers", ".xlsx", ".xsl", ".ods", ".csv"] // on stocke les extensions valides pour l'affichage de listes de mots
 var nbZones = 1 // pour toujours savoir combien on a de zones d'affichage
 var identifiantZone = 1 // pour incrémenter les zonnes et y envoyer les bonnes infos
-var dropList = [] // pour stocker la liste d'images ou de mots sur laquelle on travaille
 var tailles = {
     "portrait":
     {
@@ -146,49 +144,64 @@ window.addEventListener("dragover", (e) => {
 window.addEventListener("drop", (e) => {
     e.preventDefault();
 });
-function traverseFileTree(item, path, elt) { // on récupère de manière récursive les fichiers un par un
-    //console.log(path)
-    path = path || "";
+function lireEntrees(dirReader) { // readEntries ne renvoie que 100 entrées par appel : il faut rappeler jusqu'à la liste vide
+    return new Promise((resolve, reject) => {
+        var toutes = []
+        var lire = () => {
+            dirReader.readEntries((entries) => {
+                if (entries.length == 0) {
+                    resolve(toutes)
+                } else {
+                    toutes = toutes.concat(entries)
+                    lire()
+                }
+            }, reject)
+        }
+        lire()
+    })
+}
+function traverseFileTree(item, chemin, liste) { // on récupère récursivement les fichiers ; la promesse dit quand c'est fini
     if (item.isFile) {
-        // Get file
-        item.file(function (file) {
-            dropList.push(path + file.name)
-        });
+        return new Promise((resolve) => {
+            item.file((file) => {
+                liste.push(chemin + file.name)
+                resolve()
+            }, resolve)
+        })
     } else if (item.isDirectory) {
-        // Get folder contents
-        var dirReader = item.createReader();
-        dirReader.readEntries(function (entries) {
-            for (var i = 0; i < entries.length; i++) {
-                traverseFileTree(entries[i], path + item.name + "/", elt);
-            }
-        });
+        return lireEntrees(item.createReader()).then((entries) => {
+            return Promise.all(entries.map((entry) => traverseFileTree(entry, chemin + item.name + "/", liste)))
+        })
     }
+    return Promise.resolve()
 }
 function getDropFiles(event) { // on récupère les données du drop
-    dropList = [] // on vide la liste au cas ou elle aurait été remplie
-    $(event.target).closest(".mainDiv").children(".listeAffichable").html("") // on vide le div de secours des données
     event.preventDefault();
+    var liste = []
+    $(event.target).closest(".mainDiv").children(".listeAffichable").html("") // on vide le div de secours des données
     var items = event.dataTransfer.items;
-    //console.log(items)
-    if (userOS == "Win32" || userOS == "Win16") {
-        var path = event.dataTransfer.files[0].path.split("\\")
-    } else {
-        var path = event.dataTransfer.files[0].path.split("/")
+    var premier = event.dataTransfer.files[0]
+    if (!premier || !premier.path) { // fichiers sans chemin disque : OneDrive à la demande, pièces jointes, archives…
+        swal("Il y a un problème", "Ces fichiers n'ont pas de chemin sur le disque. Copiez-les dans un dossier de l'ordinateur avant de les glisser ici.")
+        return
     }
-    //console.log(path)
-    var goodPath = (path.slice(0, path.length - 1)).join("/")
-    //console.log(goodPath)
+    var dossier = premier.path.split(/[\\/]/) // séparateur Windows ou macOS/Linux
+    var goodPath = (dossier.slice(0, dossier.length - 1)).join("/")
+    var parcours = []
     for (var i = 0; i < items.length; i++) {
-        // webkitGetAsEntry is where the magic happens
+        // webkitGetAsEntry is where the magic happens (à appeler avant tout await : les items ne survivent pas à l'événement)
         var item = items[i].webkitGetAsEntry();
-        //console.log("item")
-        //console.log(item)
         if (item) {
-            traverseFileTree(item, goodPath + "/", $(event.target));
+            parcours.push(traverseFileTree(item, goodPath + "/", liste))
         }
     }
-    sleep(200).then(() => {
-        checkListFormats(dropList, event.target)
+    Promise.all(parcours).then(() => { // on attend la fin du parcours, pas un délai fixe
+        console.log(liste)
+        if (liste.length == 0) {
+            swal("Il y a un problème", "Aucun fichier n'a pu être lu dans ce qui a été déposé")
+            return
+        }
+        checkListFormats(liste, event.target)
     })
 }
 // ============= GESTION DU BOUTON TELECHARGER DOSSIER(S) ============= //
