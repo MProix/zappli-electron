@@ -192,14 +192,13 @@ function getDropFiles(event) { // on récupère les données du drop
     })
 }
 // ============= GESTION DU BOUTON TELECHARGER DOSSIER(S) ============= //
-function getFilesOrFolders(e) {
-    console.log(e)
+function getFilesOrFolders(e, typeImpose) {
     var listePaths = []
     for (let elt of e.target.files) {
         listePaths.push(elt.path)
     }
     console.log(listePaths)
-    checkListFormats(listePaths, e.target)
+    return checkListFormats(listePaths, e.target, typeImpose)
 }
 // ============= BOUTON POUR REVENIR AU CHOIX DE DOSSIER ============= //
 function backToChooser(e) {
@@ -241,8 +240,6 @@ function clickOnPlay(event) {
             selector = "#folderChosen2-" + quelleZone
         }
         console.log(selector)
-        console.log(document.querySelector(selector));
-        const reloadSameDeck = new Event('reloadSameDeck');
         if (data[1]["erreur"]) {
             console.log(data)
             console.log(erreurs[data[1]["erreur"]][langue])
@@ -250,27 +247,17 @@ function clickOnPlay(event) {
             if (erreurs[data[1]["erreur"]][langue].length > 1 && Array.isArray(erreurs[data[1]["erreur"]][langue])) {
                 //console.log(data[1]["nb"])
                 //console.log(erreurs[data[1]["erreur"]][langue][0] + data[1]["nb"] + erreurs[data[1]["erreur"]][langue][1])
-                if (parseInt($(event.target).parents(".mainDiv").find(".nbTirages").html()) > 0) {
-                    console.log("déjà au moins un tirage")
-                    console.log("TATATATATATATATA")
-                    document.querySelector(selector).addEventListener('reloadSameDeck', (e) => { // once : sinon les écouteurs s'empilent à chaque paquet épuisé
-                        $(e.target).parents(".mainDiv").children(".affichageMessage").css("opacity", 0)
-                        $(e.target).parents(".mainDiv").children(".affichageMessage").css("display", "none")
-                        $(e.target).parents(".mainDiv").children(".affichageBtns").css("display", "none")
-                        $(e.target).parents(".mainDiv").children(".oneCardContainer").css("display", "flex")
-                        $(e.target).parents(".mainDiv").children(".oneCardContainer").css("opacity", 0)
-                        $(e.target).parents(".mainDiv").children(".affichageDesCartes").css("display", "none")
-                        console.log("fait1")
-                        //$(e.target).parents(".mainDiv").find(".filepicker").val("")
-                        getFilesOrFolders(e)
-                        console.log("fait2")
-                        //console.log('Custom event "reloadSameDeck" has been triggered!');
-                    }, { once: true });
-                    document.querySelector(selector).dispatchEvent(reloadSameDeck);
-                    sleep(100).then(() => {
-                        $("#affichage" + quelleZone).find("#play").trigger("click")
-                        $(event.target).parents(".mainDiv").children(".affichageMessage").css("opacity", 1)
-                        $(event.target).parents(".mainDiv").children(".oneCardContainer").css("opacity", 1)
+                if (parseInt($(event.target).parents(".mainDiv").find(".nbTirages").html()) > 0) { // le paquet est épuisé : on le recharge tel quel
+                    var zone = $(event.target).parents(".mainDiv")
+                    zone.children(".affichageMessage").css({ "opacity": 0, "display": "none" })
+                    zone.children(".affichageBtns").css("display", "none")
+                    zone.children(".oneCardContainer").css({ "display": "flex", "opacity": 0 })
+                    zone.children(".affichageDesCartes").css("display", "none")
+                    // on rejoue une fois le rechargement terminé, et sans reposer la question mots/images
+                    getFilesOrFolders({ "target": document.querySelector(selector) }, zone.attr("data-type")).then(() => {
+                        zone.find("#play").trigger("click")
+                        zone.children(".affichageMessage").css("opacity", 1)
+                        zone.children(".oneCardContainer").css("opacity", 1)
                     })
                 } else {
                     console.log("TOTOTOTOTO")
@@ -501,12 +488,25 @@ $("#deplace, #efface, #change, #surligne").on("click", function () {
 })
 // ============= FONCTIONS ============= //
 
-function manageListeUploaded(goodList, zone) { // zone : le .mainDiv concerné
+function appliquerListe(goodList, zone, type) { // on installe le paquet choisi dans la zone
+    if (type == "mots") {
+        zone.children(".listeAffichable").html(JSON.stringify([goodList[4].length, goodList[3], "mots", goodList[4]]))
+    } else {
+        zone.children(".listeAffichable").html(JSON.stringify([goodList[2].length, goodList[2], "images"]))
+    }
+    zone.attr("data-type", type) // pour recharger le même paquet sans reposer la question
+    readyToPlay(zone)
+}
+function manageListeUploaded(goodList, zone, typeImpose) { // zone : le .mainDiv concerné ; renvoie une promesse résolue quand le paquet est prêt
     console.log("goodlist", goodList)
     if (goodList[1] == false && goodList[0] == false) { // s'il n'y a ni listes de mots ni images
-        swal("Il y a un problème", "Il n'y pas de liste de mots ni d'images dans ce dossier")
+        return swal("Il y a un problème", "Il n'y pas de liste de mots ni d'images dans ce dossier")
     } else if (goodList[1] == true && goodList[0] == true) { // s'il y a les deux
-        swal("Il y a un problème", "Vous avez importé à la fois des listes de mots et des images", {
+        if (typeImpose == "mots" || typeImpose == "images") {
+            appliquerListe(goodList, zone, typeImpose)
+            return Promise.resolve()
+        }
+        return swal("Il y a un problème", "Vous avez importé à la fois des listes de mots et des images", {
             buttons: {
                 catch1: {
                     text: "Je choisis les mots",
@@ -520,31 +520,25 @@ function manageListeUploaded(goodList, zone) { // zone : le .mainDiv concerné
         }).then((value) => {
             switch (value) {
                 case "catch1":
-                    zone.children(".listeAffichable").html(JSON.stringify([goodList[4].length, goodList[3], "mots", goodList[4]]))
-                    readyToPlay(zone)
+                    appliquerListe(goodList, zone, "mots")
                     break;
                 case "catch2":
-                    zone.children(".listeAffichable").html(JSON.stringify([goodList[2].length, goodList[2], "images"]))
-                    readyToPlay(zone)
+                    appliquerListe(goodList, zone, "images")
                     break;
             }
         });
     } else if (goodList[1] == true && goodList[0] == false) { // si l'upload est bon du premier coup et ce sont des mots HOURRA !!!
-        //console.log("2")
-        //console.log(goodList)
-        zone.children(".listeAffichable").html(JSON.stringify([goodList[4].length, goodList[3], "mots", goodList[4]]))
-        readyToPlay(zone)
+        appliquerListe(goodList, zone, "mots")
+        return Promise.resolve()
     } else {// si l'upload est bon du premier coup et ce sont des images HOURRA !!!
-        //console.log("3")
-        //console.log(goodList)
-        zone.children(".listeAffichable").html(JSON.stringify([goodList[2].length, goodList[2], "images"]))
-        readyToPlay(zone)
+        appliquerListe(goodList, zone, "images")
+        return Promise.resolve()
     }
 }
 function numeroDeZone(elt) { // le numéro de la zone (.mainDiv) qui contient l'élément
     return $(elt).parents(".mainDiv").attr("id").replace("affichage", "")
 }
-function checkListFormats(liste, cible) { // cible : un élément de la zone (le drop peut viser un enfant sans id)
+function checkListFormats(liste, cible, typeImpose) { // cible : un élément de la zone (le drop peut viser un enfant sans id)
     var zone = $(cible).closest(".mainDiv")
     console.log(liste)
     var imagesList = []
@@ -562,12 +556,12 @@ function checkListFormats(liste, cible) { // cible : un élément de la zone (le
         }
     }
     if (listeDeMots == true) {
-        ipcRenderer.invoke('getWords', [wordsList[0]]).then((listOfWords) => { // on attend la lecture du tableur, pas un délai fixe
+        return ipcRenderer.invoke('getWords', [wordsList[0]]).then((listOfWords) => { // on attend la lecture du tableur, pas un délai fixe
             zone.children(".listeAffichableMots").html(JSON.stringify(listOfWords))
-            manageListeUploaded([image, listeDeMots, imagesList, wordsList, listOfWords], zone)
+            return manageListeUploaded([image, listeDeMots, imagesList, wordsList, listOfWords], zone, typeImpose)
         })
     } else {
-        manageListeUploaded([image, listeDeMots, imagesList, wordsList, []], zone)
+        return manageListeUploaded([image, listeDeMots, imagesList, wordsList, []], zone, typeImpose)
     }
 }
 // il faut un délai pour le traitement des images chargées
