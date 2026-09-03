@@ -179,58 +179,37 @@ ipcMain.handle('addOne', async (evt, arg) => {
     // deux possibiltés : des images, des mots
     //console.log(arg)
 
+    // on ne compare pas les longueurs : la non-répétition retire déjà les cartes tirées de la liste
     if (arg["typeDeTirage"] == "images") {
-        if (arg["listeImagesOuMots"].length == arg["listeAffichee"].length) {
+        var candidats = arg["listeImagesOuMots"].filter((elt) => !arg["listeAffichee"].includes(elt))
+        if (candidats.length == 0) {
             return { "erreur": "erAllImages" }
-        } else {
-            //console.log(arg["typeDeTirage"])
-            var newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
-            while (arg["listeAffichee"].includes(newElt)) {
-                newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
-            }
-            return [newElt,"images"]
         }
+        return [candidats[Math.floor(Math.random() * candidats.length)], "images"]
     } else {
-        if (arg["listeImagesOuMots"].length == arg["listeAffichee"].length) {
+        var candidats = arg["listeImagesOuMots"].filter((elt) => !arg["listeAffichee"].includes(elt[0]))
+        if (candidats.length == 0) {
             return { "erreur": "erAllWords" }
-        } else {
-            //console.log(arg["typeDeTirage"])
-            var newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
-            //console.log("newElt",newElt[0])
-            //console.log("listeAffichee",arg["listeAffichee"])
-            while (arg["listeAffichee"].includes(newElt[0])) {
-                newElt = arg["listeImagesOuMots"][Math.floor(Math.random() * arg["listeImagesOuMots"].length)];
-                //console.log("nouveau", newElt)
-            }
-            return [newElt,"mots"]
         }
+        return [candidats[Math.floor(Math.random() * candidats.length)], "mots"]
     }
 })
 ipcMain.handle('changeImage', async (evt, arg) => {
     //console.log(arg)
     // deux possibiltés : des images, des mots
     if (arg["typeDeTirage"] == "images") {
-        if (arg["listeImagesOuMots"].length <= arg["srcImagesAffichees"].length) {
+        var candidats = arg["listeImagesOuMots"].filter((elt) => !arg["srcImagesAffichees"].includes(elt)) // on ne remet pas une carte déjà à l'écran
+        if (candidats.length == 0) {
             return { "error": "erAllImages" }
-        } else {
-            var newImage = getRandomValues(arg["listeImagesOuMots"], 1)
-            while (arg["srcImagesAffichees"].includes(newImage[0][0])) { // on ne remet pas une carte déjà à l'écran
-                newImage = getRandomValues(arg["listeImagesOuMots"], 1)
-            }
-            //console.log(newImage)
-            return newImage
         }
+        return getRandomValues(candidats, 1)
     } else {
         var words = getWordsFromCalcFile(arg["listeImagesOuMots"][0])
-        if (words.length == arg["listeMotsAffiches"].length) {
+        var candidats = words.filter((elt) => !arg["listeMotsAffiches"].includes(elt[0]))
+        if (candidats.length == 0) {
             return { "error": "erAllWords" }
-        } else {
-            var newWord = getRandomValues(words, 1)
-            while (arg["listeMotsAffiches"].includes(newWord[0][0][0]) == true) {
-                newWord = getRandomValues(words, 1)
-            }
-            return newWord
         }
+        return getRandomValues(candidats, 1)
     }
 })
 
@@ -316,7 +295,7 @@ function sleep(ms) {
 function getRandomValues(liste, nbCartes) {
     var max = liste.length
     if (max >= nbCartes) { // on vérifie qu'il y a assez de mots dans la liste par rapport au nombre demandé
-        var shuffleList = liste.sort((a, b) => 0.5 - Math.random());
+        var shuffleList = liste.slice().sort((a, b) => 0.5 - Math.random()); // on ne mélange pas la liste d'origine
         var listeItems = shuffleList.slice(0, nbCartes)
         return [listeItems, max]
     } else {
