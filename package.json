@@ -35,6 +35,7 @@
       ],
       "icon": "public/icon.icns",
       "category": "public.app-category.utilities",
+      "identity": "Developer ID Application: Les Zexperts FLE Sp. z O.O. (J4V9GYXRJS)",
       "hardenedRuntime": true,
       "entitlements": "./node_modules/electron-builder-notarize/entitlements.mac.inherit.plist"
     },
