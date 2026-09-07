@@ -484,7 +484,7 @@ function carteRessource(ressource) { // titre + image cliquables vers la page pr
 
 function construireSurvolNotifs() { // une fois le popup déjà ouvert une fois, les nouveautés se consultent au survol
     $("#notifsSurvol").remove()
-    if (!infosRessources["dejaOuvert"] || infosRessources["nouveautes"].length == 0) { return }
+    if (!infosRessources["dejaOuvert"] || infosRessources["desactive"] || infosRessources["nouveautes"].length == 0) { return }
     var survol = $('<div id="notifsSurvol"></div>')
     survol.append($("<p></p>").text(erreurs["notifsNouveautes"][langue]))
     for (let ressource of infosRessources["nouveautes"].slice(0, 3)) {
@@ -507,12 +507,13 @@ $("#notifs").on("click", () => {
             contenu.append(carteRessource(ressource))
         }
     }
-    var caseNotifs = $('<input type="checkbox" id="plusDeNotifs">')
+    var caseNotifs = $('<input type="checkbox" id="plusDeNotifs">').prop("checked", infosRessources["desactive"] == true) // décocher réactive les alertes
     contenu.append($('<label class="plusDeNotifs" for="plusDeNotifs"></label>').append(caseNotifs).append($("<span></span>").text(erreurs["notifsNePlusAvertir"][langue])))
     swal({ "title": erreurs["notifsTitre"][langue], "content": contenu[0] }).then(() => {
         ipcRenderer.send("ressourcesVues", caseNotifs.is(":checked")) // on retient ce qui a été vu pour ne signaler que les prochaines nouveautés
         infosRessources["desactive"] = caseNotifs.is(":checked")
         infosRessources["dejaOuvert"] = true
+        infosRessources["nouveautes"] = [] // tout ce qui était affiché vient d'être vu
         $("#notifs").removeClass("exergue")
         construireSurvolNotifs()
     })

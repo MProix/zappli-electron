@@ -140,6 +140,7 @@ app.whenReady().then(() => {
         mainWindow.send('OS', process.platform)
         mainWindow.send("storage", userStoragePath)
         envoyerRessources()
+        setInterval(envoyerRessources, 6 * 60 * 60 * 1000) // une publication en cours de journée finit par être signalée
     })
     log.info
     autoUpdater.checkForUpdatesAndNotify()
