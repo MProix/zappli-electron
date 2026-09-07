@@ -60,3 +60,24 @@ body{
 h4{
     text-decoration: underline;
 }
+h2{
+    font-size: 1.1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    padding-bottom: 4px;
+    margin-top: 25px;
+}
+details{
+    margin-bottom: 8px;
+}
+summary{
+    cursor: pointer;
+    font-weight: bold;
+    padding: 4px 0px;
+}
+summary:hover{
+    color: #8ec5f5;
+}
+details p, details ul{
+    margin-top: 6px;
+    font-weight: normal;
+}

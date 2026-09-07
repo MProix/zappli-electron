@@ -1,4 +1,9 @@
 const { ipcRenderer } = require('electron');
+const langue = document.documentElement.lang == "en" ? "en" : "fr";
+const titresBtn = {
+    "fr": { "maximize": "Agrandir", "restore": "Restaurer" },
+    "en": { "maximize": "Maximize", "restore": "Restore" }
+};
 ipcRenderer.on('OS', (evt, arg) => {
     if (arg == "darwin") {
         $("#titleBar").css("display", "none");
@@ -16,11 +21,11 @@ $("#maxRes").on("click", () => {
 });
 function changeMaxResBtn(isMaximizedFaq) { // on gère les deux options : déjà maximisé ou pas encore
     if (isMaximizedFaq) {
-        $("#maxRes").attr('title', "Restaurer");
+        $("#maxRes").attr('title', titresBtn[langue]["restore"]);
         $("#maxRes").removeClass("maximize");
         $("#maxRes").addClass("restore");
     } else {
-        $("#maxRes").attr("title", "Agrandir");
+        $("#maxRes").attr("title", titresBtn[langue]["maximize"]);
         $("#maxRes").removeClass("restore");
         $("#maxRes").addClass("maximize");
     }
