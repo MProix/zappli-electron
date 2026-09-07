@@ -64,9 +64,29 @@
         "fr": "Je choisis les images",
         "en": "I choose the images"
     },
-    "notifsAVenir" : {
-        "fr": "Lien à venir vers les nouvelles ressources",
-        "en": "A link to the new resources is coming soon"
+    "notifsTitre" : {
+        "fr": "Des ressources pour la zappli",
+        "en": "Resources for the zappli"
+    },
+    "notifsIntro" : {
+        "fr": "Des imagiers et des listes de mots prêts à l'emploi vous attendent sur le site des Zexperts FLE.",
+        "en": "Ready-to-use picture sets and word lists are waiting for you on the Zexperts FLE website."
+    },
+    "notifsNouveautes" : {
+        "fr": "Nouveautés",
+        "en": "What's new"
+    },
+    "notifsToutesLesRessources" : {
+        "fr": "Voir toutes les ressources compatibles",
+        "en": "See all the compatible resources"
+    },
+    "notifsAucune" : {
+        "fr": "Aucune nouveauté pour le moment.",
+        "en": "Nothing new for now."
+    },
+    "notifsNePlusAvertir" : {
+        "fr": "Je préfère visiter le site pour trouver moi-même les nouvelles ressources, je préfère que la zappli ne m'avertisse pas des nouveautés",
+        "en": "I would rather visit the website to find new resources myself, I do not want the zappli to notify me"
     },
     "erPlusieursListes" :{
         "fr": "Il y a plusieurs listes de mots dans ce fichier",
