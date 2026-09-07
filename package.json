@@ -73,6 +73,7 @@
       "icon": "public/icon.ico"
     },
     "linux": {
+      "icon": "public/icon.png",
       "target": [
         "deb",
         "snap"
