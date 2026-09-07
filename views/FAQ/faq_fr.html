@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>FAQ</title>
+    <link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="faqStyles.css">
+
+</head>
+<body>
+    <div id="titleBar">
+        <div id="titre">zappli</div>
+        <button class="topBtn minimize" id="minimize" title="Réduire"></button>
+        <button class="topBtn maximize" id="maxRes" title="Agrandir"></button>
+        <button class="topBtn close" id="close" title="Fermer"></button>
+    </div>
+    <div id="content">
+        <h1>FAQ</h1>
+        <p>Toutes les réponses aux questions de fonctionnement. Cliquez sur une question pour dérouler la réponse.</p>
+
+        <h2>Importer des images ou des mots</h2>
+
+        <details>
+            <summary>Comment charger des images ou une liste de mots ?</summary>
+            <p>Trois possibilités, au choix, dans la zone d'accueil :</p>
+            <ul>
+                <li><strong>Sélectionnez un dossier</strong> : toutes les images du dossier (et de ses sous-dossiers) sont chargées.</li>
+                <li><strong>Sélectionnez un ou des fichiers</strong> : pour choisir des images précises ou un tableur de mots.</li>
+                <li><strong>Glissez-déposez</strong> un dossier, des images ou un tableur directement sur la zone.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>Quels formats d'images sont acceptés ?</summary>
+            <p>.png, .jpg, .jpeg, .webp, .gif et .tiff. Les autres fichiers du dossier sont simplement ignorés.</p>
+        </details>
+
+        <details>
+            <summary>Quels formats de listes de mots sont acceptés ?</summary>
+            <p>.xlsx, .xls, .csv, .ods et .numbers.</p>
+        </details>
+
+        <details>
+            <summary>Comment doit être construit mon tableur de mots ?</summary>
+            <ul>
+                <li>Une seule liste par fichier : un mot (ou une expression) par ligne, dans la première colonne de la première feuille.</li>
+                <li>Les cellules vides sont ignorées : inutile de supprimer les lignes vides.</li>
+                <li>Si le fichier contient plusieurs colonnes remplies, la zappli considère qu'il y a plusieurs listes et affiche « Il y a plusieurs listes de mots dans ce fichier » : séparez-les en plusieurs fichiers.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>Puis-je mélanger des mots et des images dans un même dossier ?</summary>
+            <p>Oui. La zappli vous demande alors si vous voulez travailler avec les mots ou avec les images, et garde votre choix pour cette zone jusqu'au prochain import.</p>
+        </details>
+
+        <details>
+            <summary>Le dossier que j'ai sélectionné ne contient aucune image d'après la zappli, alors qu'il y en a</summary>
+            <ul>
+                <li>Le format de vos images est-il standard ? (.png, .jpg, .jpeg, .webp, .gif, .tiff)</li>
+                <li>Sous Windows : si un clic droit sur le dossier vous propose de l'extraire, il s'agit d'une archive et non d'un dossier. Extrayez les fichiers avant de les utiliser.</li>
+                <li>Les fichiers sont-ils réellement téléchargés sur l'ordinateur ? Un fichier OneDrive ou iCloud « en ligne uniquement » n'a pas de chemin sur le disque : la zappli affiche alors « Ces fichiers n'ont pas de chemin sur le disque ». Faites un clic droit → « Toujours conserver sur cet appareil », ou copiez-les dans un dossier local.</li>
+            </ul>
+        </details>
+
+        <h2>Tirer des cartes</h2>
+
+        <details>
+            <summary>Comment lancer un tirage ?</summary>
+            <p>Indiquez le nombre de cartes voulu (de 1 à 24), puis cliquez sur le bouton <i class="fa-solid fa-circle-play"></i>. Chaque nouveau clic remplace les cartes affichées par un nouveau tirage.</p>
+        </details>
+
+        <details>
+            <summary>À quoi sert le bouton <i class="fa-solid fa-circle-plus"></i> ?</summary>
+            <p>Il ajoute une carte supplémentaire au tirage en cours, sans toucher aux cartes déjà affichées. Toutes les cartes sont automatiquement redimensionnées pour rester dans la zone.</p>
+        </details>
+
+        <details>
+            <summary>À quoi sert « Ne pas répéter les cartes » ?</summary>
+            <p>Cochée (par défaut), cette case garantit qu'une carte déjà sortie ne ressortira pas tant que le paquet n'est pas épuisé — pratique pour faire passer toute une classe. Décochée, chaque tirage repart de la liste complète.</p>
+        </details>
+
+        <details>
+            <summary>Que se passe-t-il quand toutes les cartes sont sorties ?</summary>
+            <p>La zappli vous prévient, puis recharge automatiquement le paquet complet (le même dossier ou la même liste) et repart pour un tour. Avec le bouton <i class="fa-solid fa-circle-plus"></i>, le message « Toutes les images sont déjà affichées » signale simplement qu'il ne reste rien à ajouter.</p>
+        </details>
+
+        <details>
+            <summary>« Ce dossier ne contient que X image(s) ! »</summary>
+            <p>Vous demandez plus de cartes qu'il n'y a d'images (ou de mots) disponibles. Réduisez le nombre de cartes ou ajoutez des fichiers au dossier.</p>
+        </details>
+
+        <details>
+            <summary>À quoi sert la gomme <i class="fa-solid fa-eraser"></i> de la zone ?</summary>
+            <p>Elle vide la zone de toutes ses cartes, sans perdre le dossier importé : vous pouvez relancer un tirage immédiatement.</p>
+        </details>
+
+        <details>
+            <summary>Comment changer de dossier sans tout recommencer ?</summary>
+            <p>Le bouton <i class="fa-regular fa-folder-open"></i> de la zone ramène à l'écran de choix d'un dossier ou de fichiers, pour cette zone uniquement.</p>
+        </details>
+
+        <h2>Travailler avec plusieurs zones</h2>
+
+        <details>
+            <summary>Comment afficher plusieurs séries de cartes côte à côte ?</summary>
+            <p>Le bouton <i class="fa-regular fa-square-plus"></i> ajoute une zone (jusqu'à 5), le bouton <i class="fa-regular fa-square-minus"></i> supprime la zone concernée. Chaque zone a son propre dossier, son propre nombre de cartes et son propre zoom.</p>
+        </details>
+
+        <details>
+            <summary>Que fait « Tout mélanger » ?</summary>
+            <p>Il relance simultanément le tirage de toutes les zones qui ont un dossier chargé. Les zones encore vides restent sur leur écran d'accueil.</p>
+        </details>
+
+        <details>
+            <summary>Puis-je déplacer une carte d'une zone à l'autre ?</summary>
+            <p>Non : une carte se déplace librement à l'intérieur de sa zone, mais ne peut pas passer dans la zone voisine. Si vous ajoutez ou supprimez une zone, les cartes déplacées reprennent leur place dans la grille pour éviter tout débordement.</p>
+        </details>
+
+        <h2>Manipuler les cartes</h2>
+
+        <details>
+            <summary>À quoi servent les boutons du menu de gauche ?</summary>
+            <ul>
+                <li><strong>Déplacer une carte</strong> : glissez une carte à la souris pour la repositionner.</li>
+                <li><strong>Effacer une carte</strong> : un clic sur une carte la retire de l'affichage.</li>
+                <li><strong>Changer une carte</strong> : un clic remplace la carte par une autre du paquet.</li>
+                <li><strong>Surligner une carte</strong> : un clic met la carte en valeur (halo jaune) ; un second clic l'enlève.</li>
+                <li><strong>Numéroter les cartes</strong> : affiche un numéro sur chaque carte ; un second clic les enlève.</li>
+            </ul>
+            <p>Ces modes s'excluent : le bouton actif détermine ce que fait un clic sur une carte.</p>
+        </details>
+
+        <details>
+            <summary>Que fait « Revenir en arrière » ?</summary>
+            <p>Il restaure l'état précédent de l'affichage (tirage, carte effacée, carte ajoutée, déplacement…). S'il n'y a rien à annuler, la zappli affiche « Pas de tirage antérieur ».</p>
+        </details>
+
+        <details>
+            <summary>Comment agrandir ou réduire les cartes ?</summary>
+            <p>Le curseur « Zoom cartes », en bas de chaque zone, agrandit les cartes de 20 % à 200 % sans changer leur nombre. Le zoom du menu <em>Affichage</em>, lui, agrandit toute l'interface.</p>
+        </details>
+
+        <h2>Personnaliser l'affichage</h2>
+
+        <details>
+            <summary>Comment mettre une image de fond ?</summary>
+            <p>« Changer le fond » ouvre le sélecteur d'image ; « Supprimer le fond » revient au fond d'origine. Le fond s'applique à toute la zone d'affichage.</p>
+        </details>
+
+        <details>
+            <summary>Comment agrandir la zone des cartes ?</summary>
+            <p>Le bouton en haut à gauche replie le menu latéral. Vous pouvez aussi déplacer la bordure entre le menu et les cartes, et passer en plein écran par le menu <em>Affichage</em>.</p>
+        </details>
+
+        <details>
+            <summary>Comment changer la langue de l'application ?</summary>
+            <p>Menu <em>Action</em> → « Changer la langue d'affichage » → Français ou English. La zappli redémarre et garde ce choix pour les fois suivantes.</p>
+        </details>
+
+        <h2>Mises à jour et problèmes</h2>
+
+        <details>
+            <summary>Comment savoir si une nouvelle version est disponible ?</summary>
+            <p>La zappli vérifie les mises à jour à chaque démarrage et vous propose de les installer. Le numéro de version est indiqué dans « À propos ».</p>
+        </details>
+
+        <details>
+            <summary>Rien ne se passe quand je clique</summary>
+            <p>Vérifiez qu'une action est bien sélectionnée dans le menu de gauche (déplacer, effacer, changer, surligner), et qu'un dossier est chargé dans la zone. Si le problème persiste, fermez et rouvrez la zappli : rien de ce qui est enregistré n'est perdu, seul l'affichage en cours est réinitialisé.</p>
+        </details>
+
+        <details>
+            <summary>Ma question n'est pas là</summary>
+            <p>Écrivez-nous : cette FAQ se complète avec vos questions.</p>
+        </details>
+    </div>
+    <script>
+        window.jquery = window.$ = require('jquery');
+        global.jQuery = require('jquery')
+    </script>
+    <script src="../../node_modules/jquery-ui/dist/jquery-ui.min.js"></script>
+    <script src="faq.js"></script>
+
+</body>
+</html>

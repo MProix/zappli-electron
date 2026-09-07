@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>FAQ</title>
+    <link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="faqStyles.css">
+
+</head>
+<body>
+    <div id="titleBar">
+        <div id="titre">zappli</div>
+        <button class="topBtn minimize" id="minimize" title="Minimize"></button>
+        <button class="topBtn maximize" id="maxRes" title="Maximize"></button>
+        <button class="topBtn close" id="close" title="Close"></button>
+    </div>
+    <div id="content">
+        <h1>FAQ</h1>
+        <p>All the answers about how the app works. Click a question to unfold the answer.</p>
+
+        <h2>Importing images or words</h2>
+
+        <details>
+            <summary>How do I load images or a list of words?</summary>
+            <p>Three options, from the welcome area:</p>
+            <ul>
+                <li><strong>Select a folder</strong>: every image in the folder (and its subfolders) is loaded.</li>
+                <li><strong>Select one or several files</strong>: to pick specific images or a spreadsheet of words.</li>
+                <li><strong>Drag and drop</strong> a folder, images or a spreadsheet straight onto the area.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>Which image formats are supported?</summary>
+            <p>.png, .jpg, .jpeg, .webp, .gif and .tiff. Any other file in the folder is simply ignored.</p>
+        </details>
+
+        <details>
+            <summary>Which word list formats are supported?</summary>
+            <p>.xlsx, .xls, .csv, .ods and .numbers.</p>
+        </details>
+
+        <details>
+            <summary>How should my spreadsheet be built?</summary>
+            <ul>
+                <li>One list per file: one word (or phrase) per row, in the first column of the first sheet.</li>
+                <li>Empty cells are ignored, so you don't need to delete blank rows.</li>
+                <li>If the file has several filled columns, the app considers it holds several lists and shows “There is more than a single list in this file”: split them into separate files.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>Can a folder contain both words and images?</summary>
+            <p>Yes. The app then asks whether you want to work with the words or the images, and keeps your choice for that area until the next import.</p>
+        </details>
+
+        <details>
+            <summary>The app says my folder has no images, but it does</summary>
+            <ul>
+                <li>Are your images in a standard format? (.png, .jpg, .jpeg, .webp, .gif, .tiff)</li>
+                <li>On Windows: if right-clicking the folder offers to extract it, it is an archive, not a folder. Extract the files before using them.</li>
+                <li>Are the files really downloaded on the computer? A OneDrive or iCloud “online-only” file has no path on the disk, and the app shows “These files have no path on the disk”. Right-click → “Always keep on this device”, or copy them into a local folder.</li>
+            </ul>
+        </details>
+
+        <h2>Drawing cards</h2>
+
+        <details>
+            <summary>How do I draw cards?</summary>
+            <p>Set the number of cards you want (1 to 24), then click <i class="fa-solid fa-circle-play"></i>. Each new click replaces the displayed cards with a new draw.</p>
+        </details>
+
+        <details>
+            <summary>What does the <i class="fa-solid fa-circle-plus"></i> button do?</summary>
+            <p>It adds one more card to the current draw without touching the cards already displayed. All cards are automatically resized so they stay inside the area.</p>
+        </details>
+
+        <details>
+            <summary>What is “Do not repeat cards” for?</summary>
+            <p>When ticked (the default), a card that has already come out will not come out again until the deck is used up — handy to go through a whole class. When unticked, every draw starts again from the full list.</p>
+        </details>
+
+        <details>
+            <summary>What happens when every card has been drawn?</summary>
+            <p>The app tells you, then automatically reloads the full deck (the same folder or list) and starts over. With the <i class="fa-solid fa-circle-plus"></i> button, the message “All the images are already displayed” simply means there is nothing left to add.</p>
+        </details>
+
+        <details>
+            <summary>“This folder only contains X image(s)!”</summary>
+            <p>You are asking for more cards than there are images (or words) available. Lower the number of cards or add files to the folder.</p>
+        </details>
+
+        <details>
+            <summary>What is the <i class="fa-solid fa-eraser"></i> eraser of an area for?</summary>
+            <p>It clears every card from the area without losing the imported folder: you can draw again straight away.</p>
+        </details>
+
+        <details>
+            <summary>How do I change folder without starting over?</summary>
+            <p>The <i class="fa-regular fa-folder-open"></i> button of the area goes back to the folder/file selection screen, for that area only.</p>
+        </details>
+
+        <h2>Working with several areas</h2>
+
+        <details>
+            <summary>How do I show several sets of cards side by side?</summary>
+            <p>The <i class="fa-regular fa-square-plus"></i> button adds an area (up to 5), the <i class="fa-regular fa-square-minus"></i> button removes that area. Each area has its own folder, its own number of cards and its own zoom.</p>
+        </details>
+
+        <details>
+            <summary>What does “Shuffle everything” do?</summary>
+            <p>It draws again in every area that has a folder loaded, all at once. Areas that are still empty stay on their welcome screen.</p>
+        </details>
+
+        <details>
+            <summary>Can I move a card from one area to another?</summary>
+            <p>No: a card moves freely inside its own area but cannot cross into the next one. If you add or remove an area, moved cards go back into the grid so that nothing overflows.</p>
+        </details>
+
+        <h2>Handling the cards</h2>
+
+        <details>
+            <summary>What are the buttons of the left menu for?</summary>
+            <ul>
+                <li><strong>Move a card</strong>: drag a card with the mouse to reposition it.</li>
+                <li><strong>Erase a card</strong>: a click removes the card from the display.</li>
+                <li><strong>Change a card</strong>: a click replaces the card with another one from the deck.</li>
+                <li><strong>Highlight a card</strong>: a click puts the card forward (yellow glow); a second click removes it.</li>
+                <li><strong>Number the cards</strong>: shows a number on each card; a second click removes them.</li>
+            </ul>
+            <p>These modes are exclusive: the active button decides what a click on a card does.</p>
+        </details>
+
+        <details>
+            <summary>What does “Go back” do?</summary>
+            <p>It restores the previous state of the display (draw, erased card, added card, move…). When there is nothing to undo, the app shows “No previous draw”.</p>
+        </details>
+
+        <details>
+            <summary>How do I make the cards bigger or smaller?</summary>
+            <p>The “Zoom cards” slider at the bottom of each area scales the cards from 20% to 200% without changing their number. The zoom in the <em>View</em> menu scales the whole interface instead.</p>
+        </details>
+
+        <h2>Customising the display</h2>
+
+        <details>
+            <summary>How do I set a background image?</summary>
+            <p>“Change background” opens the image picker; “Remove background” goes back to the original one. The background applies to the whole display area.</p>
+        </details>
+
+        <details>
+            <summary>How do I get more room for the cards?</summary>
+            <p>The button at the top left folds the side menu. You can also drag the border between the menu and the cards, and switch to full screen from the <em>View</em> menu.</p>
+        </details>
+
+        <details>
+            <summary>How do I change the language of the app?</summary>
+            <p><em>Action</em> menu → “Change display language” → Français or English. The app restarts and remembers your choice.</p>
+        </details>
+
+        <h2>Updates and problems</h2>
+
+        <details>
+            <summary>How do I know a new version is available?</summary>
+            <p>The app checks for updates on every start and offers to install them. The version number is shown in “About”.</p>
+        </details>
+
+        <details>
+            <summary>Nothing happens when I click</summary>
+            <p>Check that an action is selected in the left menu (move, erase, change, highlight) and that a folder is loaded in the area. If the problem remains, close and reopen the app: nothing saved is lost, only the current display is reset.</p>
+        </details>
+
+        <details>
+            <summary>My question is not here</summary>
+            <p>Write to us: this FAQ grows with your questions.</p>
+        </details>
+    </div>
+    <script>
+        window.jquery = window.$ = require('jquery');
+        global.jQuery = require('jquery')
+    </script>
+    <script src="../../node_modules/jquery-ui/dist/jquery-ui.min.js"></script>
+    <script src="faq.js"></script>
+
+</body>
+</html>

@@ -150,7 +150,12 @@ ipcMain.handle('getWords', async (evt, arg) => {
 // =============== ROUTES AIDE ===============
 
 ipcMain.on("help", (evt, arg) => {
-    faq = createWindow("views/FAQ/faq.html", winWidth = 600, winHeight = 400)
+    if (faq != null && !faq.isDestroyed()) { // une seule fenêtre d'aide : on remet au premier plan celle qui est déjà ouverte
+        if (faq.isMinimized()) { faq.restore() }
+        faq.focus()
+        return
+    }
+    faq = createWindow("views/FAQ/faq_" + showLanguage + ".html", winWidth = 600, winHeight = 500)
     faq.webContents.once('did-finish-load', () => {
         faq.send('OS', process.platform)
     })
