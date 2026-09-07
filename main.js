@@ -1,8 +1,9 @@
-const { app, BrowserWindow, ipcMain, Menu, dialog } = require("electron"), // import des modules d'electron
+const { app, BrowserWindow, ipcMain, Menu, dialog, shell } = require("electron"), // import des modules d'electron
     Store = require("electron-store"),
     store = new Store() // on crée la base de données qui collectera les infos pour les notifications
 const fs = require('fs')
 const path = require("path")
+const https = require("https")
 //const xlsx = require('node-xlsx');
 const XLSX = require('xlsx')
 //const { parse } = require("csv-parse");
@@ -138,10 +139,114 @@ app.whenReady().then(() => {
         mainWindow.send('mainDir', mainDir)
         mainWindow.send('OS', process.platform)
         mainWindow.send("storage", userStoragePath)
+        envoyerRessources()
     })
     log.info
     autoUpdater.checkForUpdatesAndNotify()
 })
+// =============== RESSOURCES COMPATIBLES (NOTIFICATIONS) ===============
+
+const urlRessources = "https://leszexpertsfle.com/zappli/zappli-ressources-fle/"
+
+function getNotifs() { // les préférences de notification vivent à part de localConfig, que setConfig() réécrit entièrement
+    var notifs = store.get("notifs")
+    if (notifs == undefined) { notifs = {} }
+    if (!Array.isArray(notifs["vues"])) { notifs["vues"] = [] }
+    if (!Array.isArray(notifs["cache"])) { notifs["cache"] = [] }
+    if (typeof notifs["desactive"] != "boolean") { notifs["desactive"] = false }
+    if (typeof notifs["dejaOuvert"] != "boolean") { notifs["dejaOuvert"] = false }
+    return notifs
+}
+
+function recupererPage(url, redirections = 3) { // petit GET maison pour ne pas ajouter de dépendance
+    return new Promise((resolve, reject) => {
+        var requete = https.get(url, { headers: { "User-Agent": "zappli/" + app.getVersion() } }, (reponse) => {
+            if (reponse.statusCode >= 300 && reponse.statusCode < 400 && reponse.headers.location && redirections > 0) {
+                reponse.resume()
+                return resolve(recupererPage(new URL(reponse.headers.location, url).href, redirections - 1))
+            }
+            if (reponse.statusCode != 200) {
+                reponse.resume()
+                return reject(new Error("statut " + reponse.statusCode))
+            }
+            var contenu = ""
+            reponse.setEncoding("utf-8")
+            reponse.on("data", (morceau) => { contenu += morceau })
+            reponse.on("end", () => resolve(contenu))
+        })
+        requete.setTimeout(15000, () => { requete.destroy(new Error("délai dépassé")) })
+        requete.on("error", reject)
+    })
+}
+
+function decoderHtml(texte) {
+    return texte
+        .replace(/&#(\d+);/g, (correspondance, code) => String.fromCharCode(parseInt(code, 10)))
+        .replace(/&#x([0-9a-f]+);/gi, (correspondance, code) => String.fromCharCode(parseInt(code, 16)))
+        .replace(/&nbsp;/g, " ")
+        .replace(/&quot;/g, '"')
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
+        .trim()
+}
+
+function extraireRessources(html) { // la page est une grille WooCommerce : un <li> par ressource
+    var ressources = []
+    for (let produit of html.match(/<li class="[^"]*\bproduct\b[^"]*"[^>]*>[\s\S]*?<\/li>/g) || []) {
+        var lien = produit.match(/<a href="([^"]+)"/)
+        var titre = produit.match(/<h2 class="woocommerce-loop-product__title">([\s\S]*?)<\/h2>/)
+        var image = produit.match(/<img[^>]+src="([^"]+)"/)
+        if (lien == null || titre == null) { continue }
+        ressources.push({
+            "url": decoderHtml(lien[1]),
+            "titre": decoderHtml(titre[1].replace(/<[^>]+>/g, "")),
+            "image": image == null ? "" : decoderHtml(image[1])
+        })
+    }
+    return ressources
+}
+
+async function envoyerRessources() {
+    var notifs = getNotifs()
+    var ressources = notifs["cache"]
+    try {
+        var trouvees = extraireRessources(await recupererPage(urlRessources))
+        if (trouvees.length > 0) {
+            ressources = trouvees
+            notifs["cache"] = trouvees
+            store.set("notifs", notifs)
+        }
+    } catch (erreur) {
+        log.warn("ressources compatibles non récupérées : " + erreur) // hors ligne : on retombe sur le dernier contenu connu
+    }
+    var nouveautes = notifs["dejaOuvert"]
+        ? ressources.filter((ressource) => !notifs["vues"].includes(ressource["url"]))
+        : ressources // tant que l'utilisateur n'a jamais ouvert le popup, tout est nouveau pour lui
+    if (mainWindow != null && !mainWindow.isDestroyed()) {
+        mainWindow.send("ressources", {
+            "url": urlRessources,
+            "ressources": ressources,
+            "nouveautes": nouveautes,
+            "dejaOuvert": notifs["dejaOuvert"],
+            "desactive": notifs["desactive"],
+            "exergue": !notifs["desactive"] && nouveautes.length > 0
+        })
+    }
+}
+
+ipcMain.on("ressourcesVues", (evt, arg) => { // l'utilisateur a ouvert le popup : plus rien n'est "nouveau" jusqu'à la prochaine publication
+    var notifs = getNotifs()
+    notifs["dejaOuvert"] = true
+    notifs["vues"] = notifs["cache"].map((ressource) => ressource["url"])
+    if (typeof arg == "boolean") { notifs["desactive"] = arg }
+    store.set("notifs", notifs)
+})
+
+ipcMain.on("ouvrirLien", (evt, arg) => {
+    if (typeof arg == "string" && arg.startsWith("https://")) { shell.openExternal(arg) }
+})
+
 // =============== ROUTE POUR RECUPERER LES MOTS ===============
 ipcMain.handle('getWords', async (evt, arg) => {
     //console.log(arg)

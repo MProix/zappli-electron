@@ -460,8 +460,62 @@ ipcRenderer.on("isRestored", () => { changeMaxResBtn(false) });
 $("#aide").on("click", () => {
     ipcRenderer.send("help")
 })
+var infosRessources = { "url": "", "ressources": [], "nouveautes": [], "dejaOuvert": false, "desactive": false, "exergue": false }
+
+ipcRenderer.on("ressources", (evt, arg) => { // envoyé par le main au démarrage, après lecture de la page des ressources compatibles
+    infosRessources = arg
+    $("#notifs").toggleClass("exergue", arg["exergue"] == true)
+    construireSurvolNotifs()
+})
+
+function ouvrirLien(url) {
+    ipcRenderer.send("ouvrirLien", url)
+}
+
+function carteRessource(ressource) { // titre + image cliquables vers la page produit
+    var carte = $('<div class="ressource"></div>')
+    if (ressource["image"] != "") {
+        carte.append($("<img>").attr("src", ressource["image"]).attr("alt", ressource["titre"]))
+    }
+    carte.append($("<span></span>").text(ressource["titre"]))
+    carte.on("click", () => { ouvrirLien(ressource["url"]) })
+    return carte
+}
+
+function construireSurvolNotifs() { // une fois le popup déjà ouvert une fois, les nouveautés se consultent au survol
+    $("#notifsSurvol").remove()
+    if (!infosRessources["dejaOuvert"] || infosRessources["nouveautes"].length == 0) { return }
+    var survol = $('<div id="notifsSurvol"></div>')
+    survol.append($("<p></p>").text(erreurs["notifsNouveautes"][langue]))
+    for (let ressource of infosRessources["nouveautes"].slice(0, 3)) {
+        survol.append(carteRessource(ressource))
+    }
+    $("#notifs").append(survol)
+}
+
 $("#notifs").on("click", () => {
-    alert(erreurs["notifsAVenir"][langue])
+    var contenu = $('<div id="popupRessources"></div>')
+    contenu.append($("<p></p>").text(erreurs["notifsIntro"][langue]))
+    var lien = $('<p class="lienRessources"></p>').text(erreurs["notifsToutesLesRessources"][langue])
+    lien.on("click", () => { ouvrirLien(infosRessources["url"]) })
+    contenu.append(lien)
+    contenu.append($("<h4></h4>").text(erreurs["notifsNouveautes"][langue]))
+    if (infosRessources["nouveautes"].length == 0) {
+        contenu.append($("<p></p>").text(erreurs["notifsAucune"][langue]))
+    } else {
+        for (let ressource of infosRessources["nouveautes"].slice(0, 3)) {
+            contenu.append(carteRessource(ressource))
+        }
+    }
+    var caseNotifs = $('<input type="checkbox" id="plusDeNotifs">')
+    contenu.append($('<label class="plusDeNotifs" for="plusDeNotifs"></label>').append(caseNotifs).append($("<span></span>").text(erreurs["notifsNePlusAvertir"][langue])))
+    swal({ "title": erreurs["notifsTitre"][langue], "content": contenu[0] }).then(() => {
+        ipcRenderer.send("ressourcesVues", caseNotifs.is(":checked")) // on retient ce qui a été vu pour ne signaler que les prochaines nouveautés
+        infosRessources["desactive"] = caseNotifs.is(":checked")
+        infosRessources["dejaOuvert"] = true
+        $("#notifs").removeClass("exergue")
+        construireSurvolNotifs()
+    })
 })
 // ============= Montrer quel bouton est sélectionné dans la barre du haut pour les actions au click ============= //
 $("#deplace, #efface, #change, #surligne").on("click", function () {
