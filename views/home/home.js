@@ -511,11 +511,14 @@ $("#notifs").on("click", () => {
     var lien = $('<p class="lienRessources"></p>').text(erreurs["notifsToutesLesRessources"][langue])
     lien.on("click", () => { ouvrirLien(infosRessources["url"]) })
     contenu.append(lien)
-    contenu.append($("<h4></h4>").text(erreurs["notifsNouveautes"][langue]))
-    if (infosRessources["nouveautes"].length == 0) {
+    var aMontrer = infosRessources["nouveautes"].length > 0 // faute de nouveauté, on montre le haut de la page des ressources
+        ? { "titre": erreurs["notifsNouveautes"][langue], "ressources": infosRessources["nouveautes"] }
+        : { "titre": erreurs["notifsALaUne"][langue], "ressources": infosRessources["ressources"] }
+    contenu.append($("<h4></h4>").text(aMontrer["titre"]))
+    if (aMontrer["ressources"].length == 0) {
         contenu.append($("<p></p>").text(erreurs["notifsAucune"][langue]))
     } else {
-        for (let ressource of infosRessources["nouveautes"].slice(0, 3)) {
+        for (let ressource of aMontrer["ressources"].slice(0, 3)) {
             contenu.append(carteRessource(ressource))
         }
     }

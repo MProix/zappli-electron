@@ -80,9 +80,13 @@
         "fr": "Voir toutes les ressources compatibles",
         "en": "See all the compatible resources"
     },
+    "notifsALaUne" : {
+        "fr": "À la une",
+        "en": "Featured"
+    },
     "notifsAucune" : {
-        "fr": "Aucune nouveauté pour le moment.",
-        "en": "Nothing new for now."
+        "fr": "Aucune ressource à afficher pour le moment.",
+        "en": "No resource to show for now."
     },
     "notifsNePlusAvertir" : {
         "fr": "Je préfère visiter le site pour trouver moi-même les nouvelles ressources, je préfère que la zappli ne m'avertisse pas des nouveautés",
