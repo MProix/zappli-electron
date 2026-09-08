@@ -401,6 +401,7 @@ function addOne(event) {
             alert(erreurs[data["erreur"]][langue])
         } else {
             var zoneAMontrer = "#affichageDesCartes" + quelleZone
+            var modele = $(zoneAMontrer).children(".image").last() // la nouvelle carte reprend le gabarit courant : les cartes déjà posées ne bougent pas
             if (data[1] == "images") {
                 $(zoneAMontrer).append('<div class="image"><div class="cardContainer"><img class="img" src="' + data[0] + '" onmousedown="clickOnImage(event)"></div></div>')
             } else {
@@ -410,7 +411,19 @@ function addOne(event) {
             if (draggableActive == true) {
                 rendreDeplacable(nouvelleCarte.children(".cardContainer"))
             }
-            remesurerZone(zoneAMontrer).then(() => { // la carte ajoutée entre dans le flux : toutes les cartes de la zone sont redimensionnées
+            if (modele.length == 0) { // zone vide : aucun gabarit à reprendre, on mesure comme un tirage
+                remesurerZone(zoneAMontrer).then(() => {
+                    nouvelleCarte.find(".img").css("opacity", 1)
+                    actualisePile(pile)
+                })
+                return
+            }
+            nouvelleCarte.css({ "width": modele.css("width"), "height": modele.css("height") })
+            attendreImages(zoneAMontrer).then(() => { // seule la carte ajoutée est mesurée : les autres gardent leur taille et leur place
+                poserTaillesEtPlaces(nouvelleCarte.find(".img")[0])
+                if ($("#vol" + quelleZone).length > 0) {
+                    zommOnCards($("#vol" + quelleZone)[0])
+                }
                 nouvelleCarte.find(".img").css("opacity", 1)
                 actualisePile(pile)
             })
