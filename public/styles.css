@@ -597,6 +597,10 @@ body {
     height: 85%;
 }
 
+.affichageDesCartes {
+    position: relative;
+}
+
 .nbDiv1 .affichageMessage>p {
     width: 50%
 }
@@ -651,6 +655,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.image.carteAjoutee {
+    position: absolute;
+    right: 0;
+    bottom: 0;
 }
 
 .image p { 
