@@ -420,6 +420,7 @@ function addOne(event) {
             }
             // hors du flux, dans le coin bas-droite : la grille existante n'est pas redistribuée, quitte à recouvrir une carte
             nouvelleCarte.addClass("carteAjoutee").css({ "width": modele.css("width"), "height": modele.css("height") })
+            nouvelleCarte.find("img").css({ "maxHeight": "100%", "maxWidth": "100%" }) // imgSize() n'a pas vu cette image : sans bornes elle s'affiche à sa taille naturelle
             attendreImages(zoneAMontrer).then(() => { // seule la carte ajoutée est mesurée : les autres gardent leur taille et leur place
                 poserTaillesEtPlaces(nouvelleCarte.find(".img")[0])
                 if ($("#vol" + quelleZone).length > 0) {
