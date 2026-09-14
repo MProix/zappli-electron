@@ -418,7 +418,8 @@ function addOne(event) {
                 })
                 return
             }
-            nouvelleCarte.css({ "width": modele.css("width"), "height": modele.css("height") })
+            // hors du flux, dans le coin bas-droite : la grille existante n'est pas redistribuée, quitte à recouvrir une carte
+            nouvelleCarte.addClass("carteAjoutee").css({ "width": modele.css("width"), "height": modele.css("height") })
             attendreImages(zoneAMontrer).then(() => { // seule la carte ajoutée est mesurée : les autres gardent leur taille et leur place
                 poserTaillesEtPlaces(nouvelleCarte.find(".img")[0])
                 if ($("#vol" + quelleZone).length > 0) {
